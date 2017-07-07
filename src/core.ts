@@ -1,5 +1,5 @@
 class Circuit {
-	private devices: Set<Device>;
+	public devices: Set<Device>;
 	private shouldUpdates: Set<Device>;
 
 	constructor(devices: Set<Device>) {

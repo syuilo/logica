@@ -3,7 +3,7 @@ import のーど from '../../node';
 /**
  * ANDゲート
  */
-class And extends のーど {
+export default class And extends のーど {
 	numberOfInputs = 2;
 
 	update() {

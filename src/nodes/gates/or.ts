@@ -3,7 +3,7 @@ import のーど from '../../node';
 /**
  * ORゲート
  */
-class Or extends のーど {
+export default class Or extends のーど {
 	numberOfInputs = 2;
 
 	update() {

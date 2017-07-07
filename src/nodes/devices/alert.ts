@@ -3,7 +3,7 @@ import のーど from '../../node';
 /**
  * Alertデバイス
  */
-class Alert extends のーど {
+export default class Alert extends のーど {
 	numberOfInputs = 0;
 
 	public msg: string;

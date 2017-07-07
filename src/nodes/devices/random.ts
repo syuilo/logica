@@ -1,6 +1,6 @@
 import のーど from '../../node';
 
-class Rnd extends のーど {
+export default class Rnd extends のーど {
 	numberOfInputs = 0;
 
 	update() {

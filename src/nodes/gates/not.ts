@@ -3,7 +3,7 @@ import のーど from '../../node';
 /**
  * NOTゲート
  */
-class Not extends のーど {
+export default class Not extends のーど {
 	numberOfInputs = 1;
 
 	update() {

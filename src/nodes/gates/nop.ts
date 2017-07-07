@@ -1,6 +1,6 @@
 import のーど from '../../node';
 
-class Nop extends のーど {
+export default class Nop extends のーど {
 	numberOfInputs = 1;
 
 	update() {

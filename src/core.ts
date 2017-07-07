@@ -1,6 +1,6 @@
 import のーど from './node';
 
-class Circuit {
+export default class Circuit {
 	public nodes: Set<のーど>;
 	private shouldUpdates: Set<のーど>;
 

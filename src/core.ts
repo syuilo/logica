@@ -1,35 +1,37 @@
 class Circuit {
-	public devices: Set<Device>;
-	private shouldUpdates: Set<Device>;
+	public nodes: Set<Node>;
+	private shouldUpdates: Set<Node>;
 
-	constructor(devices: Set<Device>) {
-		this.devices = devices;
-		this.shouldUpdates = devices;
+	constructor(nodes: Set<Node>) {
+		this.nodes = nodes;
+		this.shouldUpdates = nodes;
 		this.tick();
 	}
 
 	public tick() {
-		this.shouldUpdates.forEach(d => {
-			if (!d.update()) this.shouldUpdates.delete(d);
-			d.outputs.forEach(d => this.shouldUpdates.add(d));
+		this.shouldUpdates.forEach(node => {
+			if (!node.update()) this.shouldUpdates.delete(node);
+			node.outputs.forEach(node => this.shouldUpdates.add(node));
 		});
 	}
 
-	public addDevice(device: Device) {
-		this.devices.add(device);
-		this.shouldUpdates.add(device);
+	public addNode(node: Node) {
+		this.nodes.add(node);
+		this.shouldUpdates.add(node);
 	}
 }
 
-abstract class Device {
-	numberOfInputs: number;
-	inputs: Device[];
-	outputs: Device[];
-	state: boolean;
-	get isOn() {
+abstract class Node {
+	public numberOfInputs: number;
+	public inputs: Node[];
+	public outputs: Node[];
+	public state: boolean;
+
+	public get isOn() {
 		return this.state;
 	}
-	get isOff() {
+
+	public get isOff() {
 		return !this.state;
 	}
 
@@ -39,7 +41,7 @@ abstract class Device {
 	public update: () => void | boolean;
 }
 
-class And extends Device {
+class And extends Node {
 	numberOfInputs = 2;
 
 	update() {
@@ -47,7 +49,7 @@ class And extends Device {
 	}
 }
 
-class Nop extends Device {
+class Nop extends Node {
 	numberOfInputs = 1;
 
 	update() {
@@ -55,7 +57,7 @@ class Nop extends Device {
 	}
 }
 
-class Rnd extends Device {
+class Rnd extends Node {
 	numberOfInputs = 0;
 
 	update() {
@@ -64,7 +66,7 @@ class Rnd extends Device {
 	}
 }
 
-class Button extends Device {
+class Button extends Node {
 	numberOfInputs = 0;
 
 }

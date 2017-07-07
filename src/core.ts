@@ -41,11 +41,36 @@ abstract class Node {
 	public update: () => void | boolean;
 }
 
+/**
+ * ANDゲート
+ */
 class And extends Node {
 	numberOfInputs = 2;
 
 	update() {
 		this.state = this.inputs[0].isOn && this.inputs[1].isOn;
+	}
+}
+
+/**
+ * ORゲート
+ */
+class Or extends Node {
+	numberOfInputs = 2;
+
+	update() {
+		this.state = this.inputs[0].isOn || this.inputs[1].isOn;
+	}
+}
+
+/**
+ * NOTゲート
+ */
+class Not extends Node {
+	numberOfInputs = 1;
+
+	update() {
+		this.state = !this.inputs[0].state;
 	}
 }
 
@@ -63,6 +88,19 @@ class Rnd extends Node {
 	update() {
 		this.state = Math.random() > 0.5;
 		return true;
+	}
+}
+
+/**
+ * Alertデバイス
+ */
+class Alert extends Node {
+	numberOfInputs = 0;
+
+	public msg: string;
+
+	update() {
+		if (this.inputs[0].isOn) alert(this.msg);
 	}
 }
 

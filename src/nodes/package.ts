@@ -39,15 +39,6 @@ export default class Package extends のーど {
 			}));
 	}
 
-	public getState(id: string) {
-		const node = Array.from(this.nodes)
-			.find(n => n.outputs.find(c => c.node.type === 'PackageOutput' && (c.node as PackageOutput).outputId === id) != null);
-
-		const connection = node.outputs.find(c => (c.node as PackageOutput).outputId === id);
-
-		return node.getState(connection.from);
-	}
-
 	update() {
 		throw 'Do not call this method because this node is virtual (at Package)';
 	}

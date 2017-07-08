@@ -16,6 +16,9 @@ export default class Circuit {
 
 	constructor(nodes: のーど[]) {
 		this.nodes = new Set(nodes);
+		this.nodes.forEach(n => n.requestUpdateAtNextTick = () => {
+			this.shouldUpdates.add(n);
+		});
 		this.shouldUpdates = new Set(Array.from(this.nodes).filter(n => n.isForceUpdate));
 	}
 

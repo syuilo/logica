@@ -76,6 +76,8 @@ export default abstract class のーど {
 	 */
 	public isForceUpdate: boolean = false;
 
+	public requestUpdateAtNextTick: () => void = () => {};
+
 	protected states: { [id: string]: boolean } = {};
 
 	/**

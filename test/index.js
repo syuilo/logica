@@ -242,6 +242,25 @@ it('Full adder', () => {
 		assert.equal(s.states.x, true);
 		assert.equal(c.states.x, false);
 	}
+
+	{
+		a.on();
+		b.on();
+		x.on();
+
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+
+		assert.equal(s.states.x, true);
+		assert.equal(c.states.x, true);
+	}
 });
-
-

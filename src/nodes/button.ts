@@ -21,13 +21,16 @@ export default class Button extends のーど {
 
 	public click() {
 		this.states['x'] = !this.states['x'];
+		this.requestUpdateAtNextTick();
 	}
 
 	public on() {
 		this.states['x'] = true;
+		this.requestUpdateAtNextTick();
 	}
 
 	public off() {
 		this.states['x'] = false;
+		this.requestUpdateAtNextTick();
 	}
 }

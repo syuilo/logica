@@ -1,4 +1,5 @@
 import のーど from './node';
+import Package from './nodes/package';
 
 export default class Circuit {
 	public nodes: Set<のーど>;
@@ -13,7 +14,14 @@ export default class Circuit {
 	public tick() {
 		this.shouldUpdates.forEach(node => {
 			if (!node.update()) this.shouldUpdates.delete(node);
-			node.outputs.forEach(node => this.shouldUpdates.add(node));
+			node.outputs.forEach(connection => {
+				const node = connection.node;
+				if (node.isPackage) {
+					this.shouldUpdates.add((node as Package).nodes.filter(n => (n as のーど).inputs.map(c => c.node).find(n => n.isPackageInput && n.inputId === connection.to)));
+				} else {
+					this.shouldUpdates.add(node);
+				}
+			});
 		});
 	}
 

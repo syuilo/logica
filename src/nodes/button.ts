@@ -17,9 +17,7 @@ export default class Button extends のーど {
 
 	isForceUpdate = true;
 
-	update() {
-		return true;
-	}
+	update() {}
 
 	public click() {
 		this.states['x'] = !this.states['x'];

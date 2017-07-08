@@ -86,9 +86,9 @@ export default abstract class のーど {
 	};
 
 	/**
-	 * true を返すと次回(next tick)も更新されます
+	 * 入力が変化したときに呼ばれます
 	 */
-	public abstract update(): void | boolean;
+	public abstract update(): void;
 
 	protected getInput(id: string) {
 		return this.getActualPreviousNodeState(id);

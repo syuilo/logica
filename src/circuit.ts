@@ -37,7 +37,8 @@ export default class Circuit {
 		}).join('\n'));
 
 		new Set(this.shouldUpdates).forEach(node => {
-			if (!node.update()) this.shouldUpdates.delete(node);
+			node.update();
+			this.shouldUpdates.delete(node);
 
 			node.outputInfo.forEach(o => {
 				if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;

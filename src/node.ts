@@ -8,12 +8,12 @@ export default abstract class のーど {
 	/**
 	 * Name of this node
 	 */
-	name: string;
+	public name: string;
 
 	/**
 	 * Description of this node
 	 */
-	desc: string;
+	public desc: string;
 
 	public inputs: connection[] = [];
 

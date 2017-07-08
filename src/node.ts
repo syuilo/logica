@@ -15,11 +15,11 @@ export default abstract class のーど {
 	 */
 	desc: string;
 
-	public inputs: connection[];
-	public outputs: connection[];
+	public inputs: connection[] = [];
+	public outputs: connection[] = [];
 	public inputInfo: any;
 	public outputInfo: any;
-	public states: { [id: string]: boolean };
+	public states: { [id: string]: boolean } = {};
 
 	/**
 	 * true を返すと次回(next tick)も更新されます

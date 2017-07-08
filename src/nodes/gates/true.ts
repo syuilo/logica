@@ -16,7 +16,10 @@ export default class True extends のーど {
 		}
 	};
 
-	update() {
+	constructor() {
+		super();
 		this.states['x'] = true;
 	}
+
+	update() {}
 }

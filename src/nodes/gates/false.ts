@@ -16,7 +16,10 @@ export default class False extends のーど {
 		}
 	};
 
-	update() {
+	constructor() {
+		super();
 		this.states['x'] = false;
 	}
+
+	update() {}
 }

@@ -5,10 +5,10 @@ export default class Circuit {
 	public nodes: Set<のーど>;
 	private shouldUpdates: Set<のーど>;
 
-	constructor(nodes: Set<のーど>) {
-		this.nodes = nodes;
-		this.shouldUpdates = nodes;
-		this.tick();
+	constructor(nodes: のーど[]) {
+		this.nodes = new Set(nodes);
+		this.shouldUpdates = new Set(nodes);
+		//this.tick();
 	}
 
 	public tick() {

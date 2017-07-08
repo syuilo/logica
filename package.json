@@ -1,0 +1,19 @@
+{
+  "name": "logica",
+  "version": "0.0.0",
+  "description": "Logic circuit simuldator",
+  "author": "syuilo",
+  "license": "MIT",
+  "repository": "https://github.com/syuilo/logica.git",
+  "bugs": "https://github.com/syuilo/logica/issues",
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha --harmony"
+  },
+  "devDependencies": {
+    "@types/mocha": "2.2.41",
+    "@types/node": "8.0.9",
+    "mocha": "3.4.2",
+    "typescript": "2.4.1"
+  }
+}

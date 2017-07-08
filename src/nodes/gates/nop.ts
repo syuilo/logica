@@ -1,9 +1,24 @@
 import のーど from '../../node';
 
 export default class Nop extends のーど {
-	numberOfInputs = 1;
+	name = 'Nop';
+	desc = 'No operation. This gate will nothing to do.';
+
+	inputInfo = {
+		x: {
+			name: 'X',
+			desc: 'Input X'
+		}
+	};
+
+	outputInfo = {
+		x: {
+			name: 'X',
+			desc: 'Input X'
+		}
+	};
 
 	update() {
-		this.state = this.inputs[0].state;
+		this.states['x'] = this.getInput('x');
 	}
 }

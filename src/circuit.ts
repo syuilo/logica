@@ -1,5 +1,5 @@
 import のーど from './node';
-import Package from './nodes/package';
+//import Package from './nodes/package';
 
 export default class Circuit {
 	public nodes: Set<のーど>;
@@ -16,11 +16,11 @@ export default class Circuit {
 			if (!node.update()) this.shouldUpdates.delete(node);
 			node.outputs.forEach(connection => {
 				const node = connection.node;
-				if (node.isPackage) {
+				/*if (node.name === 'Package') {
 					this.shouldUpdates.add((node as Package).nodes.filter(n => (n as のーど).inputs.map(c => c.node).find(n => n.isPackageInput && n.inputId === connection.to)));
-				} else {
+				} else {*/
 					this.shouldUpdates.add(node);
-				}
+				/*}*/
 			});
 		});
 	}

@@ -4,9 +4,24 @@ import のーど from '../../node';
  * NOTゲート
  */
 export default class Not extends のーど {
-	numberOfInputs = 1;
+	name = 'Not';
+	desc = 'Not gate';
+
+	inputInfo = {
+		x: {
+			name: 'X',
+			desc: 'Input'
+		}
+	};
+
+	outputInfo = {
+		x: {
+			name: 'X',
+			desc: 'Inverted X'
+		}
+	};
 
 	update() {
-		this.state = !this.inputs[0].state;
+		this.states['x'] = !this.getInput('x');
 	}
 }

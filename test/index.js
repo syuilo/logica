@@ -45,7 +45,7 @@ const c = new Nop();
 and1.connectTo(c);
 and2.connectTo(s);
 
-const circuit = new Circuit([or, and1, and2, not, a, b]);
+const circuit = new Circuit([or, and1, and2, not, a, b, s, c]);
 
 console.log('S: ' + s.states.x);
 console.log('C: ' + c.states.x);

@@ -4,7 +4,7 @@ import のーど from '../../node';
  * FALSE
  */
 export default class False extends のーど {
-	name = 'False';
+	type = 'False';
 	desc = 'Always LOW';
 
 	inputInfo = null;

@@ -32,10 +32,10 @@ function createHalfAdder() {
 	//////////////////////////////////////////////////////////////
 	// 半加算器本体構築
 
-	const or = new Or();
-	const and1 = new And();
-	const and2 = new And();
-	const not = new Not();
+	const or = new Or(); or.name = '半加算器の中のor';
+	const and1 = new And(); and1.name = '半加算器の中のand1';
+	const and2 = new And(); and2.name = '半加算器の中のand2';
+	const not = new Not(); not.name = '半加算器の中のnot';
 
 	or.connectTo(and2);
 	and1.connectTo(not);
@@ -69,8 +69,8 @@ function createHalfAdder() {
 //it('Half adder', () => {
 	const halfAdder = createHalfAdder();
 
-	const a = new False();
-	const b = new True();
+	const a = new True();
+	const b = new False();
 
 	a.connectTo(halfAdder, 'a');
 	b.connectTo(halfAdder, 'b');
@@ -82,6 +82,11 @@ function createHalfAdder() {
 	halfAdder.connectTo(c, 'x', 'c');
 
 	const circuit = new Circuit([halfAdder, a, b, s, c]);
+
+	console.log('S: ' + s.states.x);
+	console.log('C: ' + c.states.x);
+
+	circuit.tick();
 
 	console.log('S: ' + s.states.x);
 	console.log('C: ' + c.states.x);

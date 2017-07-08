@@ -4,7 +4,7 @@ import のーど from '../../node';
  * TRUE
  */
 export default class True extends のーど {
-	name = 'True';
+	type = 'True';
 	desc = 'Always HIGH';
 
 	inputInfo = null;

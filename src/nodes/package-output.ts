@@ -3,7 +3,7 @@ import Package from './package';
 
 
 export default class PackageOutput extends のーど {
-	name = 'PackageOutput';
+	type = 'PackageOutput';
 	desc = 'output of a package パッケージ外部へ出力するためのインターフェースです';
 
 	inputInfo = [{

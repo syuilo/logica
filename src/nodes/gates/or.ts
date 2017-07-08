@@ -4,7 +4,7 @@ import のーど from '../../node';
  * ORゲート
  */
 export default class Or extends のーど {
-	name = 'Or';
+	type = 'Or';
 	desc = 'Or gate';
 
 	isInputCommutative = true;

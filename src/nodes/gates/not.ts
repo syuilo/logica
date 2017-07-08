@@ -4,7 +4,7 @@ import のーど from '../../node';
  * NOTゲート
  */
 export default class Not extends のーど {
-	name = 'Not';
+	type = 'Not';
 	desc = 'Not gate';
 
 	inputInfo = [{

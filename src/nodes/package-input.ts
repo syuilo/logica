@@ -1,7 +1,8 @@
 import のーど from '../node';
+import Package from './package';
 
 export default class PackageInput extends のーど {
-	name = 'PackageInput';
+	type = 'PackageInput';
 	desc = 'input of a package パッケージ外部からの入力を受け付けるインターフェースです';
 
 	inputInfo = null;
@@ -16,9 +17,17 @@ export default class PackageInput extends のーど {
 	public inputName: string;
 	public inputDesc: string;
 
+	public parent: Package;
+
 	constructor(id: string) {
 		super();
 		this.inputId = id;
+	}
+
+	public getState(id: string) {
+		return this.parent.inputs
+			.find(c => c.from === id)
+			.node.getState(id);
 	}
 
 	update() {

@@ -6,7 +6,12 @@ export type connection = {
 
 export default abstract class のーど {
 	/**
-	 * Name of this node
+	 * Type of this node
+	 */
+	public type: string;
+
+	/**
+	 * Name of this node (for debugging)
 	 */
 	public name: string;
 

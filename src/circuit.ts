@@ -10,7 +10,7 @@ export default class Circuit {
 	constructor(nodes: のーど[]) {
 		this.nodes = new Set(nodes);
 		this.shouldUpdates = new Set(nodes.filter(n => n.isInitializeRequired));
-		//this.tick();
+		this.tick();
 	}
 
 	public tick() {
@@ -18,12 +18,12 @@ export default class Circuit {
 			if (!node.update()) this.shouldUpdates.delete(node);
 			node.outputs.forEach(connection => {
 				const node = connection.node;
-				switch (node.name) {
+				switch (node.type) {
 					case 'Package':
 						const actualNodes = Array.from((node as Package).nodes)
 							.filter(n => n.inputs
 								.map(c => c.node)
-								.find(n => n.name === 'PackageInput' && (n as PackageInput).inputId === connection.to))
+								.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === connection.to))
 						actualNodes.forEach(n => this.shouldUpdates.add(n));
 						break;
 					case 'PackageOutput':
@@ -38,6 +38,13 @@ export default class Circuit {
 				}
 			});
 		});
+/*
+		console.log('======================');
+		console.log(Array.from(this.nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));
+		console.log('---');
+		console.log(Array.from((this.nodes.values().next().value as any).nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));
+		console.log('======================');
+		*/
 	}
 
 	public addNode(node: のーど) {

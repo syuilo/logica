@@ -4,7 +4,7 @@ import のーど from '../../node';
  * ANDゲート
  */
 export default class And extends のーど {
-	name = 'And';
+	type = 'And';
 	desc = 'And gate';
 
 	isInputCommutative = true;

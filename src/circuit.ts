@@ -12,7 +12,7 @@ export default class Circuit {
 	}
 
 	public tick() {
-		this.shouldUpdates.forEach(node => {
+		new Set(this.shouldUpdates).forEach(node => {
 			if (!node.update()) this.shouldUpdates.delete(node);
 			node.outputs.forEach(connection => {
 				const node = connection.node;

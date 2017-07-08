@@ -27,28 +27,41 @@ const and1 = new And();
 const and2 = new And();
 const not = new Not();
 
-or.connectTo('a_or_b', and2, 'a');
-and1.connectTo('a_and_b', not, 'x');
-not.connectTo('x', and2, 'b');
+or.connectTo(and2, 'a');
+and1.connectTo(not);
+not.connectTo(and2, 'b');
 
-const a = new True();
-const b = new False();
+const a = new False();
+const b = new True();
 
-a.connectTo('x', or, 'a');
-a.connectTo('x', and1, 'a');
-b.connectTo('x', or, 'b');
-b.connectTo('x', and1, 'b');
+a.connectTo(or, 'a');
+a.connectTo(and1, 'a');
+b.connectTo(or, 'b');
+b.connectTo(and1, 'b');
 
 const s = new Nop();
 const c = new Nop();
 
-and1.connectTo('a_and_b', c, 'x');
-and2.connectTo('a_and_b', s, 'x');
+and1.connectTo(c);
+and2.connectTo(s);
 
 const circuit = new Circuit([or, and1, and2, not, a, b]);
 
-setInterval(() => {
-	circuit.tick();
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
-}, 3000);
+console.log('S: ' + s.states.x);
+console.log('C: ' + c.states.x);
+
+circuit.tick();
+
+console.log('S: ' + s.states.x);
+console.log('C: ' + c.states.x);
+
+circuit.tick();
+
+console.log('S: ' + s.states.x);
+console.log('C: ' + c.states.x);
+
+circuit.tick();
+
+console.log('S: ' + s.states.x);
+console.log('C: ' + c.states.x);
+

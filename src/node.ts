@@ -16,9 +16,21 @@ export default abstract class のーど {
 	desc: string;
 
 	public inputs: connection[] = [];
+
 	public outputs: connection[] = [];
-	public inputInfo: any;
-	public outputInfo: any;
+
+	public inputInfo: {
+		id: string;
+		name: string;
+		desc: string;
+	}[];
+
+	public outputInfo: {
+		id: string;
+		name: string;
+		desc: string;
+	}[];
+
 	public states: { [id: string]: boolean } = {};
 
 	/**
@@ -31,8 +43,31 @@ export default abstract class のーど {
 		return connection.node.states[connection.from];
 	}
 
-	// TODO: 入力が一つしかないノードに接続する場合はIDを省略できるようにする
-	public connectTo(myOutputId: string, target: のーど, targetInputId: string) {
+	public connectTo(target: のーど, targetInputId?: string, myOutputId?: string) {
+		if (target.inputInfo == null || target.inputInfo.length === 0) {
+			throw 'ターゲット ノードは入力ポートを持たないので接続できません';
+		}
+
+		if (this.outputInfo == null || this.outputInfo.length === 0) {
+			throw 'このノードは出力ポートを持たないので接続できません';
+		}
+
+		if (targetInputId == null) {
+			if (target.inputInfo.length === 1) {
+				targetInputId = target.inputInfo[0].id;
+			} else {
+				throw 'ターゲット ノードの入力ポートが複数あるので、入力ポートIDを省略することはできません';
+			}
+		}
+
+		if (myOutputId == null) {
+			if (this.outputInfo.length === 1) {
+				myOutputId = this.outputInfo[0].id;
+			} else {
+				throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+			}
+		}
+
 		this.outputs.push({
 			node: target,
 			from: myOutputId,

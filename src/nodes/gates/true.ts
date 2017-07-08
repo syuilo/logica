@@ -9,12 +9,11 @@ export default class True extends のーど {
 
 	inputInfo = null;
 
-	outputInfo = {
-		x: {
-			name: 'High',
-			desc: 'Always HIGH'
-		}
-	};
+	outputInfo = [{
+		id: 'x',
+		name: 'High',
+		desc: 'Always HIGH'
+	}];
 
 	constructor() {
 		super();

@@ -4,19 +4,17 @@ export default class Nop extends のーど {
 	name = 'Nop';
 	desc = 'No operation. This gate will nothing to do.';
 
-	inputInfo = {
-		x: {
-			name: 'X',
-			desc: 'Input X'
-		}
-	};
+	inputInfo = [{
+		id: 'x',
+		name: 'X',
+		desc: 'Input'
+	}];
 
-	outputInfo = {
-		x: {
-			name: 'X',
-			desc: 'Input X'
-		}
-	};
+	outputInfo = [{
+		id: 'x',
+		name: 'X',
+		desc: 'Input'
+	}];
 
 	update() {
 		this.states['x'] = this.getInput('x');

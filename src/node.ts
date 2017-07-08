@@ -36,6 +36,11 @@ export default abstract class のーど {
 	 */
 	public isInputCommutative: boolean = false;
 
+	/**
+	 * 回路初期時に信号発生の起点となるか否かを表します
+	 */
+	public isInitializeRequired: boolean = false;
+
 	public states: { [id: string]: boolean } = {};
 
 	/**

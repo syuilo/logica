@@ -15,6 +15,8 @@ export default class True extends のーど {
 		desc: 'Always HIGH'
 	}];
 
+	isInitializeRequired = true;
+
 	constructor() {
 		super();
 		this.states['x'] = true;

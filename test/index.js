@@ -1,3 +1,5 @@
+const assert = require('assert');
+
 /*
 import Circuit from '../built/circuit';
 
@@ -13,6 +15,10 @@ import Nop from '../built/nodes/gates/nop';
 
 const Circuit = require('../built/circuit').default;
 
+const Package = require('../built/nodes/package').default;
+const PackageInput = require('../built/nodes/package-input').default;
+const PackageOutput = require('../built/nodes/package-output').default;
+
 const And = require('../built/nodes/gates/and').default;
 const Or = require('../built/nodes/gates/or').default;
 const Not = require('../built/nodes/gates/not').default;
@@ -22,46 +28,79 @@ const False = require('../built/nodes/gates/false').default;
 
 const Nop = require('../built/nodes/gates/nop').default;
 
-const or = new Or();
-const and1 = new And();
-const and2 = new And();
-const not = new Not();
+function createHalfAdder() {
+	//////////////////////////////////////////////////////////////
+	// 半加算器本体構築
 
-or.connectTo(and2);
-and1.connectTo(not);
-not.connectTo(and2);
+	const or = new Or();
+	const and1 = new And();
+	const and2 = new And();
+	const not = new Not();
 
-const a = new False();
-const b = new True();
+	or.connectTo(and2);
+	and1.connectTo(not);
+	not.connectTo(and2);
 
-a.connectTo(or);
-a.connectTo(and1);
-b.connectTo(or);
-b.connectTo(and1);
+	//////////////////////////////////////////////////////////////
+	// パッケージのインターフェース接続
 
-const s = new Nop();
-const c = new Nop();
+	const a = new PackageInput('a');
+	const b = new PackageInput('b');
 
-and1.connectTo(c);
-and2.connectTo(s);
+	a.connectTo(or);
+	a.connectTo(and1);
+	b.connectTo(or);
+	b.connectTo(and1);
 
-const circuit = new Circuit([or, and1, and2, not, a, b, s, c]);
+	const s = new PackageOutput('s');
+	const c = new PackageOutput('c');
 
-console.log('S: ' + s.states.x);
-console.log('C: ' + c.states.x);
+	and1.connectTo(c);
+	and2.connectTo(s);
 
-circuit.tick();
+	//////////////////////////////////////////////////////////////
+	// パッケージ作成
 
-console.log('S: ' + s.states.x);
-console.log('C: ' + c.states.x);
+	const package = new Package(new Set([or, and1, and2, not, a, b, s, c]));
 
-circuit.tick();
+	return package;
+}
 
-console.log('S: ' + s.states.x);
-console.log('C: ' + c.states.x);
+//it('Half adder', () => {
+	const halfAdder = createHalfAdder();
 
-circuit.tick();
+	const a = new False();
+	const b = new True();
 
-console.log('S: ' + s.states.x);
-console.log('C: ' + c.states.x);
+	a.connectTo(halfAdder, 'a');
+	b.connectTo(halfAdder, 'b');
+
+	const s = new Nop();
+	const c = new Nop();
+
+	halfAdder.connectTo(s, 'x', 's');
+	halfAdder.connectTo(c, 'x', 'c');
+
+	const circuit = new Circuit([halfAdder, a, b, s, c]);
+
+	console.log('S: ' + s.states.x);
+	console.log('C: ' + c.states.x);
+
+	circuit.tick();
+
+	console.log('S: ' + s.states.x);
+	console.log('C: ' + c.states.x);
+
+	circuit.tick();
+
+	console.log('S: ' + s.states.x);
+	console.log('C: ' + c.states.x);
+
+	circuit.tick();
+
+	console.log('S: ' + s.states.x);
+	console.log('C: ' + c.states.x);
+
+	//assert.equal();
+//});
 

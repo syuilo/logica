@@ -7,6 +7,8 @@ export default class And extends のーど {
 	name = 'And';
 	desc = 'And gate';
 
+	isInputCommutative = true;
+
 	inputInfo = [{
 		id: 'a',
 		name: 'A',

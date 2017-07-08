@@ -31,6 +31,11 @@ export default abstract class のーど {
 		desc: string;
 	}[];
 
+	/**
+	 * 入力が交換法則を満たすか否かを表します
+	 */
+	public isInputCommutative: boolean = false;
+
 	public states: { [id: string]: boolean } = {};
 
 	/**
@@ -55,8 +60,15 @@ export default abstract class のーど {
 		if (targetInputId == null) {
 			if (target.inputInfo.length === 1) {
 				targetInputId = target.inputInfo[0].id;
+			} else if (target.isInputCommutative) {
+				const availablePort = target.inputInfo.find(i => target.inputs.filter(j => j.to === i.id).length === 0);
+				if (availablePort != null) {
+					targetInputId = availablePort.id;
+				} else {
+					throw 'ターゲット ノードの入力ポートはすべて既に接続されていて、空きがないため接続できません';
+				}
 			} else {
-				throw 'ターゲット ノードの入力ポートが複数あるので、入力ポートIDを省略することはできません';
+				throw 'ターゲット ノードの入力ポートが複数ある(かつ交換法則を満たさない)ので、入力ポートIDを省略することはできません';
 			}
 		}
 

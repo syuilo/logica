@@ -7,6 +7,8 @@ export default class Or extends のーど {
 	name = 'Or';
 	desc = 'Or gate';
 
+	isInputCommutative = true;
+
 	inputInfo = [{
 		id: 'a',
 		name: 'A',

@@ -27,17 +27,17 @@ const and1 = new And();
 const and2 = new And();
 const not = new Not();
 
-or.connectTo(and2, 'a');
+or.connectTo(and2);
 and1.connectTo(not);
-not.connectTo(and2, 'b');
+not.connectTo(and2);
 
 const a = new False();
 const b = new True();
 
-a.connectTo(or, 'a');
-a.connectTo(and1, 'a');
-b.connectTo(or, 'b');
-b.connectTo(and1, 'b');
+a.connectTo(or);
+a.connectTo(and1);
+b.connectTo(or);
+b.connectTo(and1);
 
 const s = new Nop();
 const c = new Nop();

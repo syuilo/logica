@@ -1,4 +1,6 @@
 import のーど from '../node';
+import Package from './package';
+
 
 export default class PackageOutput extends のーど {
 	name = 'PackageOutput';
@@ -15,6 +17,8 @@ export default class PackageOutput extends のーど {
 	public outputId: string;
 	public outputName: string;
 	public outputDesc: string;
+
+	public parent: Package;
 
 	constructor(id: string) {
 		super();

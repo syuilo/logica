@@ -13,6 +13,12 @@ export default class Package extends のーど {
 
 		this.nodes = nodes;
 
+		this.nodes.forEach(n => {
+			if (n.name === 'PackageOutput') {
+				(n as PackageOutput).parent = this;
+			}
+		});
+
 		this.inputInfo = Array.from(this.nodes)
 			.filter(n => n.name === 'PackageInput')
 			.map((pi: PackageInput) => ({
@@ -28,6 +34,13 @@ export default class Package extends のーど {
 				name: po.outputName,
 				desc: po.outputDesc
 			}));
+	}
+
+	public getState(id: string) {
+		return Array.from(this.nodes)
+			.find(n => n.outputs
+				.find(c => c.node.name === 'PackageOutput' && (c.node as PackageOutput).outputId === id) != null)
+			.getState(id);
 	}
 
 	update() {

@@ -9,7 +9,7 @@ export default class Circuit {
 
 	constructor(nodes: のーど[]) {
 		this.nodes = new Set(nodes);
-		this.shouldUpdates = new Set(nodes.filter(n => n.isInputCommutative));
+		this.shouldUpdates = new Set(nodes.filter(n => n.isInitializeRequired));
 		//this.tick();
 	}
 
@@ -27,8 +27,9 @@ export default class Circuit {
 						actualNodes.forEach(n => this.shouldUpdates.add(n));
 						break;
 					case 'PackageOutput':
-						const actualNodes2 = Array.from((node as PackageOutput).outputs)
-							.map(c => c.node);
+						const actualNodes2 = (node as PackageOutput).parent.outputs
+							.filter(c => c.from === (node as PackageOutput).outputId)
+							.map(c => c.node)
 						actualNodes2.forEach(n => this.shouldUpdates.add(n));
 						break;
 					default:

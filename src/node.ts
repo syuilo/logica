@@ -41,7 +41,7 @@ export default abstract class のーど {
 	 */
 	public isInitializeRequired: boolean = false;
 
-	public states: { [id: string]: boolean } = {};
+	protected states: { [id: string]: boolean } = {};
 
 	/**
 	 * true を返すと次回(next tick)も更新されます
@@ -50,7 +50,11 @@ export default abstract class のーど {
 
 	protected getInput(id: string) {
 		const connection = this.inputs.find(c => c.to === id);
-		return connection.node.states[connection.from];
+		return connection.node.getState(connection.from);
+	}
+
+	public getState(id: string) {
+		return this.states[id];
 	}
 
 	public connectTo(target: のーど, targetInputId?: string, myOutputId?: string) {

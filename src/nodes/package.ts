@@ -51,4 +51,18 @@ export default class Package extends のーど {
 	update() {
 		throw 'Do not call this method because this node is virtual (at Package)';
 	}
+
+	public getActualInputNodes(portId: string): のーど[] {
+		const n = Array.from(this.nodes)
+			.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === portId);
+
+		return n.getActualNextNodes('x');
+	}
+
+	public getActualOutputNodeState(portId: string): boolean {
+		const n = Array.from(this.nodes)
+			.find(n => n.type === 'PackageOutput' && (n as PackageOutput).outputId === portId);
+
+		return n.getActualPreviousNodeState('x');
+	}
 }

@@ -1,3 +1,7 @@
+import Package from './nodes/package';
+import PackageInput from './nodes/package-input';
+import PackageOutput from './nodes/package-output';
+
 export type connection = {
 	/**
 	 * 相手のノード
@@ -87,8 +91,7 @@ export default abstract class のーど {
 	public abstract update(): void | boolean;
 
 	protected getInput(id: string) {
-		const connection = this.inputs.find(c => c.to === id);
-		return connection.node.getState(connection.from);
+		return this.getActualPreviousNodeState(id);
 	}
 
 	public getState(id: string) {
@@ -144,5 +147,31 @@ export default abstract class のーど {
 			from: myOutputId,
 			to: targetInputId
 		});
+	}
+
+	public getActualPreviousNodeState(portId: string): boolean {
+		const c = this.inputs.find(c => c.to === portId);
+		const n = c.node;
+		if (n.type === 'PackageInput') {
+			return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
+		} else if (n.type === 'Package') {
+			return (n as Package).getActualOutputNodeState(c.from);
+		} else {
+			return n.getState(c.from);
+		}
+	}
+
+	public getActualNextNodes(portId: string): のーど[] {
+		if (this.outputs == null || this.outputs.length === 0) return [this];
+		return this.outputs.filter(c => c.from === portId).map(c => {
+			const n = c.node;
+			if (n.type === 'PackageOutput') {
+				return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
+			} else if (n.type === 'Package') {
+				return (n as Package).getActualInputNodes(c.to);
+			} else {
+				return [n];
+			}
+		}).reduce((a, b) => a.concat(b));
 	}
 }

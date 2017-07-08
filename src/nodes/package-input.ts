@@ -33,6 +33,6 @@ export default class PackageInput extends のーど {
 	}
 
 	update() {
-		throw 'Do not call this method because this node is virtual';
+		throw 'Do not call this method because this node is virtual (at PackageInput)';
 	}
 }

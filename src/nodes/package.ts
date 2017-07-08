@@ -4,7 +4,7 @@ import PackageOutput from './package-output';
 
 export default class Package extends のーど {
 	type = 'Package';
-	desc = 'package';
+	desc = '回路の集合。';
 
 	public nodes: Set<のーど>;
 

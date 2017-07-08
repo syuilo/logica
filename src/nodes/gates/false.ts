@@ -15,10 +15,7 @@ export default class False extends のーど {
 		desc: 'Always LOW'
 	}];
 
-	constructor() {
-		super();
+	update() {
 		this.states['x'] = false;
 	}
-
-	update() {}
 }

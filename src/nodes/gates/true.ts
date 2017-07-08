@@ -15,12 +15,9 @@ export default class True extends のーど {
 		desc: 'Always HIGH'
 	}];
 
-	isInitializeRequired = true;
+	isForceUpdate = true;
 
-	constructor() {
-		super();
+	update() {
 		this.states['x'] = true;
 	}
-
-	update() {}
 }

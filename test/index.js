@@ -23,8 +23,10 @@ const And = require('../built/nodes/gates/and').default;
 const Or = require('../built/nodes/gates/or').default;
 const Not = require('../built/nodes/gates/not').default;
 
-const True = require('../built/nodes/gates/true').default;
-const False = require('../built/nodes/gates/false').default;
+//const True = require('../built/nodes/gates/true').default;
+//const False = require('../built/nodes/gates/false').default;
+
+const Button = require('../built/nodes/button').default;
 
 const Nop = require('../built/nodes/gates/nop').default;
 
@@ -66,46 +68,81 @@ function createHalfAdder() {
 	return package;
 }
 
-//it('Half adder', () => {
+it('Half adder', () => {
 	const halfAdder = createHalfAdder();
 
-	const a = new True();
-	const b = new False();
+	const a = new Button();
+	const b = new Button();
 
 	a.connectTo(halfAdder, 'a');
 	b.connectTo(halfAdder, 'b');
 
-	const s = new Nop();
-	const c = new Nop();
+	const s = new Nop(); s.name = 'S';
+	const c = new Nop(); c.name = 'C';
 
 	halfAdder.connectTo(s, 'x', 's');
 	halfAdder.connectTo(c, 'x', 'c');
 
 	const circuit = new Circuit([halfAdder, a, b, s, c]);
 
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
+	{
+		a.off();
+		b.off();
 
-	circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
 
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
+		//console.log('S: ' + s.states.x);
+		//console.log('C: ' + c.states.x);
 
-	circuit.tick();
+		assert.equal(s.states.x, false);
+		assert.equal(c.states.x, false);
+	}
 
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
+	{
+		a.on();
+		b.off();
 
-	circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
 
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
+		assert.equal(s.states.x, true);
+		assert.equal(c.states.x, false);
+	}
 
-	circuit.tick();
+	{
+		a.off();
+		b.on();
 
-	console.log('S: ' + s.states.x);
-	console.log('C: ' + c.states.x);
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
 
-	//assert.equal();
-//});
+		assert.equal(s.states.x, true);
+		assert.equal(c.states.x, false);
+	}
+
+
+	{
+		a.on();
+		b.on();
+
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+		circuit.tick();
+
+		assert.equal(s.states.x, false);
+		assert.equal(c.states.x, true);
+	}
+});
 

@@ -25,9 +25,11 @@ export default class PackageInput extends のーど {
 	}
 
 	public getState(id: string) {
-		return this.parent.inputs
-			.find(c => c.from === id)
-			.node.getState(id);
+		//console.log(id);
+		//console.log(this.parent.inputs);
+		const connection = this.parent.inputs
+			.find(c => c.to === this.inputId);
+		return connection.node.getState(id);
 	}
 
 	update() {

@@ -1,7 +1,35 @@
 export type connection = {
+	/**
+	 * 相手のノード
+	 */
 	node: のーど;
+
+	/**
+	 * 出力ポートのID
+	 */
 	from: string;
+
+	/**
+	 * 入力ポートのID
+	 */
 	to: string;
+};
+
+export type port = {
+	/**
+	 * ポートID
+	 */
+	id: string;
+
+	/**
+	 * ポート名
+	 */
+	name: string;
+
+	/**
+	 * ポートの説明
+	 */
+	desc: string;
 };
 
 export default abstract class のーど {
@@ -20,21 +48,19 @@ export default abstract class のーど {
 	 */
 	public desc: string;
 
+	/**
+	 * このノードに入力されている接続
+	 */
 	public inputs: connection[] = [];
 
+	/**
+	 * このノードから出力されている接続
+	 */
 	public outputs: connection[] = [];
 
-	public inputInfo: {
-		id: string;
-		name: string;
-		desc: string;
-	}[];
+	public inputInfo: port[];
 
-	public outputInfo: {
-		id: string;
-		name: string;
-		desc: string;
-	}[];
+	public outputInfo: port[];
 
 	/**
 	 * 入力が交換法則を満たすか否かを表します
@@ -42,11 +68,18 @@ export default abstract class のーど {
 	public isInputCommutative: boolean = false;
 
 	/**
-	 * 回路初期時に信号発生の起点となるか否かを表します
+	 * 回路初期時に update が呼ばれることを保証させます
 	 */
-	public isInitializeRequired: boolean = false;
+	public isForceUpdate: boolean = false;
 
 	protected states: { [id: string]: boolean } = {};
+
+	/**
+	 * ノードの状態を初期化します
+	 */
+	public init() {
+		this.states = {};
+	};
 
 	/**
 	 * true を返すと次回(next tick)も更新されます
@@ -59,9 +92,15 @@ export default abstract class のーど {
 	}
 
 	public getState(id: string) {
-		return this.states[id];
+		return this.states.hasOwnProperty(id) ? this.states[id] : false;
 	}
 
+	/**
+	 * このノードの出力を他のノードの入力に繋ぎます
+	 * @param target ターゲット ノード
+	 * @param targetInputId ターゲット ノードの入力ポートID
+	 * @param myOutputId このノードの出力ポートID
+	 */
 	public connectTo(target: のーど, targetInputId?: string, myOutputId?: string) {
 		if (target.inputInfo == null || target.inputInfo.length === 0) {
 			throw 'ターゲット ノードは入力ポートを持たないので接続できません';

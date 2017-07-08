@@ -29,19 +29,31 @@ export default class Circuit {
 	 * 回路の状態を1ステップ進めます
 	 */
 	public tick() {
+		console.log('======================');
+		console.log(Array.from(this.shouldUpdates).map((n: any) => {
+			let log = `${n.type} ${n.name || '-'}`;
+			if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
+			return log;
+		}).join('\n'));
+
 		new Set(this.shouldUpdates).forEach(node => {
 			if (!node.update()) this.shouldUpdates.delete(node);
 
 			node.outputInfo.forEach(o => {
+				if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
+				if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
+				(node as any)._previousStates[o.id] = node.getState(o.id);
+
 				const next = node.getActualNextNodes(o.id);
+				next.forEach(n => (n as any)._reason = node);
 				next.forEach(n => this.shouldUpdates.add(n));
 			});
 		});
-
+/*
 		console.log('======================');
 		console.log(Array.from(this.nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));
 		console.log('======================');
-
+*/
 	}
 
 	/**
@@ -50,9 +62,9 @@ export default class Circuit {
 	public reset() {
 		this.init();
 	}
-
+/*
 	public addNode(node: のーど) {
 		this.nodes.add(node);
 		this.shouldUpdates.add(node);
-	}
+	}*/
 }

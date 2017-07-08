@@ -182,7 +182,6 @@ it('Half adder', () => {
 	}
 });
 
-
 it('Full adder', () => {
 	const fullAdder = createFullAdder();
 
@@ -244,4 +243,5 @@ it('Full adder', () => {
 		assert.equal(c.states.x, false);
 	}
 });
+
 

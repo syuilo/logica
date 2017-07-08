@@ -126,11 +126,7 @@ it('Half adder', () => {
 		a.off();
 		b.off();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.tick(5);
 
 		//console.log('S: ' + s.states.x);
 		//console.log('C: ' + c.states.x);
@@ -143,11 +139,7 @@ it('Half adder', () => {
 		a.on();
 		b.off();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.tick(5);
 
 		assert.equal(s.states.x, true);
 		assert.equal(c.states.x, false);
@@ -157,11 +149,7 @@ it('Half adder', () => {
 		a.off();
 		b.on();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.tick(5);
 
 		assert.equal(s.states.x, true);
 		assert.equal(c.states.x, false);
@@ -171,11 +159,7 @@ it('Half adder', () => {
 		a.on();
 		b.on();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.tick(5);
 
 		assert.equal(s.states.x, false);
 		assert.equal(c.states.x, true);
@@ -206,17 +190,7 @@ it('Full adder', () => {
 		b.off();
 		x.off();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.calc();
 
 		assert.equal(s.states.x, false);
 		assert.equal(c.states.x, false);
@@ -227,17 +201,7 @@ it('Full adder', () => {
 		b.off();
 		x.on();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.calc();
 
 		assert.equal(s.states.x, true);
 		assert.equal(c.states.x, false);
@@ -248,17 +212,7 @@ it('Full adder', () => {
 		b.on();
 		x.on();
 
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
-		circuit.tick();
+		circuit.calc();
 
 		assert.equal(s.states.x, true);
 		assert.equal(c.states.x, true);

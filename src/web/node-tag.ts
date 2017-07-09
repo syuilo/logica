@@ -1,3 +1,5 @@
+import * as riot from 'riot';
+
 import のーど from '../core/node';
 
 export default class NodeTag {
@@ -18,11 +20,18 @@ export default class NodeTag {
 
 	outputs: any[] = [];
 
+	lines: any[] = [];
+
 	constructor(draw, tags, node) {
+		riot.observable(this);
+
 		this.node = node;
 
 		this.el = draw.nested();
-		this.el.draggable();
+		this.el.draggable().on('dragmove', () => {
+			(this as any).trigger('move');
+			this.drawLines();
+		});
 		this.el.rect(this.width, this.height).fill('#3be295').radius(6);
 
 		this.el.text(node.type);
@@ -61,16 +70,20 @@ export default class NodeTag {
 						connection: c
 					});
 					this.drawLines();
+					target.on('move', () => {
+						this.drawLines();
+					});
 				}
 			});
 		});
 	}
 
 	drawLines() {
+		this.lines.forEach(l => l.remove());
 		this.outputs.forEach(o => {
 			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
 			const inputPortIndex = o.tag.node.inputInfo.findIndex(info => o.connection.to === info.id);
-			this.el.line(this.width, outputPortIndex / this.node.outputInfo.length * this.height, o.tag.x - this.x, o.tag.y + (inputPortIndex / o.tag.node.inputInfo.length * o.tag.height) - this.y).stroke({ width: 1 });
+			this.lines.push(this.el.line(this.width, outputPortIndex / this.node.outputInfo.length * this.height, o.tag.x - this.x, o.tag.y + (inputPortIndex / o.tag.node.inputInfo.length * o.tag.height) - this.y).stroke({ width: 1 }));
 		});
 	}
 }

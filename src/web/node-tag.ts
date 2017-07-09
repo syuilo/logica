@@ -40,7 +40,7 @@ export default class NodeTag {
 			(this as any).trigger('move');
 			this.drawLines();
 		});
-		this.el.rect(this.width, this.height).fill('#484D4B').radius(6);
+		this.el.rect(this.width, this.height).fill('#355556').radius(6);
 
 		this.el.text(node.type).fill('#fff');
 
@@ -51,7 +51,7 @@ export default class NodeTag {
 				const x = -(diameter / 2);
 				const y = ((i + 1) / (node.inputInfo.length + 1) * this.height) - (diameter / 2);
 				this.inputPorts.push({
-					el: this.el.circle(diameter).move(x, y).fill('#f5de3c'),
+					el: this.el.circle(diameter).move(x, y).fill('#0bf1c2').style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);'),
 					id: input.id
 				});
 			});
@@ -61,7 +61,7 @@ export default class NodeTag {
 			node.outputInfo.forEach((output, i) => {
 				const x = this.width - (diameter / 2);
 				const y = ((i + 1) / (node.outputInfo.length + 1) * this.height) - (diameter / 2);
-				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#f5de3c' });
+				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#0bf1c2' }).style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);');
 				let line = null;
 
 				o.draggable().on('beforedrag', (e) => {

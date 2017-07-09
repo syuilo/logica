@@ -24,12 +24,12 @@ export default class Button extends のーど {
 		this.requestUpdateAtNextTick();
 	}
 
-	public _on() {
+	public __on() {
 		this.setState(true);
 		this.requestUpdateAtNextTick();
 	}
 
-	public _off() {
+	public __off() {
 		this.setState(false);
 		this.requestUpdateAtNextTick();
 	}

@@ -22,6 +22,8 @@ export default class NodeTag {
 
 	lines: any[] = [];
 
+	inputPorts: any[] = [];
+
 	constructor(draw, tags, node) {
 		riot.observable(this);
 
@@ -37,7 +39,10 @@ export default class NodeTag {
 		this.el.text(node.type);
 
 		node.inputInfo.forEach((input, i) => {
-			this.el.rect(8, 8).move(0, i / node.inputInfo.length * this.height).attr({ fill: '#f5de3c' });
+			this.inputPorts.push({
+				el: this.el.rect(8, 8).move(0, i / node.inputInfo.length * this.height).fill('#f5de3c'),
+				id: input.id
+			});
 		});
 
 		node.outputInfo.forEach((output, i) => {
@@ -61,16 +66,45 @@ export default class NodeTag {
 				line.remove();
 				const x = this.x + e.detail.p.x;
 				const y = this.y + e.detail.p.y;
-				const target = tags.find(t => t.x < x && t.y < y && t.x + t.width > x && t.y + t.height > y);
+
+				draw.select('.input-port').find
+
+				let target: any = null;
+
+				tags.some(tag => {
+					const asobi = 12;
+					const nearPort = tag.inputPorts.find(p => (p.el.x() + tag.x - asobi) < x && (p.el.y() + tag.y - asobi) < y && (p.el.x() + tag.x) + p.el.width() + asobi > x && (p.el.y() + tag.y) + p.el.height() + asobi > y);
+					if (nearPort) {
+						target = {
+							tag: tag,
+							portId: nearPort.id
+						};
+						return true;
+					} else {
+						return false;
+					}
+				});
+
+				if (!target) {
+					const nearTag = tags.find(t => t.x < x && t.y < y && t.x + t.width > x && t.y + t.height > y);
+					if (nearTag) {
+						target = {
+							tag: nearTag,
+							portId: null
+						};
+					}
+				}
+
 				console.log(target);
+
 				if (target) {
-					const c = this.node.connectTo(target.node);
+					const c = this.node.connectTo(target.tag.node, target.portId);
 					this.outputs.push({
-						tag: target,
+						tag: target.tag,
 						connection: c
 					});
 					this.drawLines();
-					target.on('move', () => {
+					target.tag.on('move', () => {
 						this.drawLines();
 					});
 				}

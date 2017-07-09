@@ -40,15 +40,17 @@ export default class Circuit {
 				node.update();
 				this.shouldUpdates.delete(node);
 
-				node.outputInfo.forEach(o => {
-					if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
-					if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
-					(node as any)._previousStates[o.id] = node.getState(o.id);
+				if (node.outputInfo != null && node.outputInfo.length !== 0) {
+					node.outputInfo.forEach(o => {
+						if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
+						if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
+						(node as any)._previousStates[o.id] = node.getState(o.id);
 
-					const next = node.getActualNextNodes(o.id);
-					next.forEach(n => (n as any)._reason = node);
-					next.forEach(n => this.shouldUpdates.add(n));
-				});
+						const next = node.getActualNextNodes(o.id);
+						next.forEach(n => (n as any)._reason = node);
+						next.forEach(n => this.shouldUpdates.add(n));
+					});
+				}
 			});
 /*
 		console.log('======================');

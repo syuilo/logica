@@ -94,25 +94,39 @@ export default abstract class のーど extends EventEmitter {
 	 */
 	public abstract update(): void;
 
-	protected getInput(id: string) {
+	protected getInput(id?: string) {
+		if (id == null) {
+			if (this.inputInfo.length === 1) {
+				id = this.inputInfo[0].id;
+			} else if (this.inputInfo.length === 0) {
+				throw 'このノードに入力ポートがありません';
+			} else {
+				throw 'このノードの入力ポートが複数あるので、入力ポートIDを省略することはできません';
+			}
+		}
+
 		return this.getActualPreviousNodeState(id);
 	}
 
 	public getState(id?: string) {
-		if (this.outputInfo.length === 1) {
-			id = this.outputInfo[0].id;
-		} else {
-			throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+		if (id == null) {
+			if (this.outputInfo.length === 1) {
+				id = this.outputInfo[0].id;
+			} else {
+				throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+			}
 		}
 
 		return this.states.hasOwnProperty(id) ? this.states[id] : false;
 	}
 
 	protected setState(state: boolean, id?: string) {
-		if (this.outputInfo.length === 1) {
-			id = this.outputInfo[0].id;
-		} else {
-			throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+		if (id == null) {
+			if (this.outputInfo.length === 1) {
+				id = this.outputInfo[0].id;
+			} else {
+				throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+			}
 		}
 
 		this.states[id] = state;

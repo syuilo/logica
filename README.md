@@ -1,7 +1,11 @@
 logica
 ================================================================
-This project is work in progress.
+Logica is an intuitive circuit simulator developed for education.
+It is possible to simulate simple sequential circuits as well as simple combinational circuits.
+
+This project is still under construction.
+If you are interested in logica, you're welcome to participate in the development of logica!
 
 LICENSE
 ----------------------------------------------------------------
-[MIT](LICENSE)
+logica is an open-source software licensed under [The MIT License](LICENSE).

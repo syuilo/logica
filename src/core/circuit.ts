@@ -18,12 +18,6 @@ export default class Circuit {
 		if (nodes) nodes.forEach(n => this.addNode(n));
 	}
 
-	private init() {
-		this.nodes.forEach(n => n.init());
-		this.shouldUpdates = new Set(Array.from(this.nodes).filter(n => n.isForceUpdate));
-		this.tick();
-	}
-
 	/**
 	 * 回路の状態を1(またはn)ステップ進めます
 	 */
@@ -76,12 +70,16 @@ export default class Circuit {
 	 * 回路の状態を初期状態に戻します
 	 */
 	public reset() {
-		this.init();
 	}
 
 	public addNode(node: のーど) {
 		this.nodes.add(node);
 		node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
 		if (node.isForceUpdate) this.shouldUpdates.add(node);
+		if (node.type === 'Package') { // TODO: 再帰的パッケージがあるかたどる
+			(node as Package).nodes.forEach(n => {
+				if (n.isForceUpdate) this.shouldUpdates.add(n);
+			});
+		}
 	}
 }

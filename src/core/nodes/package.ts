@@ -6,7 +6,7 @@ export default class Package extends のーど {
 	type = 'Package';
 	desc = '回路の集合。';
 
-	isVirtual = true;
+	public packageName: string;
 
 	public nodes: Set<のーど>;
 
@@ -39,6 +39,13 @@ export default class Package extends のーど {
 				name: po.outputName,
 				desc: po.outputDesc
 			}));
+
+		Array.from(this.nodes)
+			.filter(n => n.outputs.find(c => c.node.type === 'PackageOutput'))
+			.forEach(n => n.on('updated', () => {
+				console.log('waaaaaaaaaaaa');
+				this.emit('updated');
+			}))
 	}
 
 	update() {

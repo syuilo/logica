@@ -122,6 +122,8 @@ export default abstract class のーど extends EventEmitter {
 
 		if (this.isVirtual) {
 			return this.getActualPreviousNodeState(id);
+		} else if (this.type === 'Package') {
+			return (this as any).getActualOutputNodeState(id);
 		} else {
 			return this.states.hasOwnProperty(id) ? this.states[id] : false;
 		}
@@ -203,7 +205,11 @@ export default abstract class のーど extends EventEmitter {
 		if (n.type === 'Pin') {
 			return (n as Pin).getActualPreviousNodeState('x');
 		} else if (n.type === 'PackageInput') {
-			return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
+			if ((n as PackageInput).parent == null) {
+				return false;
+			} else {
+				return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
+			}
 		} else if (n.type === 'Package') {
 			return (n as Package).getActualOutputNodeState(c.from);
 		} else {
@@ -213,7 +219,7 @@ export default abstract class のーど extends EventEmitter {
 
 	public getActualNextNodes(portId: string): のーど[] {
 		if (this.outputs == null || this.outputs.length === 0) {
-			if (this.isVirtual) {
+			if (this.isVirtual || this.type === 'Package') {
 				return [];
 			} else {
 				return [this];
@@ -224,7 +230,11 @@ export default abstract class のーど extends EventEmitter {
 			if (n.type === 'Pin') {
 				return (n as Pin).getActualNextNodes('x');
 			} else if (n.type === 'PackageOutput') {
-				return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
+				if ((n as PackageOutput).parent == null) {
+					return [];
+				} else {
+					return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
+				}
 			} else if (n.type === 'Package') {
 				return (n as Package).getActualInputNodes(c.to);
 			} else {
@@ -239,6 +249,7 @@ export default abstract class のーど extends EventEmitter {
 			connection.node.on('updated', () => {
 				this.emit('updated');
 			});
+		} else if (this.type === 'Package') {
 		} else {
 			this.requestUpdateAtNextTick();
 		}

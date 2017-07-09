@@ -20,6 +20,7 @@
   "dependencies": {
     "eventemitter2": "4.1.0",
     "gulp": "3.9.1",
+    "msgpack-lite": "0.1.26",
     "riot": "3.6.1",
     "riot-tag-loader": "1.0.0",
     "style-loader": "0.18.2",

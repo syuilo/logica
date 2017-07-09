@@ -18,6 +18,14 @@ export default abstract class NodeTag {
 		return this.el.y();
 	}
 
+	set x(x) {
+		this.el.x(x);
+	}
+
+	set y(y) {
+		this.el.y(y);
+	}
+
 	outputs: any[] = [];
 
 	lines: any[] = [];
@@ -123,15 +131,7 @@ export default abstract class NodeTag {
 					}
 
 					if (target) {
-						const c = this.node.connectTo(target.tag.node, target.portId);
-						this.outputs.push({
-							tag: target.tag,
-							connection: c
-						});
-						this.drawLines();
-						target.tag.on('move', () => {
-							this.drawLines();
-						});
+						this.connectTo(target);
 					}
 				});
 
@@ -141,6 +141,18 @@ export default abstract class NodeTag {
 				});
 			});
 		}
+	}
+
+	connectTo(target) {
+		const c = this.node.connectTo(target.tag.node, target.portId);
+		this.outputs.push({
+			tag: target.tag,
+			connection: c
+		});
+		this.drawLines();
+		target.tag.on('move', () => {
+			this.drawLines();
+		});
 	}
 
 	drawLines() {

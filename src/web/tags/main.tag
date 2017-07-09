@@ -7,10 +7,15 @@
 	<button onclick={ addButton }>Button</button>
 	<button onclick={ addLed }>LED</button>
 	<button onclick={ addPin }>Pin</button>
+	<span>---</span>
+	<button onclick={ import }>Import</button>
+	<button onclick={ export }>Export</button>
 	<div ref="drawing"></div>
 	<script>
 		import SVG from 'svg.js';
 		require('svg.draggable.js');
+
+		const msgpack = require('msgpack-lite');
 
 		import Circuit from '../../core/circuit.ts';
 
@@ -107,6 +112,63 @@
 			this.nodeTags.push(new PinTag(this.draw, this.nodeTags, pin));
 
 			this.circuit.addNode(pin);
+		};
+
+		this.export = () => {
+			this.nodeTags.forEach((tag, i) => tag.id = i);
+			const data = this.nodeTags
+				.map(tag => ({
+					id: tag.id,
+					x: tag.x,
+					y: tag.y,
+					type: tag.node.type,
+					name: tag.node.name,
+					outputs: tag.outputs.map(output => ({
+						tagId: output.tag.id,
+						from: output.connection.from,
+						to: output.connection.to
+					}))
+				}));
+
+			window.prompt('', Array.prototype.map.call(msgpack.encode(data), val => {
+				let hex = (val).toString(16).toUpperCase();
+				if (val < 16) hex = '0' + hex;
+				return hex;
+			}).join(''));
+		};
+
+		this.import = () => {
+			let data = window.prompt('');
+
+			data = msgpack.decode(data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16)));
+
+			data.forEach(tagData => {
+				let tag = null;
+				if (tagData.type === 'And') tag = new AndTag(this.draw, this.nodeTags, new And());
+				if (tagData.type === 'And3') tag = new And3Tag(this.draw, this.nodeTags, new And3());
+				if (tagData.type === 'Or') tag = new OrTag(this.draw, this.nodeTags, new Or());
+				if (tagData.type === 'Not') tag = new NotTag(this.draw, this.nodeTags, new Not());
+				if (tagData.type === 'Nop') tag = new NopTag(this.draw, this.nodeTags, new Nop());
+				if (tagData.type === 'Button') tag = new ButtonTag(this.draw, this.nodeTags, new Button());
+				if (tagData.type === 'Led') tag = new LedTag(this.draw, this.nodeTags, new Led());
+				if (tagData.type === 'Pin') tag = new PinTag(this.draw, this.nodeTags, new Pin());
+				tag.id = tagData.id;
+				tag.x = tagData.x;
+				tag.y = tagData.y;
+
+				this.nodeTags.push(tag);
+
+				this.circuit.addNode(tag.node);
+			});
+
+			data.forEach(tagData => {
+				tagData.outputs.forEach(output => {
+					this.nodeTags.find(tag => tag.id === tagData.id).connectTo({
+						tag: this.nodeTags.find(tag => tag.id === output.tagId),
+						portId: output.to
+					});
+				});
+			});
 		};
 	</script>
 </lo-main>

@@ -43,7 +43,7 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * Type of this node
 	 */
-	public type: string;
+	public readonly type: string;
 
 	/**
 	 * Name of this node (for debugging)
@@ -53,7 +53,7 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * Description of this node
 	 */
-	public desc: string;
+	public readonly desc: string;
 
 	/**
 	 * このノードに入力されている接続
@@ -72,14 +72,14 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * 入力が交換法則を満たすか否かを表します
 	 */
-	public isInputCommutative: boolean = false;
+	public readonly isInputCommutative: boolean = false;
 
 	/**
 	 * 回路初期時に update が呼ばれることを保証させます
 	 */
-	public isForceUpdate: boolean = false;
+	public readonly isForceUpdate: boolean = false;
 
-	public isVirtual: boolean = false;
+	public readonly isVirtual: boolean = false;
 
 	public requestUpdateAtNextTick: () => void = () => {};
 

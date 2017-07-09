@@ -19,6 +19,8 @@ export default class Not extends のーど {
 		desc: 'Inverted X'
 	}];
 
+	isForceUpdate = true;
+
 	update() {
 		this.setState(!this.getInput());
 	}

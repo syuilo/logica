@@ -133,7 +133,7 @@ export default class NodeTag {
 			const lineEndY = o.tag.y + (inputPortIndex / o.tag.node.inputInfo.length * o.tag.height) - this.y;
 			this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 				.stroke({ color: this.node.getState(o.connection.from) ? '#f00' : '#000', width: 2 })
-				.style('stroke-dasharray: 5; animation: dash 20s linear;'));
+				.style('stroke-dasharray: 5; animation: dash 1s linear infinite;'));
 		});
 	}
 }

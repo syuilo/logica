@@ -1,5 +1,7 @@
 <lo-main>
 	<button onclick={ addAnd }>And</button>
+	<button onclick={ addOr }>Or</button>
+	<button onclick={ addNot }>Not</button>
 	<button onclick={ addButton }>Button</button>
 	<div ref="drawing"></div>
 	<script>
@@ -9,6 +11,8 @@
 		import Circuit from '../../core/circuit.ts';
 
 		import And from '../../core/nodes/gates/and.ts';
+		import Or from '../../core/nodes/gates/or.ts';
+		import Not from '../../core/nodes/gates/not.ts';
 		import Button from '../../core/nodes/button.ts';
 
 		import NodeTag from '../node-tag.ts';
@@ -33,6 +37,22 @@
 			this.nodeTags.push(new NodeTag(this.draw, this.nodeTags, and));
 
 			this.circuit.addNode(and);
+		};
+
+		this.addOr = () => {
+			const or = new Or();
+
+			this.nodeTags.push(new NodeTag(this.draw, this.nodeTags, or));
+
+			this.circuit.addNode(or);
+		};
+
+		this.addNot = () => {
+			const not = new Not();
+
+			this.nodeTags.push(new NodeTag(this.draw, this.nodeTags, not));
+
+			this.circuit.addNode(not);
 		};
 
 		this.addButton = () => {

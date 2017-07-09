@@ -57,12 +57,12 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * このノードに入力されている接続
 	 */
-	public inputs: connection[] = [];
+	public readonly inputs: connection[] = [];
 
 	/**
 	 * このノードから出力されている接続
 	 */
-	public outputs: connection[] = [];
+	public readonly outputs: connection[] = [];
 
 	public inputInfo: port[];
 
@@ -180,7 +180,7 @@ export default abstract class のーど extends EventEmitter {
 
 		this.outputs.push(connection);
 
-		target.inputs.push({
+		target.addInput({
 			node: this,
 			from: myOutputId,
 			to: targetInputId
@@ -214,5 +214,11 @@ export default abstract class のーど extends EventEmitter {
 				return [n];
 			}
 		}).reduce((a, b) => a.concat(b));
+	}
+
+	public addInput(connection: connection) {
+		this.inputs.push(connection);
+		this.requestUpdateAtNextTick();
+		//this.emit('');
 	}
 }

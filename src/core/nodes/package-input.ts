@@ -19,6 +19,8 @@ export default class PackageInput extends のーど {
 
 	public parent: Package;
 
+	isVirtual = true;
+
 	constructor(id: string) {
 		super();
 		this.inputId = id;

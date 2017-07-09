@@ -3,6 +3,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import Package from './nodes/package';
 import PackageInput from './nodes/package-input';
 import PackageOutput from './nodes/package-output';
+import Pin from './nodes/pin';
 
 export type connection = {
 	/**
@@ -78,6 +79,8 @@ export default abstract class のーど extends EventEmitter {
 	 */
 	public isForceUpdate: boolean = false;
 
+	public isVirtual: boolean = false;
+
 	public requestUpdateAtNextTick: () => void = () => {};
 
 	protected states: { [id: string]: boolean } = {};
@@ -117,7 +120,11 @@ export default abstract class のーど extends EventEmitter {
 			}
 		}
 
-		return this.states.hasOwnProperty(id) ? this.states[id] : false;
+		if (this.isVirtual) {
+			return this.getActualPreviousNodeState(id);
+		} else {
+			return this.states.hasOwnProperty(id) ? this.states[id] : false;
+		}
 	}
 
 	protected setState(state: boolean, id?: string) {
@@ -193,7 +200,9 @@ export default abstract class のーど extends EventEmitter {
 		const c = this.inputs.find(c => c.to === portId);
 		if (c == null) return false;
 		const n = c.node;
-		if (n.type === 'PackageInput') {
+		if (n.type === 'Pin') {
+			return (n as Pin).getActualPreviousNodeState('x');
+		} else if (n.type === 'PackageInput') {
 			return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
 		} else if (n.type === 'Package') {
 			return (n as Package).getActualOutputNodeState(c.from);
@@ -203,10 +212,18 @@ export default abstract class のーど extends EventEmitter {
 	}
 
 	public getActualNextNodes(portId: string): のーど[] {
-		if (this.outputs == null || this.outputs.length === 0) return [this];
+		if (this.outputs == null || this.outputs.length === 0) {
+			if (this.isVirtual) {
+				return [];
+			} else {
+				return [this];
+			}
+		}
 		return this.outputs.filter(c => c.from === portId).map(c => {
 			const n = c.node;
-			if (n.type === 'PackageOutput') {
+			if (n.type === 'Pin') {
+				return (n as Pin).getActualNextNodes('x');
+			} else if (n.type === 'PackageOutput') {
 				return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
 			} else if (n.type === 'Package') {
 				return (n as Package).getActualInputNodes(c.to);
@@ -218,7 +235,15 @@ export default abstract class のーど extends EventEmitter {
 
 	public addInput(connection: connection) {
 		this.inputs.push(connection);
-		this.requestUpdateAtNextTick();
+		if (this.isVirtual) {
+			console.log(connection.node);
+			connection.node.on('updated', () => {
+				console.log('sss');
+				this.emit('updated');
+			});
+		} else {
+			this.requestUpdateAtNextTick();
+		}
 		//this.emit('');
 	}
 }

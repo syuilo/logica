@@ -6,6 +6,7 @@
 	<button onclick={ addNop }>Nop</button>
 	<button onclick={ addButton }>Button</button>
 	<button onclick={ addLed }>LED</button>
+	<button onclick={ addPin }>Pin</button>
 	<div ref="drawing"></div>
 	<script>
 		import SVG from 'svg.js';
@@ -20,6 +21,7 @@
 		import Nop from '../../core/nodes/gates/nop.ts';
 		import Button from '../../core/nodes/button.ts';
 		import Led from '../../core/nodes/led.ts';
+		import Pin from '../../core/nodes/pin.ts';
 
 		import AndTag from '../node-tags/and.ts';
 		import And3Tag from '../node-tags/and3.ts';
@@ -28,6 +30,7 @@
 		import NopTag from '../node-tags/nop.ts';
 		import ButtonTag from '../node-tags/button.ts';
 		import LedTag from '../node-tags/led.ts';
+		import PinTag from '../node-tags/pin.ts';
 
 		this.nodeTags = [];
 
@@ -77,7 +80,7 @@
 		this.addNop = () => {
 			const nop = new Nop();
 
-			this.nodeTags.push(new NotTag(this.draw, this.nodeTags, nop));
+			this.nodeTags.push(new NopTag(this.draw, this.nodeTags, nop));
 
 			this.circuit.addNode(nop);
 		};
@@ -96,6 +99,14 @@
 			this.nodeTags.push(new LedTag(this.draw, this.nodeTags, led));
 
 			this.circuit.addNode(led);
+		};
+
+		this.addPin = () => {
+			const pin = new Pin();
+
+			this.nodeTags.push(new PinTag(this.draw, this.nodeTags, pin));
+
+			this.circuit.addNode(pin);
 		};
 	</script>
 </lo-main>

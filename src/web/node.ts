@@ -7,8 +7,8 @@ export default abstract class NodeTag {
 
 	el: any;
 
-	width = 64;
-	height = 64;
+	width: number;
+	height: number;
 
 	get x() {
 		return this.el.x();
@@ -25,17 +25,17 @@ export default abstract class NodeTag {
 	inputPorts: any[] = [];
 	outputPorts: any[] = [];
 
-	constructor(draw, tags, node) {
+	constructor(draw, tags, node, w, h) {
 		riot.observable(this);
 
 		this.node = node;
 
 		node.on('updated', () => {
-			console.log('yo');
 			this.drawLines();
 		});
 
-		if (Math.max((node.inputInfo || []).length, (node.outputInfo || []).length) > 2) this.height = 128;
+		this.width = w;
+		this.height = h;
 
 		this.el = draw.nested();
 		this.el.draggable().on('dragmove', () => {
@@ -43,8 +43,6 @@ export default abstract class NodeTag {
 			this.drawLines();
 		});
 		this.el.rect(this.width, this.height).fill('#355556').radius(6);
-
-		this.el.text(node.type).fill('#fff').move(10, 4);
 
 		const diameter = 8;
 

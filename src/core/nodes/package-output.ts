@@ -20,6 +20,8 @@ export default class PackageOutput extends のーど {
 
 	public parent: Package;
 
+	isVirtual = true;
+
 	constructor(id: string) {
 		super();
 		this.outputId = id;

@@ -6,6 +6,8 @@ export default class Package extends のーど {
 	type = 'Package';
 	desc = '回路の集合。';
 
+	isVirtual = true;
+
 	public nodes: Set<のーど>;
 
 	constructor(nodes: Set<のーど>) {

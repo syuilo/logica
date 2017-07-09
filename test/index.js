@@ -13,22 +13,22 @@ import False from '../built/nodes/gates/false';
 import Nop from '../built/nodes/gates/nop';
 */
 
-const Circuit = require('../built/circuit').default;
+const Circuit = require('../built/core/circuit').default;
 
-const Package = require('../built/nodes/package').default;
-const PackageInput = require('../built/nodes/package-input').default;
-const PackageOutput = require('../built/nodes/package-output').default;
+const Package = require('../built/core/nodes/package').default;
+const PackageInput = require('../built/core/nodes/package-input').default;
+const PackageOutput = require('../built/core/nodes/package-output').default;
 
-const And = require('../built/nodes/gates/and').default;
-const Or = require('../built/nodes/gates/or').default;
-const Not = require('../built/nodes/gates/not').default;
+const And = require('../built/core/nodes/gates/and').default;
+const Or = require('../built/core/nodes/gates/or').default;
+const Not = require('../built/core/nodes/gates/not').default;
 
 //const True = require('../built/nodes/gates/true').default;
 //const False = require('../built/nodes/gates/false').default;
 
-const Button = require('../built/nodes/button').default;
+const Button = require('../built/core/nodes/button').default;
 
-const Nop = require('../built/nodes/gates/nop').default;
+const Nop = require('../built/core/nodes/gates/nop').default;
 
 function createHalfAdder() {
 	//////////////////////////////////////////////////////////////
@@ -123,8 +123,8 @@ it('Half adder', () => {
 	const circuit = new Circuit([halfAdder, a, b, s, c]);
 
 	{
-		a.off();
-		b.off();
+		a._off();
+		b._off();
 
 		circuit.tick(5);
 
@@ -136,8 +136,8 @@ it('Half adder', () => {
 	}
 
 	{
-		a.on();
-		b.off();
+		a._on();
+		b._off();
 
 		circuit.tick(5);
 
@@ -146,8 +146,8 @@ it('Half adder', () => {
 	}
 
 	{
-		a.off();
-		b.on();
+		a._off();
+		b._on();
 
 		circuit.tick(5);
 
@@ -156,8 +156,8 @@ it('Half adder', () => {
 	}
 
 	{
-		a.on();
-		b.on();
+		a._on();
+		b._on();
 
 		circuit.tick(5);
 
@@ -186,9 +186,9 @@ it('Full adder', () => {
 	const circuit = new Circuit([fullAdder, a, b, x, s, c]);
 
 	{
-		a.off();
-		b.off();
-		x.off();
+		a._off();
+		b._off();
+		x._off();
 
 		circuit.calc();
 
@@ -197,9 +197,9 @@ it('Full adder', () => {
 	}
 
 	{
-		a.off();
-		b.off();
-		x.on();
+		a._off();
+		b._off();
+		x._on();
 
 		circuit.calc();
 
@@ -208,9 +208,9 @@ it('Full adder', () => {
 	}
 
 	{
-		a.on();
-		b.on();
-		x.on();
+		a._on();
+		b._on();
+		x._on();
 
 		circuit.calc();
 

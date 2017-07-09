@@ -26,6 +26,6 @@ export default class And extends のーど {
 	}];
 
 	update() {
-		this.states['a_and_b'] = this.getInput('a') && this.getInput('b');
+		this.setState(this.getInput('a') && this.getInput('b'));
 	}
 }

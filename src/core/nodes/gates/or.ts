@@ -26,6 +26,6 @@ export default class Or extends のーど {
 	}];
 
 	update() {
-		this.states['a_or_b'] = this.getInput('a') || this.getInput('b');
+		this.setState(this.getInput('a') || this.getInput('b'));
 	}
 }

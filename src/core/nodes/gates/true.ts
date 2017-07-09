@@ -18,6 +18,6 @@ export default class True extends のーど {
 	isForceUpdate = true;
 
 	update() {
-		this.states['x'] = true;
+		this.setState(true);
 	}
 }

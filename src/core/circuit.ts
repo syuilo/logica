@@ -10,16 +10,12 @@ export default class Circuit {
 	/**
 	 * この回路に含まれているノード
 	 */
-	public nodes: Set<のーど>;
+	public nodes: Set<のーど> = new Set();
 
-	private shouldUpdates: Set<のーど>;
+	private shouldUpdates: Set<のーど> = new Set();
 
-	constructor(nodes: のーど[]) {
-		this.nodes = new Set(nodes);
-		this.nodes.forEach(n => n.requestUpdateAtNextTick = () => {
-			this.shouldUpdates.add(n);
-		});
-		this.shouldUpdates = new Set(Array.from(this.nodes).filter(n => n.isForceUpdate));
+	constructor(nodes?: のーど[]) {
+		if (nodes) nodes.forEach(n => this.addNode(n));
 	}
 
 	private init() {
@@ -80,9 +76,10 @@ export default class Circuit {
 	public reset() {
 		this.init();
 	}
-/*
+
 	public addNode(node: のーど) {
 		this.nodes.add(node);
-		this.shouldUpdates.add(node);
-	}*/
+		node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
+		if (node.isForceUpdate) this.shouldUpdates.add(node);
+	}
 }

@@ -20,6 +20,6 @@ export default class Not extends のーど {
 	}];
 
 	update() {
-		this.states['x'] = !this.getInput('x');
+		this.setState(!this.getInput('x'));
 	}
 }

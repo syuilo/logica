@@ -1,3 +1,5 @@
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+
 import Package from './nodes/package';
 import PackageInput from './nodes/package-input';
 import PackageOutput from './nodes/package-output';
@@ -36,7 +38,7 @@ export type port = {
 	desc: string;
 };
 
-export default abstract class のーど {
+export default abstract class のーど extends EventEmitter {
 	/**
 	 * Type of this node
 	 */
@@ -96,8 +98,26 @@ export default abstract class のーど {
 		return this.getActualPreviousNodeState(id);
 	}
 
-	public getState(id: string) {
+	public getState(id?: string) {
+		if (this.outputInfo.length === 1) {
+			id = this.outputInfo[0].id;
+		} else {
+			throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+		}
+
 		return this.states.hasOwnProperty(id) ? this.states[id] : false;
+	}
+
+	protected setState(state: boolean, id?: string) {
+		if (this.outputInfo.length === 1) {
+			id = this.outputInfo[0].id;
+		} else {
+			throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+		}
+
+		this.states[id] = state;
+
+		this.emit('updated');
 	}
 
 	/**
@@ -157,6 +177,7 @@ export default abstract class のーど {
 
 	public getActualPreviousNodeState(portId: string): boolean {
 		const c = this.inputs.find(c => c.to === portId);
+		if (c == null) return false;
 		const n = c.node;
 		if (n.type === 'PackageInput') {
 			return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);

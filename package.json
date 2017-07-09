@@ -17,6 +17,8 @@
     "typescript": "2.4.1"
   },
   "dependencies": {
+    "@types/eventemitter2": "^4.1.0",
+    "eventemitter2": "^4.1.0",
     "gulp": "3.9.1",
     "riot": "3.6.1",
     "riot-tag-loader": "1.0.0",

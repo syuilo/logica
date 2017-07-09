@@ -24,14 +24,6 @@ export default class PackageInput extends のーど {
 		this.inputId = id;
 	}
 
-	public getState(id: string) {
-		//console.log(id);
-		//console.log(this.parent.inputs);
-		const connection = this.parent.inputs
-			.find(c => c.to === this.inputId);
-		return connection.node.getState(id);
-	}
-
 	update() {
 		throw 'Do not call this method because this node is virtual (at PackageInput)';
 	}

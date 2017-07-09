@@ -22,9 +22,11 @@ export default class PackageOutput extends のーど {
 
 	isVirtual = true;
 
-	constructor(id: string) {
+	constructor(id: string, name: string, desc: string) {
 		super();
 		this.outputId = id;
+		this.outputName = name;
+		this.outputDesc = desc;
 	}
 
 	update() {

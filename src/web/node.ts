@@ -131,7 +131,7 @@ export default abstract class NodeTag {
 					}
 
 					if (target) {
-						this.connectTo(target);
+						this.connectTo(target, output.id);
 					}
 				});
 
@@ -143,8 +143,8 @@ export default abstract class NodeTag {
 		}
 	}
 
-	connectTo(target) {
-		const c = this.node.connectTo(target.tag.node, target.portId);
+	connectTo(target, myPortId) {
+		const c = this.node.connectTo(target.tag.node, target.portId, myPortId);
 		this.outputs.push({
 			tag: target.tag,
 			connection: c

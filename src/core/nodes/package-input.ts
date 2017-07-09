@@ -21,9 +21,11 @@ export default class PackageInput extends のーど {
 
 	isVirtual = true;
 
-	constructor(id: string) {
+	constructor(id: string, name: string, desc: string) {
 		super();
 		this.inputId = id;
+		this.inputName = name;
+		this.inputDesc = desc;
 	}
 
 	update() {

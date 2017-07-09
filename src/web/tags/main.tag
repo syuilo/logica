@@ -149,15 +149,29 @@
 				desc: desc,
 				author: author,
 				nodes: Array.from(this.circuit.nodes)
-					.map(node => ({
-						id: node.id,
-						type: node.type,
-						outputs: node.outputs.map(c => ({
-							nodeId: c.node.id,
-							from: c.from,
-							to: c.to
-						}))
-					}))
+					.map(node => {
+						const x = {
+							id: node.id,
+							type: node.type,
+							outputs: node.outputs.map(c => ({
+								nodeId: c.node.id,
+								from: c.from,
+								to: c.to
+							}))
+						};
+
+						if (node.type === 'PackageInput') {
+							x.inputId = node.inputId;
+							x.inputName = node.inputName;
+							x.inputDesc = node.inputDesc;
+						} else if (node.type === 'PackageOutput') {
+							x.outputId = node.outputId;
+							x.outputName = node.outputName;
+							x.outputDesc = node.outputDesc;
+						}
+
+						return x;
+					})
 			};
 
 			window.prompt('あなたのパッケージはこちらです:', Array.prototype.map.call(msgpack.encode(data), val => {
@@ -185,8 +199,8 @@
 				if (n.type === 'Led') node = new Led();
 				if (n.type === 'Pin') node = new Pin();
 				if (n.type === 'Package') node = new Package();
-				if (n.type === 'PackageInput') node = new PackageInput();
-				if (n.type === 'PackageOutput') node = new PackageOutput();
+				if (n.type === 'PackageInput') node = new PackageInput(n.inputId, n.inputName, n.inputDesc);
+				if (n.type === 'PackageOutput') node = new PackageOutput(n.outputId, n.outputName, n.outputDesc);
 				node.id = n.id;
 				return node;
 			});

@@ -138,17 +138,21 @@ export default abstract class のーど {
 			}
 		}
 
-		this.outputs.push({
+		const connection = {
 			node: target,
 			from: myOutputId,
 			to: targetInputId
-		});
+		};
+
+		this.outputs.push(connection);
 
 		target.inputs.push({
 			node: this,
 			from: myOutputId,
 			to: targetInputId
 		});
+
+		return connection;
 	}
 
 	public getActualPreviousNodeState(portId: string): boolean {

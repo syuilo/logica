@@ -1,5 +1,7 @@
+import のーど from '../core/node';
+
 export default class NodeTag {
-	node: any;
+	node: のーど;
 
 	el: any;
 
@@ -14,12 +16,14 @@ export default class NodeTag {
 		return this.el.y();
 	}
 
+	outputs: any[] = [];
+
 	constructor(draw, tags, node) {
 		this.node = node;
 
 		this.el = draw.nested();
 		this.el.draggable();
-		this.el.rect(this.width, this.height).attr({ fill: '#3be295' });
+		this.el.rect(this.width, this.height).fill('#3be295').radius(6);
 
 		this.el.text(node.type);
 
@@ -45,12 +49,28 @@ export default class NodeTag {
 				});}
 			});
 			o.draggable().on('dragend', (e) => {
+				line.remove();
 				const x = this.x + e.detail.p.x;
 				const y = this.y + e.detail.p.y;
 				const target = tags.find(t => t.x < x && t.y < y && t.x + t.width > x && t.y + t.height > y);
 				console.log(target);
+				if (target) {
+					const c = this.node.connectTo(target.node);
+					this.outputs.push({
+						tag: target,
+						connection: c
+					});
+					this.drawLines();
+				}
 			});
 		});
+	}
 
+	drawLines() {
+		this.outputs.forEach(o => {
+			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
+			const inputPortIndex = o.tag.node.inputInfo.findIndex(info => o.connection.to === info.id);
+			this.el.line(this.width, outputPortIndex / this.node.outputInfo.length * this.height, o.tag.x - this.x, o.tag.y + (inputPortIndex / o.tag.node.inputInfo.length * o.tag.height) - this.y).stroke({ width: 1 });
+		});
 	}
 }

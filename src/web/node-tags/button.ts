@@ -1,5 +1,5 @@
-import Button from '../core/nodes/button';
-import NodeTag from './node-tag';
+import Button from '../../core/nodes/button';
+import NodeTag from '../node';
 
 export default class ButtonTag extends NodeTag {
 	node: Button;

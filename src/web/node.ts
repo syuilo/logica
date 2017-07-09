@@ -2,7 +2,7 @@ import * as riot from 'riot';
 
 import のーど from '../core/node';
 
-export default class NodeTag {
+export default abstract class NodeTag {
 	node: のーど;
 
 	el: any;
@@ -34,6 +34,8 @@ export default class NodeTag {
 			console.log('yo');
 			this.drawLines();
 		});
+
+		if (Math.max((node.inputInfo || []).length, (node.outputInfo || []).length) > 2) this.height = 128;
 
 		this.el = draw.nested();
 		this.el.draggable().on('dragmove', () => {

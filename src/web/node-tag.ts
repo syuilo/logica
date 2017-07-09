@@ -23,6 +23,7 @@ export default class NodeTag {
 	lines: any[] = [];
 
 	inputPorts: any[] = [];
+	outputPorts: any[] = [];
 
 	constructor(draw, tags, node) {
 		riot.observable(this);
@@ -39,14 +40,18 @@ export default class NodeTag {
 			(this as any).trigger('move');
 			this.drawLines();
 		});
-		this.el.rect(this.width, this.height).fill('#3be295').radius(6);
+		this.el.rect(this.width, this.height).fill('#484D4B').radius(6);
 
-		this.el.text(node.type);
+		this.el.text(node.type).fill('#fff');
+
+		const diameter = 8;
 
 		if (node.inputInfo) {
 			node.inputInfo.forEach((input, i) => {
+				const x = -(diameter / 2);
+				const y = ((i + 1) / (node.inputInfo.length + 1) * this.height) - (diameter / 2);
 				this.inputPorts.push({
-					el: this.el.rect(8, 8).move(0, i / node.inputInfo.length * this.height).fill('#f5de3c'),
+					el: this.el.circle(diameter).move(x, y).fill('#f5de3c'),
 					id: input.id
 				});
 			});
@@ -54,34 +59,43 @@ export default class NodeTag {
 
 		if (node.outputInfo) {
 			node.outputInfo.forEach((output, i) => {
-				const o = this.el.rect(8, 8).move(this.width - 8, i / node.outputInfo.length * this.height).attr({ fill: '#f5de3c' });
+				const x = this.width - (diameter / 2);
+				const y = ((i + 1) / (node.outputInfo.length + 1) * this.height) - (diameter / 2);
+				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#f5de3c' });
 				let line = null;
+
 				o.draggable().on('beforedrag', (e) => {
 					e.preventDefault();
 					line = this.el.line().stroke({ width: 1 });
 				});
+
 				o.draggable().on('dragmove', function(e) {
 					e.preventDefault();
 					if (line) {
-					line.attr({
-						x1: o.x(),
-						y1: o.y(),
-						x2: e.detail.p.x,
-						y2: e.detail.p.y
-					});}
+						line.attr({
+							x1: o.x() + (o.width() / 2),
+							y1: o.y() + (o.height() / 2),
+							x2: e.detail.p.x,
+							y2: e.detail.p.y
+						});
+					}
 				});
+
 				o.draggable().on('dragend', (e) => {
 					line.remove();
 					const x = this.x + e.detail.p.x;
 					const y = this.y + e.detail.p.y;
 
-					draw.select('.input-port').find
-
 					let target: any = null;
 
 					tags.some(tag => {
 						const asobi = 12;
-						const nearPort = tag.inputPorts.find(p => (p.el.x() + tag.x - asobi) < x && (p.el.y() + tag.y - asobi) < y && (p.el.x() + tag.x) + p.el.width() + asobi > x && (p.el.y() + tag.y) + p.el.height() + asobi > y);
+						const nearPort = tag.inputPorts.find(p =>
+							(p.el.x() + tag.x - asobi) < x &&
+							(p.el.y() + tag.y - asobi) < y &&
+							(p.el.x() + tag.x) + p.el.width() + asobi > x &&
+							(p.el.y() + tag.y) + p.el.height() + asobi > y);
+
 						if (nearPort) {
 							target = {
 								tag: tag,
@@ -94,7 +108,12 @@ export default class NodeTag {
 					});
 
 					if (!target) {
-						const nearTag = tags.find(t => t.x < x && t.y < y && t.x + t.width > x && t.y + t.height > y);
+						const nearTag = tags.find(t =>
+							t.x < x &&
+							t.y < y &&
+							t.x + t.width > x &&
+							t.y + t.height > y);
+
 						if (nearTag) {
 							target = {
 								tag: nearTag,
@@ -102,8 +121,6 @@ export default class NodeTag {
 							};
 						}
 					}
-
-					console.log(target);
 
 					if (target) {
 						const c = this.node.connectTo(target.tag.node, target.portId);
@@ -117,6 +134,11 @@ export default class NodeTag {
 						});
 					}
 				});
+
+				this.outputPorts.push({
+					el: o,
+					id: output.id
+				});
 			});
 		}
 	}
@@ -124,16 +146,25 @@ export default class NodeTag {
 	drawLines() {
 		this.lines.forEach(l => l.remove());
 		this.outputs.forEach(o => {
-			console.log(this.node.getState(o.connection.from));
 			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
 			const inputPortIndex = o.tag.node.inputInfo.findIndex(info => o.connection.to === info.id);
-			const lineStartX = this.width;
-			const lineStartY = outputPortIndex / this.node.outputInfo.length * this.height;
-			const lineEndX = o.tag.x - this.x;
-			const lineEndY = o.tag.y + (inputPortIndex / o.tag.node.inputInfo.length * o.tag.height) - this.y;
-			this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-				.stroke({ color: this.node.getState(o.connection.from) ? '#f00' : '#000', width: 2 })
-				.style('stroke-dasharray: 5; animation: dash 1s linear infinite;'));
+			const lineStartX = this.outputPorts[outputPortIndex].el.x() + (this.outputPorts[outputPortIndex].el.width() / 2);
+			const lineStartY = this.outputPorts[outputPortIndex].el.y() + (this.outputPorts[outputPortIndex].el.height() / 2);
+			const lineEndX = o.tag.x + o.tag.inputPorts[inputPortIndex].el.x() + (o.tag.inputPorts[inputPortIndex].el.width() / 2) - this.x;
+			const lineEndY = o.tag.y + o.tag.inputPorts[inputPortIndex].el.y() + (o.tag.inputPorts[inputPortIndex].el.height() / 2) - this.y;
+
+			if (this.node.getState(o.connection.from)) {
+				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }));
+
+				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: '#7aff00', width: 2 })
+					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite;'));
+			} else {
+				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: '#627f84', width: 2 })
+					.style('stroke-dasharray: 5; animation: dash 1s linear infinite;'));
+			}
 		});
 	}
 }

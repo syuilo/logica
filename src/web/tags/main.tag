@@ -92,7 +92,7 @@
 		this.addTag = tag => {
 			this.nodeTags.push(tag);
 			this.circuit.addNode(tag.node);
-			tag.el.move(32 + (Math.random() * 16), 32 + (Math.random() * 16));
+			tag.el.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
 		};
 
 		this.addAnd = () => {

@@ -81,10 +81,10 @@ export default class Circuit {
 			if (node.isForceUpdate) this.shouldUpdates.add(node);
 			if (node.type === 'Package') {
 				(node as Package).nodes.forEach(n => {
-					dive(node);
+					dive(n);
 				});
 			}
-		}
+		};
 
 		dive(node);
 	}

@@ -32,4 +32,19 @@ export default class PackageOutput extends のーど {
 	update() {
 		throw 'Do not call this method because this node is virtual (at PackageOutput)';
 	}
+
+	export() {
+		const data = super.export();
+		data.outputId = this.outputId;
+		data.outputName = this.outputName;
+		data.outputDesc = this.outputDesc;
+		return data;
+	}
+
+	public static import(data): PackageOutput {
+		if (data.type !== 'PackageOutput') throw 'This data is not PackageOutput data';
+		const pkgo = new PackageOutput(data.outputId, data.outputName, data.outputDesc);
+		pkgo.name = data.name;
+		return pkgo;
+	}
 }

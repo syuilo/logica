@@ -1,4 +1,4 @@
-import のーど from '../../node';
+import のーど from '../node';
 
 /**
  * ORゲート
@@ -27,5 +27,12 @@ export default class Or extends のーど {
 
 	update() {
 		this.setState(this.getInput('a') || this.getInput('b'));
+	}
+
+	public static import(data): Or {
+		if (data.type !== 'Or') throw 'This data is not Or data';
+		const or = new Or();
+		or.name = data.name;
+		return or;
 	}
 }

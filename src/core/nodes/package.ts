@@ -1,12 +1,18 @@
 import のーど from '../node';
 import PackageInput from './package-input';
 import PackageOutput from './package-output';
+import importNodes from '../import';
+import exportNodes from '../export';
 
 export default class Package extends のーど {
 	type = 'Package';
 	desc = '回路の集合。';
 
 	public packageName: string;
+
+	public packageAuthor: string;
+
+	public packageDesc: string;
 
 	public nodes: Set<のーど>;
 
@@ -64,5 +70,25 @@ export default class Package extends のーど {
 			.find(n => n.type === 'PackageOutput' && (n as PackageOutput).outputId === portId);
 
 		return n.getActualPreviousNodeState('x');
+	}
+
+	export() {
+		const data = super.export();
+		data.packageName = this.packageName;
+		data.packageDesc = this.packageDesc;
+		data.packageAuthor = this.packageAuthor;
+		data.nodes = exportNodes(this.nodes);
+		
+		return data;
+	}
+
+	public static import(data): Package {
+		if (data.type !== 'Package') throw 'This data is not Package data';
+		const pkg = new Package(new Set(importNodes(data.nodes)));
+		pkg.name = data.name;
+		pkg.packageName = data.packageName;
+		pkg.packageDesc = data.packageDesc;
+		pkg.packageAuthor = data.packageAuthor;
+		return pkg;
 	}
 }

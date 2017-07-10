@@ -1,4 +1,4 @@
-import のーど from '../../node';
+import のーど from '../node';
 
 /**
  * NOTゲート
@@ -23,5 +23,12 @@ export default class Not extends のーど {
 
 	update() {
 		this.setState(!this.getInput());
+	}
+
+	public static import(data): Not {
+		if (data.type !== 'Not') throw 'This data is not Not data';
+		const not = new Not();
+		not.name = data.name;
+		return not;
 	}
 }

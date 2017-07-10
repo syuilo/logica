@@ -33,4 +33,11 @@ export default class Button extends のーど {
 		this.setState(false);
 		this.requestUpdateAtNextTick();
 	}
+
+	public static import(data): Button {
+		if (data.type !== 'Button') throw 'This data is not Button data';
+		const btn = new Button();
+		btn.name = data.name;
+		return btn;
+	}
 }

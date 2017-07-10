@@ -1,4 +1,4 @@
-import のーど from '../../node';
+import のーど from '../node';
 
 /**
  * ANDゲート(3)
@@ -31,5 +31,12 @@ export default class And3 extends のーど {
 
 	update() {
 		this.setState(this.getInput('a') && this.getInput('b') && this.getInput('c'));
+	}
+
+	public static import(data): And3 {
+		if (data.type !== 'And3') throw 'This data is not And3 data';
+		const and3 = new And3();
+		and3.name = data.name;
+		return and3;
 	}
 }

@@ -1,4 +1,4 @@
-import のーど from '../../node';
+import のーど from '../node';
 
 /**
  * TRUE
@@ -19,5 +19,12 @@ export default class True extends のーど {
 
 	update() {
 		this.setState(true);
+	}
+
+	public static import(data): True {
+		if (data.type !== 'True') throw 'This data is not True data';
+		const t = new True();
+		t.name = data.name;
+		return t;
 	}
 }

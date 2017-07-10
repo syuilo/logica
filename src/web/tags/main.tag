@@ -20,13 +20,15 @@
 		import SVG from 'svg.js';
 		require('svg.draggable.js');
 
+		const msgpack = require('msgpack-lite');
+
 		import Circuit from '../../core/circuit.ts';
 
-		import And from '../../core/nodes/gates/and.ts';
-		import And3 from '../../core/nodes/gates/and3.ts';
-		import Or from '../../core/nodes/gates/or.ts';
-		import Not from '../../core/nodes/gates/not.ts';
-		import Nop from '../../core/nodes/gates/nop.ts';
+		import And from '../../core/nodes/and.ts';
+		import And3 from '../../core/nodes/and3.ts';
+		import Or from '../../core/nodes/or.ts';
+		import Not from '../../core/nodes/not.ts';
+		import Nop from '../../core/nodes/nop.ts';
 		import Button from '../../core/nodes/button.ts';
 		import Led from '../../core/nodes/led.ts';
 		import Pin from '../../core/nodes/pin.ts';
@@ -48,6 +50,7 @@
 
 		import imp from '../import.ts';
 		import exp from '../export.ts';
+		import expPkg from '../../core/export-package.ts';
 
 		this.nodeTags = [];
 
@@ -144,42 +147,16 @@
 			const name = window.prompt('Package name');
 			const desc = window.prompt('Package description');
 
-			Array.from(this.circuit.nodes).forEach((node, i) => node.id = i);
-			const data = {
-				name: name,
-				desc: desc,
-				author: author,
-				nodes: Array.from(this.circuit.nodes)
-					.map(node => {
-						const x = {
-							id: node.id,
-							type: node.type,
-							outputs: node.outputs.map(c => ({
-								nodeId: c.node.id,
-								from: c.from,
-								to: c.to
-							}))
-						};
+			const data = expPkg(this.circuit.nodes, author, name, desc);
 
-						if (node.type === 'PackageInput') {
-							x.inputId = node.inputId;
-							x.inputName = node.inputName;
-							x.inputDesc = node.inputDesc;
-						} else if (node.type === 'PackageOutput') {
-							x.outputId = node.outputId;
-							x.outputName = node.outputName;
-							x.outputDesc = node.outputDesc;
-						}
-
-						return x;
-					})
-			};
-
-			window.prompt('あなたのパッケージはこちらです:', Array.prototype.map.call(msgpack.encode(data), val => {
+			console.log('あなたのパッケージはこちらです:');
+			console.log(Array.prototype.map.call(msgpack.encode(data), val => {
 				let hex = (val).toString(16).toUpperCase();
 				if (val < 16) hex = '0' + hex;
 				return hex;
 			}).join(''));
+
+			alert('ブラウザ コンソールにデータを出力しました。コピーしてください。');
 
 			alert('パッケージには回路の(レイアウトなどの)設計図情報は含まれていないのでご注意ください(設計図を保存したい場合はExportしてください)。');
 		};
@@ -189,45 +166,19 @@
 
 			data = msgpack.decode(data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16)));
 
-			const nodes = data.nodes.map(n => {
-				let node = null;
-				if (n.type === 'And') node = new And();
-				if (n.type === 'And3') node = new And3();
-				if (n.type === 'Or') node = new Or();
-				if (n.type === 'Not') node = new Not();
-				if (n.type === 'Nop') node = new Nop();
-				if (n.type === 'Button') node = new Button();
-				if (n.type === 'Led') node = new Led();
-				if (n.type === 'Pin') node = new Pin();
-				if (n.type === 'Package') node = new Package();
-				if (n.type === 'PackageInput') node = new PackageInput(n.inputId, n.inputName, n.inputDesc);
-				if (n.type === 'PackageOutput') node = new PackageOutput(n.outputId, n.outputName, n.outputDesc);
-				node.id = n.id;
-				return node;
-			});
-
-			data.nodes.forEach(n => {
-				n.outputs.forEach(output => {
-					nodes.find(tag => tag.id === n.id).connectTo(
-						nodes.find(n => n.id === output.nodeId),
-						output.to
-					);
-				});
-			});
-
-			const pkg = new Package(new Set(nodes));
-			pkg.packageName = data.name;
+			const pkg = Package.import(data);
 			this.nodeTags.push(new PackageTag(this.draw, this.nodeTags, pkg));
 			this.circuit.addNode(pkg);
 		};
 
 		this.export = () => {
 			const data = exp(this.nodeTags);
-			window.prompt('', Array.prototype.map.call(data, val => {
+			console.log(Array.prototype.map.call(data, val => {
 				let hex = (val).toString(16).toUpperCase();
 				if (val < 16) hex = '0' + hex;
 				return hex;
 			}).join(''));
+			alert('ブラウザ コンソールにデータを出力しました。コピーしてください。');
 		};
 
 		this.import = () => {

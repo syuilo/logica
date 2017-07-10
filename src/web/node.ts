@@ -131,7 +131,7 @@ export default abstract class NodeTag {
 					}
 
 					if (target) {
-						this.connectTo(target, output.id);
+						this.connectTo(target.tag, target.portId, output.id);
 					}
 				});
 
@@ -143,14 +143,14 @@ export default abstract class NodeTag {
 		}
 	}
 
-	connectTo(target, myPortId) {
-		const c = this.node.connectTo(target.tag.node, target.portId, myPortId);
+	connectTo(targetTag, targetPortId, myPortId) {
+		const c = this.node.connectTo(targetTag.node, targetPortId, myPortId);
 		this.outputs.push({
-			tag: target.tag,
+			tag: targetTag,
 			connection: c
 		});
 		this.drawLines();
-		target.tag.on('move', () => {
+		targetTag.on('move', () => {
 			this.drawLines();
 		});
 	}

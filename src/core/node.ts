@@ -45,6 +45,8 @@ export default abstract class のーど extends EventEmitter {
 	 */
 	public readonly type: string;
 
+	public id: any;
+
 	/**
 	 * Name of this node (for debugging)
 	 */
@@ -177,7 +179,7 @@ export default abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				myOutputId = this.outputInfo[0].id;
 			} else {
-				throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+				throw `このノード(${ this.type })の出力ポートが複数あるので、出力ポートIDを省略することはできません`;
 			}
 		}
 
@@ -256,6 +258,17 @@ export default abstract class のーど extends EventEmitter {
 	}
 
 	public export(): any {
-
+		return {
+			type: this.type,
+			id: this.id,
+			name: this.name,
+			outputs: this.outputs.map(c => ({
+				nid: c.node.id,
+				from: c.from,
+				to: c.to
+			}))
+		};
 	}
+
+	public static import: (data: any) => any;
 }

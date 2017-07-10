@@ -1,48 +1,50 @@
 const msgpack = require('msgpack-lite');
 
-import Circuit from '../core/circuit.ts';
+import Circuit from '../core/circuit';
 
-import And from '../core/nodes/gates/and.ts';
-import And3 from '../core/nodes/gates/and3.ts';
-import Or from '../core/nodes/gates/or.ts';
-import Not from '../core/nodes/gates/not.ts';
-import Nop from '../core/nodes/gates/nop.ts';
-import Button from '../core/nodes/button.ts';
-import Led from '../core/nodes/led.ts';
-import Pin from '../core/nodes/pin.ts';
-import Package from '../core/nodes/package.ts';
-import PackageInput from '../core/nodes/package-input.ts';
-import PackageOutput from '../core/nodes/package-output.ts';
+import importNodes from '../core/import';
 
-import AndTag from './node-tags/and.ts';
-import And3Tag from './node-tags/and3.ts';
-import OrTag from './node-tags/or.ts';
-import NotTag from './node-tags/not.ts';
-import NopTag from './node-tags/nop.ts';
-import ButtonTag from './node-tags/button.ts';
-import LedTag from './node-tags/led.ts';
-import PinTag from './node-tags/pin.ts';
-import PackageTag from './node-tags/package.ts';
-import PackageInputTag from './node-tags/package-input.ts';
-import PackageOutputTag from './node-tags/package-output.ts';
+import And from '../core/nodes/and';
+import And3 from '../core/nodes/and3';
+import Or from '../core/nodes/or';
+import Not from '../core/nodes/not';
+import Nop from '../core/nodes/nop';
+import Button from '../core/nodes/button';
+import Led from '../core/nodes/led';
+import Pin from '../core/nodes/pin';
+import Package from '../core/nodes/package';
+import PackageInput from '../core/nodes/package-input';
+import PackageOutput from '../core/nodes/package-output';
+
+import AndTag from './node-tags/and';
+import And3Tag from './node-tags/and3';
+import OrTag from './node-tags/or';
+import NotTag from './node-tags/not';
+import NopTag from './node-tags/nop';
+import ButtonTag from './node-tags/button';
+import LedTag from './node-tags/led';
+import PinTag from './node-tags/pin';
+import PackageTag from './node-tags/package';
+import PackageInputTag from './node-tags/package-input';
+import PackageOutputTag from './node-tags/package-output';
 
 export default function (draw, tags, circuit, data) {
 	data = msgpack.decode(data);
 
 	data.forEach(tagData => {
 		let tag = null;
-		if (tagData.type === 'And') tag = new AndTag(draw, tags, new And());
-		if (tagData.type === 'And3') tag = new And3Tag(draw, tags, new And3());
-		if (tagData.type === 'Or') tag = new OrTag(draw, tags, new Or());
-		if (tagData.type === 'Not') tag = new NotTag(draw, tags, new Not());
-		if (tagData.type === 'Nop') tag = new NopTag(draw, tags, new Nop());
-		if (tagData.type === 'Button') tag = new ButtonTag(draw, tags, new Button());
-		if (tagData.type === 'Led') tag = new LedTag(draw, tags, new Led());
-		if (tagData.type === 'Pin') tag = new PinTag(draw, tags, new Pin());
-		if (tagData.type === 'Package') tag = new PackageTag(draw, tags, new Package());
-		if (tagData.type === 'PackageInput') tag = new PackageInputTag(draw, tags, new PackageInput());
-		if (tagData.type === 'PackageOutput') tag = new PackageOutputTag(draw, tags, new PackageOutput());
-		tag.id = tagData.id;
+		if (tagData.node.type === 'And') tag = new AndTag(draw, tags, And.import(tagData.node));
+		if (tagData.node.type === 'And3') tag = new And3Tag(draw, tags, And3.import(tagData.node));
+		if (tagData.node.type === 'Or') tag = new OrTag(draw, tags, Or.import(tagData.node));
+		if (tagData.node.type === 'Not') tag = new NotTag(draw, tags, Not.import(tagData.node));
+		if (tagData.node.type === 'Nop') tag = new NopTag(draw, tags, Nop.import(tagData.node));
+		if (tagData.node.type === 'Button') tag = new ButtonTag(draw, tags, Button.import(tagData.node));
+		if (tagData.node.type === 'Led') tag = new LedTag(draw, tags, Led.import(tagData.node));
+		if (tagData.node.type === 'Pin') tag = new PinTag(draw, tags, Pin.import(tagData.node));
+		if (tagData.node.type === 'Package') tag = new PackageTag(draw, tags, Package.import(tagData.node));
+		if (tagData.node.type === 'PackageInput') tag = new PackageInputTag(draw, tags, PackageInput.import(tagData.node));
+		if (tagData.node.type === 'PackageOutput') tag = new PackageOutputTag(draw, tags, PackageOutput.import(tagData.node));
+		tag.id = tagData.node.id;
 		tag.x = tagData.x;
 		tag.y = tagData.y;
 
@@ -52,11 +54,12 @@ export default function (draw, tags, circuit, data) {
 	});
 
 	data.forEach(tagData => {
-		tagData.outputs.forEach(output => {
-			tags.find(tag => tag.id === tagData.id).connectTo({
-				tag: tags.find(tag => tag.id === output.tagId),
-				portId: output.to
-			});
+		tagData.node.outputs.forEach(output => {
+			tags.find(tag => tag.id === tagData.node.id).connectTo(
+				tags.find(tag => tag.id === output.nid),
+				output.to,
+				output.from
+			);
 		});
 	});
 }

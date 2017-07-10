@@ -248,9 +248,11 @@ export default abstract class のーど extends EventEmitter {
 	public addInput(connection: connection) {
 		this.inputs.push(connection);
 		if (this.isVirtual) {
+			this.emit('updated');
 			connection.node.on('updated', () => {
 				this.emit('updated');
 			});
+			this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
 		} else if (this.type === 'Package') {
 		} else {
 			this.requestUpdateAtNextTick();

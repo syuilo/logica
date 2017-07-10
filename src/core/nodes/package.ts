@@ -16,10 +16,13 @@ export default class Package extends のーど {
 
 	public nodes: Set<のーど>;
 
-	constructor(nodes: Set<のーど>) {
+	constructor(nodes: Set<のーど>, packageName, packageDesc, packageAuthor) {
 		super();
 
 		this.nodes = nodes;
+		this.packageName = packageName;
+		this.packageDesc = packageDesc;
+		this.packageAuthor = packageAuthor;
 
 		this.nodes.forEach(n => {
 			if (n.type === 'PackageOutput') {
@@ -29,6 +32,8 @@ export default class Package extends のーど {
 				(n as PackageInput).parent = this;
 			}
 		});
+
+		this.desc += `\n---\n${ this.packageDesc }\n---\nCreated by ${ this.packageAuthor }`;
 
 		this.inputInfo = Array.from(this.nodes)
 			.filter(n => n.type === 'PackageInput')
@@ -78,17 +83,14 @@ export default class Package extends のーど {
 		data.packageDesc = this.packageDesc;
 		data.packageAuthor = this.packageAuthor;
 		data.nodes = exportNodes(this.nodes);
-		
+
 		return data;
 	}
 
 	public static import(data): Package {
 		if (data.type !== 'Package') throw 'This data is not Package data';
-		const pkg = new Package(new Set(importNodes(data.nodes)));
+		const pkg = new Package(new Set(importNodes(data.nodes)), data.packageName, data.packageDesc, data.packageAuthor);
 		pkg.name = data.name;
-		pkg.packageName = data.packageName;
-		pkg.packageDesc = data.packageDesc;
-		pkg.packageAuthor = data.packageAuthor;
 		return pkg;
 	}
 }

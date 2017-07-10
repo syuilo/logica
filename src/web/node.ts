@@ -50,6 +50,9 @@ export default abstract class NodeTag {
 			(this as any).trigger('move');
 			this.drawLines();
 		});
+
+		this.el.element('title').words(this.node.desc);
+
 		this.el.rect(this.width, this.height).fill('#355556').radius(6);
 
 		const diameter = 8;

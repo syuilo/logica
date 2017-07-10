@@ -7,7 +7,7 @@ export default class ButtonTag extends NodeTag {
 	constructor(draw, tags, node) {
 		super(draw, tags, node, 64, 64);
 
-		const button = this.el.rect(32, 32).move(16, 16).fill('#0f3a35').radius(2);
+		const button = this.el.rect(32, 32).move(16, 16).fill('#0f3a35').radius(2).style('cursor: pointer;');
 		button.click(() => {
 			this.node.click();
 			button.fill(this.node.getState() ? '#ef4625' : '#0f3a35');

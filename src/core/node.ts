@@ -254,4 +254,8 @@ export default abstract class のーど extends EventEmitter {
 			this.requestUpdateAtNextTick();
 		}
 	}
+
+	public export(): any {
+
+	}
 }

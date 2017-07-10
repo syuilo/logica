@@ -23,13 +23,14 @@ export default class Circuit {
 	 */
 	public tick(n: number = 1) {
 		for (let i = 0; i < n; i++) {
+			/*
 			console.log('======================');
 			console.log(Array.from(this.shouldUpdates).map((n: any) => {
 				let log = `${n.type} ${n.name || '-'}`;
 				if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
 				return log;
 			}).join('\n'));
-
+*/
 			new Set(this.shouldUpdates).forEach(node => {
 				node.update();
 				this.shouldUpdates.delete(node);
@@ -74,12 +75,17 @@ export default class Circuit {
 
 	public addNode(node: のーど) {
 		this.nodes.add(node);
-		node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
-		if (node.isForceUpdate) this.shouldUpdates.add(node);
-		if (node.type === 'Package') { // TODO: 再帰的パッケージがあるかたどる
-			(node as Package).nodes.forEach(n => {
-				if (n.isForceUpdate) this.shouldUpdates.add(n);
-			});
+
+		const dive = node => {
+			node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
+			if (node.isForceUpdate) this.shouldUpdates.add(node);
+			if (node.type === 'Package') {
+				(node as Package).nodes.forEach(n => {
+					dive(node);
+				});
+			}
 		}
+
+		dive(node);
 	}
 }

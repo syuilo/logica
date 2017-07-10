@@ -53,7 +53,7 @@ export default abstract class NodeTag {
 
 		this.el.element('title').words(this.node.desc);
 
-		this.el.rect(this.width, this.height).fill('#355556').radius(6);
+		this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
 
 		const diameter = 8;
 
@@ -72,12 +72,12 @@ export default abstract class NodeTag {
 			node.outputInfo.forEach((output, i) => {
 				const x = this.width - (diameter / 2);
 				const y = ((i + 1) / (node.outputInfo.length + 1) * this.height) - (diameter / 2);
-				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3);');
+				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3); cursor: crosshair;');
 				let line = null;
 
 				o.draggable().on('beforedrag', (e) => {
 					e.preventDefault();
-					line = this.el.line().stroke({ width: 1 });
+					line = this.el.line().stroke({ color: '#627f84', width: 1 }).style('stroke-dasharray: 5; animation: dash 0.5s linear infinite;');
 				});
 
 				o.draggable().on('dragmove', function(e) {

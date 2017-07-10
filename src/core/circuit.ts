@@ -31,10 +31,16 @@ export default class Circuit {
 				return log;
 			}).join('\n'));
 */
-			new Set(this.shouldUpdates).forEach(node => {
-				node.update();
-				this.shouldUpdates.delete(node);
 
+			const updatedNodes = [];
+
+			new Set(this.shouldUpdates).forEach(node => {
+				this.shouldUpdates.delete(node);
+				node.update();
+				updatedNodes.push(node);
+			});
+
+			updatedNodes.forEach(node => {
 				if (node.outputInfo != null && node.outputInfo.length !== 0) {
 					node.outputInfo.forEach(o => {
 						if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
@@ -47,6 +53,7 @@ export default class Circuit {
 					});
 				}
 			});
+
 /*
 		console.log('======================');
 		console.log(Array.from(this.nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));

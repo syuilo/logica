@@ -1,28 +1,39 @@
 <lo-main>
-	<span>[</span>
-	<button onclick={ addAnd }>And</button>
-	<button onclick={ addAnd3 }>And3</button>
-	<button onclick={ addOr }>Or</button>
-	<button onclick={ addNot }>Not</button>
-	<button onclick={ addNor }>Nor</button>
-	<button onclick={ addNand }>Nand</button>
-	<button onclick={ addXor }>Xor</button>
-	<button onclick={ addNop }>Nop</button>
-	<span>-</span>
-	<button onclick={ addButton }>Button</button>
-	<button onclick={ addLed }>LED</button>
-	<button onclick={ addPin }>Pin</button>
-	<span>-</span>
-	<button onclick={ addPackageInput }>[PackageInput]</button>
-	<button onclick={ addPackageOutput }>[PackageOutput]</button>
-	<span>] --- [</span>
-	<button onclick={ appendPackage }>Append Package</button>
-	<button onclick={ createPackage }>Create Package</button>
-	<span>] --- [</span>
-	<button onclick={ import }>Import</button>
-	<button onclick={ export }>Export</button>
-	<span>]</span>
+	<header>
+		<span>[</span>
+		<button onclick={ addAnd }>And</button>
+		<button onclick={ addAnd3 }>And3</button>
+		<button onclick={ addOr }>Or</button>
+		<button onclick={ addNot }>Not</button>
+		<button onclick={ addNor }>Nor</button>
+		<button onclick={ addNand }>Nand</button>
+		<button onclick={ addXor }>Xor</button>
+		<button onclick={ addNop }>Nop</button>
+		<span>-</span>
+		<button onclick={ addButton }>Button</button>
+		<button onclick={ addLed }>LED</button>
+		<button onclick={ addPin }>Pin</button>
+		<span>-</span>
+		<button onclick={ addPackageInput }>[PackageInput]</button>
+		<button onclick={ addPackageOutput }>[PackageOutput]</button>
+		<span>] --- [</span>
+		<button onclick={ appendPackage }>Append Package</button>
+		<button onclick={ createPackage }>Create Package</button>
+		<span>] --- [</span>
+		<button onclick={ import }>Import</button>
+		<button onclick={ export }>Export</button>
+		<span>]</span>
+	</header>
 	<div ref="drawing"></div>
+	<style>
+		:scope
+			> header
+				position fixed
+				top 0
+				left 0
+				z-index 1000
+				width 100%
+	</style>
 	<script>
 		import SVG from 'svg.js';
 		require('svg.draggable.js');
@@ -70,7 +81,7 @@
 		this.circuit = new Circuit();
 
 		this.on('mount', () => {
-			this.draw = SVG(this.refs.drawing).size(1000, 1000);
+			this.draw = SVG(this.refs.drawing).size(window.innerWidth, window.innerHeight);
 			//this.draw.rect(100, 100).attr({ fill: '#f06' });
 
 			setInterval(() => {
@@ -78,70 +89,54 @@
 			}, 100);
 		});
 
+		this.addTag = tag => {
+			this.nodeTags.push(tag);
+			this.circuit.addNode(tag.node);
+			tag.el.move(32 + (Math.random() * 16), 32 + (Math.random() * 16));
+		};
+
 		this.addAnd = () => {
-			const and = new And();
-			this.nodeTags.push(new AndTag(this.draw, this.nodeTags, and));
-			this.circuit.addNode(and);
+			this.addTag(new AndTag(this.draw, this.nodeTags, new And()));
 		};
 
 		this.addAnd3 = () => {
-			const and3 = new And3();
-			this.nodeTags.push(new And3Tag(this.draw, this.nodeTags, and3));
-			this.circuit.addNode(and3);
+			this.addTag(new And3Tag(this.draw, this.nodeTags, new And3()));
 		};
 
 		this.addOr = () => {
-			const or = new Or();
-			this.nodeTags.push(new OrTag(this.draw, this.nodeTags, or));
-			this.circuit.addNode(or);
+			this.addTag(new OrTag(this.draw, this.nodeTags, new Or()));
 		};
 
 		this.addNot = () => {
-			const not = new Not();
-			this.nodeTags.push(new NotTag(this.draw, this.nodeTags, not));
-			this.circuit.addNode(not);
+			this.addTag(new NotTag(this.draw, this.nodeTags, new Not()));
 		};
 
 		this.addNor = () => {
-			const nor = new Nor();
-			this.nodeTags.push(new NorTag(this.draw, this.nodeTags, nor));
-			this.circuit.addNode(nor);
+			this.addTag(new NorTag(this.draw, this.nodeTags, new Nor()));
 		};
 
 		this.addNand = () => {
-			const nand = new Nand();
-			this.nodeTags.push(new NandTag(this.draw, this.nodeTags, nand));
-			this.circuit.addNode(nand);
+			this.addTag(new NandTag(this.draw, this.nodeTags, new Nand()));
 		};
 
 		this.addXor = () => {
-			const xor = new Xor();
-			this.nodeTags.push(new XorTag(this.draw, this.nodeTags, xor));
-			this.circuit.addNode(xor);
+			this.addTag(new XorTag(this.draw, this.nodeTags, new Xor()));
 		};
 
 		this.addNop = () => {
-			const nop = new Nop();
-			this.nodeTags.push(new NopTag(this.draw, this.nodeTags, nop));
-			this.circuit.addNode(nop);
+			this.addTag(new NopTag(this.draw, this.nodeTags, new Nop()));
 		};
 
 		this.addButton = () => {
-			const button = new Button();
-			this.nodeTags.push(new ButtonTag(this.draw, this.nodeTags, button));
-			this.circuit.addNode(button);
+			this.addTag(new ButtonTag(this.draw, this.nodeTags, new Button()));
 		};
 
 		this.addLed = () => {
-			const led = new Led();
-			this.nodeTags.push(new LedTag(this.draw, this.nodeTags, led));
-			this.circuit.addNode(led);
+			this.addTag(new LedTag(this.draw, this.nodeTags, new Led()));
 		};
 
 		this.addPin = () => {
-			const pin = new Pin();
-			this.nodeTags.push(new PinTag(this.draw, this.nodeTags, pin));
-			this.circuit.addNode(pin);
+			this.addTag(new PinTag(this.draw, this.nodeTags, new Pin()));
 		};
 
 		this.addPackageInput = () => {
@@ -152,8 +147,7 @@
 			packageInput.inputId = id;
 			packageInput.inputName = name;
 			packageInput.inputDesc = desc;
-			this.nodeTags.push(new PackageInputTag(this.draw, this.nodeTags, packageInput));
-			this.circuit.addNode(packageInput);
+			this.addTag(new PackageInputTag(this.draw, this.nodeTags, packageInput));
 		};
 
 		this.addPackageOutput = () => {
@@ -164,8 +158,7 @@
 			packageOutput.outputId = id;
 			packageOutput.outputName = name;
 			packageOutput.outputDesc = desc;
-			this.nodeTags.push(new PackageOutputTag(this.draw, this.nodeTags, packageOutput));
-			this.circuit.addNode(packageOutput);
+			this.addTag(new PackageOutputTag(this.draw, this.nodeTags, packageOutput));
 		};
 
 		this.createPackage = () => {

@@ -1,20 +1,27 @@
 <lo-main>
+	<span>[</span>
 	<button onclick={ addAnd }>And</button>
 	<button onclick={ addAnd3 }>And3</button>
 	<button onclick={ addOr }>Or</button>
 	<button onclick={ addNot }>Not</button>
+	<button onclick={ addNor }>Nor</button>
+	<button onclick={ addNand }>Nand</button>
+	<button onclick={ addXor }>Xor</button>
 	<button onclick={ addNop }>Nop</button>
+	<span>-</span>
 	<button onclick={ addButton }>Button</button>
 	<button onclick={ addLed }>LED</button>
 	<button onclick={ addPin }>Pin</button>
+	<span>-</span>
 	<button onclick={ addPackageInput }>[PackageInput]</button>
 	<button onclick={ addPackageOutput }>[PackageOutput]</button>
-	<span>---</span>
+	<span>] --- [</span>
 	<button onclick={ appendPackage }>Append Package</button>
 	<button onclick={ createPackage }>Create Package</button>
-	<span>---</span>
+	<span>] --- [</span>
 	<button onclick={ import }>Import</button>
 	<button onclick={ export }>Export</button>
+	<span>]</span>
 	<div ref="drawing"></div>
 	<script>
 		import SVG from 'svg.js';
@@ -28,6 +35,9 @@
 		import And3 from '../../core/nodes/and3.ts';
 		import Or from '../../core/nodes/or.ts';
 		import Not from '../../core/nodes/not.ts';
+		import Nor from '../../core/nodes/nor.ts';
+		import Nand from '../../core/nodes/nand.ts';
+		import Xor from '../../core/nodes/xor.ts';
 		import Nop from '../../core/nodes/nop.ts';
 		import Button from '../../core/nodes/button.ts';
 		import Led from '../../core/nodes/led.ts';
@@ -40,6 +50,9 @@
 		import And3Tag from '../node-tags/and3.ts';
 		import OrTag from '../node-tags/or.ts';
 		import NotTag from '../node-tags/not.ts';
+		import NorTag from '../node-tags/nor.ts';
+		import NandTag from '../node-tags/nand.ts';
+		import XorTag from '../node-tags/xor.ts';
 		import NopTag from '../node-tags/nop.ts';
 		import ButtonTag from '../node-tags/button.ts';
 		import LedTag from '../node-tags/led.ts';
@@ -87,6 +100,24 @@
 			const not = new Not();
 			this.nodeTags.push(new NotTag(this.draw, this.nodeTags, not));
 			this.circuit.addNode(not);
+		};
+
+		this.addNor = () => {
+			const nor = new Nor();
+			this.nodeTags.push(new NorTag(this.draw, this.nodeTags, nor));
+			this.circuit.addNode(nor);
+		};
+
+		this.addNand = () => {
+			const nand = new Nand();
+			this.nodeTags.push(new NandTag(this.draw, this.nodeTags, nand));
+			this.circuit.addNode(nand);
+		};
+
+		this.addXor = () => {
+			const xor = new Xor();
+			this.nodeTags.push(new XorTag(this.draw, this.nodeTags, xor));
+			this.circuit.addNode(xor);
 		};
 
 		this.addNop = () => {

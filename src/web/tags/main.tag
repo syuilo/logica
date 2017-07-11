@@ -32,7 +32,7 @@
 	<style>
 		:scope
 			> header
-				background #e44433
+				background #2c6d77
 
 				.play
 				.tick

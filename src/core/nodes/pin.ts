@@ -18,6 +18,14 @@ export default class Pin extends のーど {
 
 	isVirtual = true;
 
+	constructor() {
+		super();
+
+		// BIND -------------------------------------------------
+		this.emitStateUpdated = this.emitStateUpdated.bind(this);
+		// ------------------------------------------------------
+	}
+
 	update() {
 		throw 'Do not call this method because this node is virtual (at Pin)';
 	}

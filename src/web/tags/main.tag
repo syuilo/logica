@@ -1,6 +1,9 @@
 <lo-main>
 	<header>
 		<span>[</span>
+		<button onclick={ toggleAutoTick }>{ autoTick ? 'PAUSE ||' : 'PLAY >>' }</button>
+		<button onclick={ tick } disabled={ autoTick }>TICK ></button>
+		<span>] --- [</span>
 		<button onclick={ addAnd }>And</button>
 		<button onclick={ addAnd3 }>And3</button>
 		<button onclick={ addOr }>Or</button>
@@ -85,14 +88,26 @@
 
 		this.circuit = new Circuit();
 
+		this.autoTick = true;
+
 		this.on('mount', () => {
 			this.draw = SVG(this.refs.drawing).size(window.innerWidth, window.innerHeight);
 			//this.draw.rect(100, 100).attr({ fill: '#f06' });
 
 			setInterval(() => {
-				this.circuit.tick();
+				if (this.autoTick) this.circuit.tick();
 			}, 100);
 		});
+
+		this.toggleAutoTick = () => {
+			this.update({
+				autoTick: !this.autoTick
+			});
+		};
+
+		this.tick = () => {
+			this.circuit.tick();
+		};
 
 		this.addTag = tag => {
 			this.nodeTags.push(tag);

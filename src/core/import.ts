@@ -7,6 +7,7 @@ import Nor from './nodes/nor';
 import Nand from './nodes/nand';
 import Xor from './nodes/xor';
 import Nop from './nodes/nop';
+import Random from './nodes/random';
 import Button from './nodes/button';
 import Led from './nodes/led';
 import Pin from './nodes/pin';
@@ -25,6 +26,7 @@ export default function(nodesData): のーど[] {
 		if (n.type === 'Nand') node = Nand.import(n);
 		if (n.type === 'Xor') node = Xor.import(n);
 		if (n.type === 'Nop') node = Nop.import(n);
+		if (n.type === 'Random') node = Random.import(n);
 		if (n.type === 'Button') node = Button.import(n);
 		if (n.type === 'Led') node = Led.import(n);
 		if (n.type === 'Pin') node = Pin.import(n);

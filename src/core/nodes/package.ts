@@ -54,7 +54,6 @@ export default class Package extends のーど {
 		Array.from(this.nodes)
 			.filter(n => n.outputs.find(c => c.node.type === 'PackageOutput'))
 			.forEach(n => n.on('updated', () => {
-				console.log('waaaaaaaaaaaa');
 				this.emit('updated');
 			}))
 	}

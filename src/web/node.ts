@@ -177,11 +177,13 @@ export default abstract class NodeTag {
 			const lineEndX = o.tag.x + o.tag.inputPorts[inputPortIndex].el.x() + (o.tag.inputPorts[inputPortIndex].el.width() / 2);
 			const lineEndY = o.tag.y + o.tag.inputPorts[inputPortIndex].el.y() + (o.tag.inputPorts[inputPortIndex].el.height() / 2);
 
+			const state = this.node.getState(o.connection.from);
+
 			let line;
 			let cover;
-			const lineColor = this.node.getState(o.connection.from) ? '#7aff00' : '#627f84';
+			const lineColor = state ? '#7aff00' : '#627f84';
 
-			if (this.node.getState(o.connection.from)) {
+			if (state) {
 				this.lines.push(cover = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }).style('cursor: pointer;'));
 

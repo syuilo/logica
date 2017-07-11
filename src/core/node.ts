@@ -60,12 +60,12 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * このノードに入力されている接続
 	 */
-	public readonly inputs: connection[] = [];
+	public inputs: connection[] = [];
 
 	/**
 	 * このノードから出力されている接続
 	 */
-	public readonly outputs: connection[] = [];
+	public outputs: connection[] = [];
 
 	public inputInfo: port[];
 
@@ -142,7 +142,7 @@ export default abstract class のーど extends EventEmitter {
 
 		this.states[id] = state;
 
-		this.emit('updated');
+		this.emit('stateUpdated');
 	}
 
 	/**
@@ -200,6 +200,16 @@ export default abstract class のーど extends EventEmitter {
 		return connection;
 	}
 
+	public disconnectTo(target: のーど, targetInputId: string, myOutputId: string) {
+		this.outputs = this.outputs.filter(c => !(c.node == target && c.from == myOutputId && c.to == targetInputId));
+
+		target.removeInput({
+			node: this,
+			from: myOutputId,
+			to: targetInputId
+		});
+	}
+
 	public getActualPreviousNodeState(portId: string): boolean {
 		const c = this.inputs.find(c => c.to === portId);
 		if (c == null) return false;
@@ -247,16 +257,12 @@ export default abstract class のーど extends EventEmitter {
 
 	public addInput(connection: connection) {
 		this.inputs.push(connection);
-		if (this.isVirtual) {
-			this.emit('updated');
-			connection.node.on('updated', () => {
-				this.emit('updated');
-			});
-			this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
-		} else if (this.type === 'Package') {
-		} else {
-			this.requestUpdateAtNextTick();
-		}
+		this.requestUpdateAtNextTick();
+	}
+
+	public removeInput(connection: connection) {
+		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+		this.requestUpdateAtNextTick();
 	}
 
 	public export(): any {

@@ -22,6 +22,24 @@ export default class Pin extends のーど {
 		throw 'Do not call this method because this node is virtual (at Pin)';
 	}
 
+	private emitStateUpdated() {
+		this.emit('stateUpdated');
+	}
+
+	public addInput(connection) {
+		this.inputs.push(connection);
+		this.emit('stateUpdated');
+		connection.node.on('stateUpdated', this.emitStateUpdated);
+		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
+	}
+
+	public removeInput(connection) {
+		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+		this.emit('stateUpdated');
+		connection.node.off('stateUpdated', this.emitStateUpdated);
+		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
+	}
+
 	public static import(data): Pin {
 		if (data.type !== 'Pin') throw 'This data is not Pin data';
 		const pin = new Pin();

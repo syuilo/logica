@@ -5,6 +5,8 @@ import のーど from '../core/node';
 export default abstract class NodeTag {
 	node: のーど;
 
+	draw: any;
+
 	el: any;
 
 	width: number;
@@ -38,9 +40,11 @@ export default abstract class NodeTag {
 
 		this.node = node;
 
-		node.on('updated', () => {
+		node.on('stateUpdated', () => {
 			this.drawLines();
 		});
+
+		this.draw = draw;
 
 		this.width = w;
 		this.height = h;
@@ -153,9 +157,14 @@ export default abstract class NodeTag {
 			connection: c
 		});
 		this.drawLines();
-		targetTag.on('move', () => {
-			this.drawLines();
-		});
+		targetTag.on('move', this.drawLines());
+	}
+
+	disconnectTo(targetTag, targetPortId, myPortId) {
+		this.node.disconnectTo(targetTag.node, targetPortId, myPortId);
+		this.outputs = this.outputs.filter(o => !(o.connection.node == targetTag.node && o.connection.from == myPortId && o.connection.to == targetPortId));
+		this.drawLines();
+		targetTag.off('move', this.drawLines());
 	}
 
 	drawLines() {
@@ -163,23 +172,42 @@ export default abstract class NodeTag {
 		this.outputs.forEach(o => {
 			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
 			const inputPortIndex = o.tag.node.inputInfo.findIndex(info => o.connection.to === info.id);
-			const lineStartX = this.outputPorts[outputPortIndex].el.x() + (this.outputPorts[outputPortIndex].el.width() / 2);
-			const lineStartY = this.outputPorts[outputPortIndex].el.y() + (this.outputPorts[outputPortIndex].el.height() / 2);
-			const lineEndX = o.tag.x + o.tag.inputPorts[inputPortIndex].el.x() + (o.tag.inputPorts[inputPortIndex].el.width() / 2) - this.x;
-			const lineEndY = o.tag.y + o.tag.inputPorts[inputPortIndex].el.y() + (o.tag.inputPorts[inputPortIndex].el.height() / 2) - this.y;
+			const lineStartX = this.x + this.outputPorts[outputPortIndex].el.x() + (this.outputPorts[outputPortIndex].el.width() / 2);
+			const lineStartY = this.y + this.outputPorts[outputPortIndex].el.y() + (this.outputPorts[outputPortIndex].el.height() / 2);
+			const lineEndX = o.tag.x + o.tag.inputPorts[inputPortIndex].el.x() + (o.tag.inputPorts[inputPortIndex].el.width() / 2);
+			const lineEndY = o.tag.y + o.tag.inputPorts[inputPortIndex].el.y() + (o.tag.inputPorts[inputPortIndex].el.height() / 2);
+
+			let line;
+			let cover;
+			const lineColor = this.node.getState(o.connection.from) ? '#7aff00' : '#627f84';
 
 			if (this.node.getState(o.connection.from)) {
-				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }));
+				this.lines.push(cover = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }).style('cursor: pointer;'));
 
-				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: '#7aff00', width: 2 })
-					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite;'));
+				this.lines.push(line = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: lineColor, width: 2 })
+					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite; pointer-events: none;'));
 			} else {
-				this.lines.push(this.el.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: '#627f84', width: 2 })
-					.style('stroke-dasharray: 5; animation: dash 1s linear infinite;'));
+				this.lines.push(cover = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: 'transparent', width: 8 }).style('cursor: pointer;'));
+
+				this.lines.push(line = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+					.stroke({ color: lineColor, width: 2 })
+					.style('stroke-dasharray: 5; animation: dash 1s linear infinite; pointer-events: none;'));
 			}
+
+			cover.mouseover(() => {
+				line.stroke({ color: '#f00' });
+			});
+
+			cover.mouseout(() => {
+				line.stroke({ color: lineColor });
+			});
+
+			cover.click(() => {
+				this.disconnectTo(o.tag, o.connection.to, o.connection.from);
+			});
 		});
 	}
 }

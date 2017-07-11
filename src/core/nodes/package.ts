@@ -53,13 +53,21 @@ export default class Package extends のーど {
 
 		Array.from(this.nodes)
 			.filter(n => n.outputs.find(c => c.node.type === 'PackageOutput'))
-			.forEach(n => n.on('updated', () => {
-				this.emit('updated');
+			.forEach(n => n.on('stateUpdated', () => {
+				this.emit('stateUpdated');
 			}))
 	}
 
 	update() {
 		throw 'Do not call this method because this node is virtual (at Package)';
+	}
+
+	public addInput(connection) {
+		this.inputs.push(connection);
+	}
+
+	public removeInput(connection) {
+		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
 	}
 
 	public getActualInputNodes(portId: string): のーど[] {

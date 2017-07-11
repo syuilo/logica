@@ -10,8 +10,11 @@
 		<button onclick={ addXor }>Xor</button>
 		<button onclick={ addNop }>Nop</button>
 		<span>-</span>
+		<button onclick={ addRandom }>Rnd</button>
+		<span>-</span>
 		<button onclick={ addButton }>Button</button>
 		<button onclick={ addLed }>LED</button>
+		<span>-</span>
 		<button onclick={ addPin }>Pin</button>
 		<span>-</span>
 		<button onclick={ addPackageInput }>[PackageInput]</button>
@@ -50,6 +53,7 @@
 		import Nand from '../../core/nodes/nand.ts';
 		import Xor from '../../core/nodes/xor.ts';
 		import Nop from '../../core/nodes/nop.ts';
+		import Random from '../../core/nodes/random.ts';
 		import Button from '../../core/nodes/button.ts';
 		import Led from '../../core/nodes/led.ts';
 		import Pin from '../../core/nodes/pin.ts';
@@ -65,6 +69,7 @@
 		import NandTag from '../node-tags/nand.ts';
 		import XorTag from '../node-tags/xor.ts';
 		import NopTag from '../node-tags/nop.ts';
+		import RandomTag from '../node-tags/random.ts';
 		import ButtonTag from '../node-tags/button.ts';
 		import LedTag from '../node-tags/led.ts';
 		import PinTag from '../node-tags/pin.ts';
@@ -125,6 +130,10 @@
 
 		this.addNop = () => {
 			this.addTag(new NopTag(this.draw, this.nodeTags, new Nop()));
+		};
+
+		this.addRandom = () => {
+			this.addTag(new RandomTag(this.draw, this.nodeTags, new Random()));
 		};
 
 		this.addButton = () => {

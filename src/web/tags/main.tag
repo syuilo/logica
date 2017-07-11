@@ -1,9 +1,7 @@
 <lo-main>
 	<header>
-		<span>[</span>
-		<button onclick={ toggleAutoTick }>{ autoTick ? 'PAUSE ||' : 'PLAY >>' }</button>
-		<button onclick={ tick } disabled={ autoTick }>TICK ></button>
-		<span>] --- [</span>
+		<button class="play" title={ autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="tick" title="Next Tick" onclick={ tick } disabled={ autoTick }><i class="fa fa-step-forward"></i></button>
 		<button onclick={ addAnd }>And</button>
 		<button onclick={ addAnd3 }>And3</button>
 		<button onclick={ addOr }>Or</button>
@@ -34,11 +32,38 @@
 	<style>
 		:scope
 			> header
-				position fixed
-				top 0
-				left 0
-				z-index 1000
-				width 100%
+				background #e44433
+
+				.play
+				.tick
+					padding 0
+					margin 0
+					width 48px
+					height 48px
+					font-size 24px
+					color #fff
+					background none
+					border none
+					cursor pointer
+
+					&:hover
+						background rgba(255, 255, 255, 0.3)
+
+					&:active:not(:disabled)
+						background rgba(0, 0, 0, 0.1)
+
+					&:focus
+						outline none
+
+					&:disabled
+						opacity 0.5
+						cursor default
+
+				.tick
+					background-clip padding-box
+					border-right solid 2px rgba(0, 0, 0, 0.2)
+					margin-right 16px
+
 	</style>
 	<script>
 		import SVG from 'svg.js';

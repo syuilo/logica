@@ -97,9 +97,9 @@ export default abstract class のーど extends EventEmitter {
 	/**
 	 * 入力が変化したときに呼ばれます
 	 */
-	public abstract update(): void;
+	public abstract update(inputs: {[id: string]: boolean}): void;
 
-	protected getInput(id?: string) {
+	public getInput(id?: string) {
 		if (id == null) {
 			if (this.inputInfo.length === 1) {
 				id = this.inputInfo[0].id;

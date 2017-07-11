@@ -25,8 +25,8 @@ export default class Xor extends のーど {
 		desc: '片方のみがHIGHかどうか'
 	}];
 
-	update() {
-		this.setState((this.getInput('a') || this.getInput('b')) && !(this.getInput('a') && this.getInput('b')));
+	update(inputs) {
+		this.setState((inputs['a'] || inputs['b']) && !(inputs['a'] && inputs['b']));
 	}
 
 	public static import(data): Xor {

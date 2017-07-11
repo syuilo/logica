@@ -29,8 +29,8 @@ export default class And3 extends のーど {
 		desc: 'Whether all the inputs to the gate are HIGH'
 	}];
 
-	update() {
-		this.setState(this.getInput('a') && this.getInput('b') && this.getInput('c'));
+	update(inputs) {
+		this.setState(inputs['a'] && inputs['b'] && inputs['c']);
 	}
 
 	public static import(data): And3 {

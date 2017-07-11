@@ -16,8 +16,8 @@ export default class Nop extends のーど {
 		desc: 'Input'
 	}];
 
-	update() {
-		this.setState(this.getInput('x'));
+	update(inputs) {
+		this.setState(inputs['x']);
 	}
 
 	public static import(data): Nop {

@@ -25,8 +25,8 @@ export default class Or extends のーど {
 		desc: 'Whether one or both the inputs to the gate are HIGH'
 	}];
 
-	update() {
-		this.setState(this.getInput('a') || this.getInput('b'));
+	update(inputs) {
+		this.setState(inputs['a'] || inputs['b']);
 	}
 
 	public static import(data): Or {

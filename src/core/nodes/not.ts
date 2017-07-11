@@ -21,8 +21,8 @@ export default class Not extends のーど {
 
 	isForceUpdate = true;
 
-	update() {
-		this.setState(!this.getInput());
+	update(inputs) {
+		this.setState(!inputs['x']);
 	}
 
 	public static import(data): Not {

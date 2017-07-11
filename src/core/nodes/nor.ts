@@ -25,8 +25,8 @@ export default class Nor extends のーど {
 		desc: 'すべての入力がLOWかどうか'
 	}];
 
-	update() {
-		this.setState(!(this.getInput('a') || this.getInput('b')));
+	update(inputs) {
+		this.setState(!(inputs['a'] || inputs['b']));
 	}
 
 	public static import(data): Nor {

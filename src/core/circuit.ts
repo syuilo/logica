@@ -23,20 +23,31 @@ export default class Circuit {
 	 */
 	public tick(n: number = 1) {
 		for (let i = 0; i < n; i++) {
-			/*
-			console.log('======================');
-			console.log(Array.from(this.shouldUpdates).map((n: any) => {
+
+			//console.log('======================');
+			/*console.log(Array.from(this.shouldUpdates).map((n: any) => {
 				let log = `${n.type} ${n.name || '-'}`;
 				if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
 				return log;
-			}).join('\n'));
-*/
+			}).join('\n'));*/
+
+
+			const inputs = [];
+
+			Array.from(this.shouldUpdates).forEach((node, i) => {
+				inputs[i] = {};
+				if (node.inputInfo != null && node.inputInfo.length !== 0) {
+					node.inputInfo.forEach(info => {
+						inputs[i][info.id] = node.getInput(info.id);
+					});
+				}
+			});
 
 			const updatedNodes = [];
 
-			new Set(this.shouldUpdates).forEach(node => {
+			Array.from(new Set(this.shouldUpdates)).forEach((node, i) => {
 				this.shouldUpdates.delete(node);
-				node.update();
+				node.update(inputs[i]);
 				updatedNodes.push(node);
 			});
 

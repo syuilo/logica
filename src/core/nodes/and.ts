@@ -25,8 +25,8 @@ export default class And extends のーど {
 		desc: 'Whether both the inputs to the gate are HIGH'
 	}];
 
-	update() {
-		this.setState(this.getInput('a') && this.getInput('b'));
+	update(inputs) {
+		this.setState(inputs['a'] && inputs['b']);
 	}
 
 	public static import(data): And {

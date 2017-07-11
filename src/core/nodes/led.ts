@@ -10,8 +10,8 @@ export default class Led extends のーど {
 		desc: 'Input'
 	}];
 
-	update() {
-		this.emit('input-updated', this.getInput());
+	update(inputs) {
+		this.emit('input-updated', inputs['x']);
 	}
 
 	public static import(data): Led {

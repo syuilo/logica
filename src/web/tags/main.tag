@@ -2,6 +2,7 @@
 	<header>
 		<button class="play" title={ autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ autoTick ? 'pause' : 'play' }"></i></button>
 		<button class="tick" title="Next Tick" onclick={ tick } disabled={ autoTick }><i class="fa fa-step-forward"></i></button>
+		<span>[</span>
 		<button onclick={ addAnd }>And</button>
 		<button onclick={ addAnd3 }>And3</button>
 		<button onclick={ addOr }>Or</button>
@@ -32,7 +33,7 @@
 	<style>
 		:scope
 			> header
-				background #2c6d77
+				background #050f15
 
 				.play
 				.tick

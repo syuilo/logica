@@ -47,6 +47,7 @@ export default function (circuitView: CircuitView, data) {
 		view.id = viewData.node.id;
 		view.x = viewData.x;
 		view.y = viewData.y;
+		view.setRotate(viewData.r);
 
 		circuitView.nodeViews.push(view);
 

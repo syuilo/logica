@@ -6,6 +6,9 @@ import Package from '../core/nodes/package';
 
 import CircuitView from './circuit-view';
 
+// ポートの直径
+const diameter = 8;
+
 @autobind
 abstract class NodeView extends EventEmitter {
 	id: string;
@@ -14,8 +17,8 @@ abstract class NodeView extends EventEmitter {
 
 	el: any;
 
-	width: number;
-	height: number;
+	private width: number;
+	private height: number;
 
 	get x() {
 		return this.el.x();
@@ -33,11 +36,15 @@ abstract class NodeView extends EventEmitter {
 		this.el.y(y);
 	}
 
-	// 0 ... ↑ (default)
-	// 1 ... →
-	// 2 ... ↓
-	// 3 ... ←
-	rotate: number;
+	/**
+	 * この値を操作しないでください
+	 * 
+	 * 0 ... ↑ (default)
+	 * 1 ... →
+	 * 2 ... ↓
+	 * 3 ... ←
+	 */
+	public rotate: number = 0;
 
 	outputs: any[] = [];
 
@@ -105,6 +112,8 @@ abstract class NodeView extends EventEmitter {
 
 		this.rect = this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
 
+		this.rect.dblclick(() => this.setRotate(this.rotate + 1));
+
 		{
 			let x;
 			let y;
@@ -141,24 +150,16 @@ abstract class NodeView extends EventEmitter {
 			});
 		}
 
-		const diameter = 8;
-
 		if (node.inputInfo) {
-			node.inputInfo.forEach((input, i) => {
-				const x = -(diameter / 2);
-				const y = ((i + 1) / (node.inputInfo.length + 1) * this.height) - (diameter / 2);
-				this.inputPorts.push({
-					el: this.el.circle(diameter).move(x, y).fill('#0bf1c2').style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);'),
-					id: input.id
-				});
-			});
+			this.inputPorts = node.inputInfo.map((input, i) => ({
+				el: this.el.circle(diameter).fill('#0bf1c2').style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);'),
+				id: input.id
+			}));
 		}
 
 		if (node.outputInfo) {
-			node.outputInfo.forEach((output, i) => {
-				const x = this.width - (diameter / 2);
-				const y = ((i + 1) / (node.outputInfo.length + 1) * this.height) - (diameter / 2);
-				const o = this.el.circle(diameter).move(x, y).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3); cursor: crosshair;');
+			this.outputPorts = node.outputInfo.map((output, i) => {
+				const o = this.el.circle(diameter).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3); cursor: crosshair;');
 				let line = null;
 
 				o.draggable().on('beforedrag', (e) => {
@@ -224,12 +225,14 @@ abstract class NodeView extends EventEmitter {
 					}
 				});
 
-				this.outputPorts.push({
+				return {
 					el: o,
 					id: output.id
-				});
+				};
 			});
 		}
+
+		this.updatePortPosition();
 	}
 
 	public move(x: number, y: number) {
@@ -239,6 +242,73 @@ abstract class NodeView extends EventEmitter {
 			y = Math.round(y / gridSize) * gridSize;
 		}
 		this.el.move(x, y);
+	}
+
+	setRotate(r: number) {
+		if (r > 3) r = 0;
+		if (this.rotate !== r) {
+			this.rect.attr({
+				width: this.height,
+				height: this.width
+			});
+			const w = this.width;
+			const h = this.height;
+			this.width = h;
+			this.height = w;
+		}
+		this.rotate = r;
+		this.updatePortPosition();
+		this.emit('move');
+	}
+
+	updatePortPosition() {
+		this.inputPorts.forEach((p, i) => {
+			let x: number;
+			let y: number;
+			switch (this.rotate) {
+				case 0:
+					x = -(diameter / 2);
+					y = ((i + 1) / (this.node.inputInfo.length + 1) * this.height) - (diameter / 2);
+					break;
+				case 1:
+					x = ((i + 1) / (this.node.inputInfo.length + 1) * this.width) - (diameter / 2);
+					y = -(diameter / 2);
+					break;
+				case 2:
+					x = this.width - (diameter / 2);
+					y = ((i + 1) / (this.node.inputInfo.length + 1) * this.height) - (diameter / 2);
+					break;
+				case 3:
+					x = ((i + 1) / (this.node.inputInfo.length + 1) * this.width) - (diameter / 2);
+					y = this.height - (diameter / 2);
+					break;
+			}
+			p.el.move(x, y);
+		});
+
+		this.outputPorts.forEach((p, i) => {
+			let x: number;
+			let y: number;
+			switch (this.rotate) {
+				case 0:
+					x = this.width - (diameter / 2);
+					y = ((i + 1) / (this.node.outputInfo.length + 1) * this.height) - (diameter / 2);
+					break;
+				case 1:
+					x = ((i + 1) / (this.node.outputInfo.length + 1) * this.width) - (diameter / 2);
+					y = this.height - (diameter / 2);
+					break;
+				case 2:
+					x = -(diameter / 2);
+					y = ((i + 1) / (this.node.outputInfo.length + 1) * this.height) - (diameter / 2);
+					break;
+				case 3:
+					x = ((i + 1) / (this.node.outputInfo.length + 1) * this.width) - (diameter / 2);
+					y = -(diameter / 2);
+					break;
+			}
+			p.el.move(x, y);
+		});
 	}
 
 	public onMouseover() {

@@ -8,6 +8,7 @@ export default function (views: NodeView[]) {
 		.map(view => ({
 			x: view.x,
 			y: view.y,
+			r: view.rotate,
 			node: view.node.export()
 		}));
 

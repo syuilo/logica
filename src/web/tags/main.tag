@@ -27,7 +27,8 @@
 		<span>] --- [</span>
 		<button onclick={ import }>Import</button>
 		<button onclick={ export }>Export</button>
-		<span>]</span>
+		<span>]   </span>
+		<label><input type="checkbox" checked={ circuitView.snapToGrid } onchange={ onChangeSnapToGrid }>Snap to grid</label>
 	</header>
 	<div ref="drawing"></div>
 	<style>
@@ -138,6 +139,10 @@
 			let data = window.prompt('');
 			data = data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16));
 			imp(this.circuitView, data);
+		};
+
+		this.onChangeSnapToGrid = e => {
+			this.circuitView.snapToGrid = e.target.checked;
 		};
 	</script>
 </lo-main>

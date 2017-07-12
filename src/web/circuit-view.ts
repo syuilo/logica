@@ -26,11 +26,12 @@ import PackageInputView from './node-views/package-input';
 import PackageOutputView from './node-views/package-output';
 
 @autobind
-class X {
+class CircuitView {
 	draw: any;
 	circuit: Circuit;
 	nodeViews: NodeView[] = [];
 	autoTick: boolean = true;
+	snapToGrid: boolean = true;
 
 	constructor(svg, w, h) {
 		this.draw = SVG(svg).size(w, h);
@@ -117,4 +118,4 @@ class X {
 	}
 }
 
-export default X;
+export default CircuitView;

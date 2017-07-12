@@ -110,7 +110,7 @@ abstract class NodeView extends EventEmitter {
 
 			this.rect.draggable().on('dragmove', e => {
 				e.preventDefault();
-				this.el.move(x + e.detail.p.x, y + e.detail.p.y);
+				this.move(x + e.detail.p.x, y + e.detail.p.y);
 				this.emit('move');
 				this.drawLines();
 			});
@@ -226,7 +226,12 @@ abstract class NodeView extends EventEmitter {
 		}
 	}
 
-	public move(x, y) {
+	public move(x: number, y: number) {
+		if (this.circuitView.snapToGrid) {
+			const gridSize = 16;
+			x = Math.round(x / gridSize) * gridSize;
+			y = Math.round(y / gridSize) * gridSize;
+		}
 		this.el.move(x, y);
 	}
 

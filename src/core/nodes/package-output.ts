@@ -17,16 +17,18 @@ export default class PackageOutput extends のーど {
 	public outputId: string;
 	public outputName: string;
 	public outputDesc: string;
+	public outputIndex: number;
 
 	public parent: Package;
 
 	isVirtual = true;
 
-	constructor(id: string, name: string, desc: string) {
+	constructor(id: string, name: string, desc: string, index: number) {
 		super();
 		this.outputId = id;
 		this.outputName = name;
 		this.outputDesc = desc;
+		this.outputIndex = index;
 	}
 
 	update() {
@@ -46,12 +48,13 @@ export default class PackageOutput extends のーど {
 		data.outputId = this.outputId;
 		data.outputName = this.outputName;
 		data.outputDesc = this.outputDesc;
+		data.outputIndex = this.outputIndex;
 		return data;
 	}
 
 	public static import(data): PackageOutput {
 		if (data.type !== 'PackageOutput') throw 'This data is not PackageOutput data';
-		const pkgo = new PackageOutput(data.outputId, data.outputName, data.outputDesc);
+		const pkgo = new PackageOutput(data.outputId, data.outputName, data.outputDesc, data.outputIndex);
 		pkgo.name = data.name;
 		return pkgo;
 	}

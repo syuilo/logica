@@ -37,6 +37,7 @@ export default class Package extends のーど {
 
 		this.inputInfo = Array.from(this.nodes)
 			.filter(n => n.type === 'PackageInput')
+			.sort((a: PackageInput, b: PackageInput) => a.inputIndex - b.inputIndex)
 			.map((pi: PackageInput) => ({
 				id: pi.inputId,
 				name: pi.inputName,
@@ -45,6 +46,7 @@ export default class Package extends のーど {
 
 		this.outputInfo = Array.from(this.nodes)
 			.filter(n => n.type === 'PackageOutput')
+			.sort((a: PackageOutput, b: PackageOutput) => a.outputIndex - b.outputIndex)
 			.map((po: PackageOutput) => ({
 				id: po.outputId,
 				name: po.outputName,

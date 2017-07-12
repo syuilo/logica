@@ -192,18 +192,20 @@ abstract class のーど extends EventEmitter {
 		const c = this.inputs.find(c => c.to === portId);
 		if (c == null) return false;
 		const n = c.node;
-		if (n.type === 'Pin') {
-			return (n as Pin).getActualPreviousNodeState('x');
-		} else if (n.type === 'PackageInput') {
-			if ((n as PackageInput).parent == null) {
-				return false;
-			} else {
-				return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
-			}
-		} else if (n.type === 'Package') {
-			return (n as Package).getActualOutputNodeState(c.from);
-		} else {
-			return n.getState(c.from);
+
+		switch (n.type) {
+			case 'Pin':
+				return (n as Pin).getActualPreviousNodeState('x');
+			case 'PackageInput':
+				if ((n as PackageInput).parent == null) {
+					return false;
+				} else {
+					return (n as PackageInput).parent.getActualPreviousNodeState((n as PackageInput).inputId);
+				}
+			case 'Package':
+				return (n as Package).getActualOutputNodeState(c.from);
+			default:
+				return n.getState(c.from);
 		}
 	}
 
@@ -218,18 +220,20 @@ abstract class のーど extends EventEmitter {
 
 		return this.outputs.filter(c => c.from === portId).map(c => {
 			const n = c.node;
-			if (n.type === 'Pin') {
-				return (n as Pin).getActualNextNodes('x');
-			} else if (n.type === 'PackageOutput') {
-				if ((n as PackageOutput).parent == null) {
-					return [];
-				} else {
-					return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
-				}
-			} else if (n.type === 'Package') {
-				return (n as Package).getActualInputNodes(c.to);
-			} else {
-				return [n];
+
+			switch (n.type) {
+				case 'Pin':
+					return (n as Pin).getActualNextNodes('x');
+				case 'PackageOutput':
+					if ((n as PackageOutput).parent == null) {
+						return [];
+					} else {
+						return (n as PackageOutput).parent.getActualNextNodes((n as PackageOutput).outputId);
+					}
+				case 'Package':
+					return (n as Package).getActualInputNodes(c.to);
+				default:
+					return [n];
 			}
 		}).reduce((a, b) => a.concat(b), []);
 	}

@@ -2,6 +2,8 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import autobind from 'autobind-decorator';
 
 import のーど from '../core/node';
+import Package from '../core/nodes/package';
+
 import CircuitBoard from './circuit-board';
 
 @autobind
@@ -266,12 +268,23 @@ abstract class NodeTag extends EventEmitter {
 					.style('stroke-dasharray: 5; animation: dash 1s linear infinite; pointer-events: none;'));
 			}
 
+			let text;
+
 			cover.mouseover(() => {
 				line.stroke({ color: '#f00' });
+
+				const from = this.node.type === 'Package' ? (this.node as Package).packageName : this.node.type;
+				const to = o.connection.node.type === 'Package' ? (o.connection.node as Package).packageName : o.connection.node.type;
+				text = this.circuitBoard.draw
+					.text(`${ from }:${ o.connection.from } --> ${ to }:${ o.connection.to }`)
+					.fill('#fff')
+					.move(((lineStartX + lineEndX) / 2), ((lineStartY + lineEndY) / 2))
+					.style('pointer-events: none;');
 			});
 
 			cover.mouseout(() => {
 				line.stroke({ color: lineColor });
+				text.remove();
 			});
 
 			cover.click(() => {

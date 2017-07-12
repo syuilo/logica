@@ -215,6 +215,7 @@ abstract class のーど extends EventEmitter {
 				return [this];
 			}
 		}
+
 		return this.outputs.filter(c => c.from === portId).map(c => {
 			const n = c.node;
 			if (n.type === 'Pin') {
@@ -230,7 +231,7 @@ abstract class のーど extends EventEmitter {
 			} else {
 				return [n];
 			}
-		}).reduce((a, b) => a.concat(b));
+		}).reduce((a, b) => a.concat(b), []);
 	}
 
 	public addInput(connection: connection) {

@@ -19,8 +19,8 @@
 		<span>-</span>
 		<button onclick={ circuitBoard.addPin }>Pin</button>
 		<span>-</span>
-		<button onclick={ circuitBoard.addPackageInput }>[PackageInput]</button>
-		<button onclick={ circuitBoard.addPackageOutput }>[PackageOutput]</button>
+		<button onclick={ circuitBoard.addPackageInput }>[PackageIn]</button>
+		<button onclick={ circuitBoard.addPackageOutput }>[PackageOut]</button>
 		<span>] --- [</span>
 		<button onclick={ appendPackage }>Append Package</button>
 		<button onclick={ createPackage }>Create Package</button>

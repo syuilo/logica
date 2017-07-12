@@ -1,3 +1,5 @@
+import autobind from 'autobind-decorator';
+
 import のーど from './node';
 import Package from './nodes/package';
 import PackageInput from './nodes/package-input';
@@ -6,6 +8,7 @@ import PackageOutput from './nodes/package-output';
 /**
  * 回路
  */
+@autobind
 export default class Circuit {
 	/**
 	 * この回路に含まれているノード
@@ -89,22 +92,37 @@ export default class Circuit {
 	 * 回路の状態を初期状態に戻します
 	 */
 	public reset() {
-	}
-
-	public addNode(node: のーど) {
-		this.nodes.add(node);
-
 		const dive = node => {
-			node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
-			if (node.isForceUpdate) this.shouldUpdates.add(node);
+			node.init();
+			node.emit('state-updated');
+			node.emit('input-updated');
+			this.scan(node);
+
 			if (node.type === 'Package') {
 				(node as Package).nodes.forEach(n => {
 					dive(n);
 				});
 			}
 		};
+		this.nodes.forEach(n => dive(n));
 
-		dive(node);
+		this.shouldUpdates.clear();
+		this.nodes.forEach(n => this.scan(n));
+	}
+
+	public addNode(node: のーど) {
+		this.nodes.add(node);
+		this.scan(node);
+	}
+
+	private scan(node: のーど) {
+		node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
+		if (node.isForceUpdate) this.shouldUpdates.add(node);
+		if (node.type === 'Package') {
+			(node as Package).nodes.forEach(n => {
+				this.scan(n);
+			});
+		}
 	}
 
 	public removeNode(node: のーど) {

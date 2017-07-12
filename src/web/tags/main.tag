@@ -1,6 +1,7 @@
 <lo-main>
 	<header if={ circuitView }>
-		<button class="play" title={ circuitView.autoTick ? 'Pause' : 'Resume' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitView.autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="reset" title="Reset" onclick={ circuitView.circuit.reset }><i class="fa fa-repeat"></i></button>
+		<button class="autoTick" title={ circuitView.autoTick ? 'Pause' : 'Resume' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitView.autoTick ? 'pause' : 'play' }"></i></button>
 		<button class="tick" title="Next Tick" onclick={ tick } disabled={ circuitView.autoTick }><i class="fa fa-step-forward"></i></button>
 		<span>[</span>
 		<button onclick={ circuitView.addAnd }>And</button>
@@ -37,7 +38,8 @@
 			> header
 				background #050f15
 
-				.play
+				.reset
+				.autoTick
 				.tick
 					padding 0
 					margin 0

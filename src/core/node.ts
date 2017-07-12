@@ -99,7 +99,7 @@ abstract class のーど extends EventEmitter {
 		if (this.isVirtual) {
 			return this.getActualPreviousNodeState(id);
 		} else if (this.type === 'Package') {
-			return (this as Package).getActualOutputNodeState(id);
+			return (this as any).getActualOutputNodeState(id);
 		} else {
 			return this.states.hasOwnProperty(id) ? this.states[id] : false;
 		}

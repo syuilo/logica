@@ -36,39 +36,39 @@ import PackageTag from './node-tags/package';
 import PackageInputTag from './node-tags/package-input';
 import PackageOutputTag from './node-tags/package-output';
 
-export default function (draw, tags, circuit, data) {
+export default function (circuitBoard, data) {
 	data = msgpack.decode(data);
 
 	data.forEach(tagData => {
 		let tag = null;
-		if (tagData.node.type === 'And') tag = new AndTag(draw, circuit, tags, And.import(tagData.node));
-		if (tagData.node.type === 'And3') tag = new And3Tag(draw, circuit, tags, And3.import(tagData.node));
-		if (tagData.node.type === 'Or') tag = new OrTag(draw, circuit, tags, Or.import(tagData.node));
-		if (tagData.node.type === 'Not') tag = new NotTag(draw, circuit, tags, Not.import(tagData.node));
-		if (tagData.node.type === 'Nor') tag = new NorTag(draw, circuit, tags, Nor.import(tagData.node));
-		if (tagData.node.type === 'Nand') tag = new NandTag(draw, circuit, tags, Nand.import(tagData.node));
-		if (tagData.node.type === 'Xor') tag = new XorTag(draw, circuit, tags, Xor.import(tagData.node));
-		if (tagData.node.type === 'Nop') tag = new NopTag(draw, circuit, tags, Nop.import(tagData.node));
-		if (tagData.node.type === 'Random') tag = new RandomTag(draw, circuit, tags, Random.import(tagData.node));
-		if (tagData.node.type === 'Button') tag = new ButtonTag(draw, circuit, tags, Button.import(tagData.node));
-		if (tagData.node.type === 'Led') tag = new LedTag(draw, circuit, tags, Led.import(tagData.node));
-		if (tagData.node.type === 'Pin') tag = new PinTag(draw, circuit, tags, Pin.import(tagData.node));
-		if (tagData.node.type === 'Package') tag = new PackageTag(draw, circuit, tags, Package.import(tagData.node));
-		if (tagData.node.type === 'PackageInput') tag = new PackageInputTag(draw, circuit, tags, PackageInput.import(tagData.node));
-		if (tagData.node.type === 'PackageOutput') tag = new PackageOutputTag(draw, circuit, tags, PackageOutput.import(tagData.node));
+		if (tagData.node.type === 'And') tag = new AndTag(circuitBoard, And.import(tagData.node));
+		if (tagData.node.type === 'And3') tag = new And3Tag(circuitBoard, And3.import(tagData.node));
+		if (tagData.node.type === 'Or') tag = new OrTag(circuitBoard, Or.import(tagData.node));
+		if (tagData.node.type === 'Not') tag = new NotTag(circuitBoard, Not.import(tagData.node));
+		if (tagData.node.type === 'Nor') tag = new NorTag(circuitBoard, Nor.import(tagData.node));
+		if (tagData.node.type === 'Nand') tag = new NandTag(circuitBoard, Nand.import(tagData.node));
+		if (tagData.node.type === 'Xor') tag = new XorTag(circuitBoard, Xor.import(tagData.node));
+		if (tagData.node.type === 'Nop') tag = new NopTag(circuitBoard, Nop.import(tagData.node));
+		if (tagData.node.type === 'Random') tag = new RandomTag(circuitBoard, Random.import(tagData.node));
+		if (tagData.node.type === 'Button') tag = new ButtonTag(circuitBoard, Button.import(tagData.node));
+		if (tagData.node.type === 'Led') tag = new LedTag(circuitBoard, Led.import(tagData.node));
+		if (tagData.node.type === 'Pin') tag = new PinTag(circuitBoard, Pin.import(tagData.node));
+		if (tagData.node.type === 'Package') tag = new PackageTag(circuitBoard, Package.import(tagData.node));
+		if (tagData.node.type === 'PackageInput') tag = new PackageInputTag(circuitBoard, PackageInput.import(tagData.node));
+		if (tagData.node.type === 'PackageOutput') tag = new PackageOutputTag(circuitBoard, PackageOutput.import(tagData.node));
 		tag.id = tagData.node.id;
 		tag.x = tagData.x;
 		tag.y = tagData.y;
 
-		tags.push(tag);
+		circuitBoard.tags.push(tag);
 
-		circuit.addNode(tag.node);
+		circuitBoard.circuit.addNode(tag.node);
 	});
 
 	data.forEach(tagData => {
 		tagData.node.outputs.forEach(output => {
-			tags.find(tag => tag.id === tagData.node.id).node.connectTo(
-				tags.find(tag => tag.id === output.nid).node,
+			circuitBoard.tags.find(tag => tag.id === tagData.node.id).node.connectTo(
+				circuitBoard.tags.find(tag => tag.id === output.nid).node,
 				output.to,
 				output.from
 			);

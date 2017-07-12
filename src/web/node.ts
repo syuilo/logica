@@ -1,8 +1,11 @@
-import * as riot from 'riot';
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import autobind from 'autobind-decorator';
 
 import のーど from '../core/node';
+import CircuitBoard from './circuit-board';
 
-export default abstract class NodeTag {
+@autobind
+abstract class NodeTag extends EventEmitter {
 	node: のーど;
 
 	el: any;
@@ -37,20 +40,15 @@ export default abstract class NodeTag {
 
 	rect: any;
 	removeButton: any;
-	circuitBoard: any;
+	circuitBoard: CircuitBoard;
 
-	constructor(circuitBoard, node, w, h) {
-		// BIND ---------------------------------------
-		this.onMouseover = this.onMouseover.bind(this);
-		this.drawLines = this.drawLines.bind(this);
-		// --------------------------------------------
-
-		riot.observable(this);
+	constructor(circuitBoard: CircuitBoard, node: のーど, w: number, h: number) {
+		super();
 
 		this.circuitBoard = circuitBoard;
 		this.node = node;
 
-		node.on('stateUpdated', () => {
+		node.on('state-updated', () => {
 			this.drawLines();
 		});
 
@@ -84,7 +82,6 @@ export default abstract class NodeTag {
 			this.lines = [];
 			this.el.remove();
 			this.circuitBoard.nodeTags = this.circuitBoard.nodeTags.filter(tag => tag != this);
-			console.log(this.circuitBoard.nodeTags);
 		});
 
 		this.width = w;
@@ -108,7 +105,7 @@ export default abstract class NodeTag {
 			this.rect.draggable().on('dragmove', e => {
 				e.preventDefault();
 				this.el.move(x + e.detail.p.x, y + e.detail.p.y);
-				(this as any).trigger('move');
+				this.emit('move');
 				this.drawLines();
 			});
 		}
@@ -223,6 +220,10 @@ export default abstract class NodeTag {
 		}
 	}
 
+	public move(x, y) {
+		this.el.move(x, y);
+	}
+
 	public onMouseover() {
 		this.removeButton.style('display: block; cursor: pointer;');
 		this.rect.off('mouseover', this.onMouseover);
@@ -275,3 +276,5 @@ export default abstract class NodeTag {
 		});
 	}
 }
+
+export default NodeTag;

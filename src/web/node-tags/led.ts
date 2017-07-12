@@ -1,13 +1,20 @@
+import CircuitBoard from '../circuit-board';
 import NodeTag from '../node';
+import Led from '../../core/nodes/led';
 
 export default class LedTag extends NodeTag {
-	constructor(draw, circuit, tags, node) {
-		super(draw, circuit, tags, node, 64, 64);
+	constructor(circuitBoard: CircuitBoard, node?: Led) {
+		const led = node || new Led();
+		super(circuitBoard, led, 64, 64);
 
-		const led = this.el.rect(48, 48).move(8, 8).fill('#0c1319').radius(2).style('pointer-events: none;');
+		const rect = this.el.rect(48, 48).move(8, 8).fill('#0c1319').radius(2).style('pointer-events: none;');
 
-		node.on('input-updated', state => {
-			led.fill(state ? '#efcb34' : '#0c1319');
+		led.on('input-updated', state => {
+			rect.fill(state ? '#efcb34' : '#0c1319');
 		});
+	}
+
+	public static import(circuitBoard: CircuitBoard, data) {
+		return new LedTag(circuitBoard, Led.import(data.node));
 	}
 }

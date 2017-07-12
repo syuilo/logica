@@ -102,14 +102,14 @@ class X {
 
 	addPackageInput() {
 		const name = window.prompt('Input name');
-		const id = window.prompt('Input ID');
+		const id = window.prompt('Input ID ([a-z0-9_]+)');
 		const desc = window.prompt('Input description');
 		this.addTag(new PackageInputTag(this, id, name, desc));
 	}
 
 	addPackageOutput() {
 		const name = window.prompt('Output name');
-		const id = window.prompt('Output ID');
+		const id = window.prompt('Output ID ([a-z0-9_]+)');
 		const desc = window.prompt('Output description');
 		this.addTag(new PackageOutputTag(this, id, name, desc));
 	}

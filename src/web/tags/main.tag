@@ -1,6 +1,6 @@
 <lo-main>
 	<header if={ circuitBoard }>
-		<button class="play" title={ circuitBoard.autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitBoard.autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="play" title={ circuitBoard.autoTick ? 'Pause' : 'Resume' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitBoard.autoTick ? 'pause' : 'play' }"></i></button>
 		<button class="tick" title="Next Tick" onclick={ tick } disabled={ circuitBoard.autoTick }><i class="fa fa-step-forward"></i></button>
 		<span>[</span>
 		<button onclick={ circuitBoard.addAnd }>And</button>

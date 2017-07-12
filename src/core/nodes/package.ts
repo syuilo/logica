@@ -66,6 +66,7 @@ export default class Package extends のーど {
 
 	public addInput(connection) {
 		this.inputs.push(connection);
+		this.getActualInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {

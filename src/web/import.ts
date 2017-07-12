@@ -4,6 +4,8 @@ import Circuit from '../core/circuit';
 
 import importNodes from '../core/import';
 
+import CircuitBoard from './circuit-board';
+
 import AndTag from './node-tags/and';
 import And3Tag from './node-tags/and3';
 import OrTag from './node-tags/or';
@@ -20,7 +22,7 @@ import PackageTag from './node-tags/package';
 import PackageInputTag from './node-tags/package-input';
 import PackageOutputTag from './node-tags/package-output';
 
-export default function (circuitBoard, data) {
+export default function (circuitBoard: CircuitBoard, data) {
 	data = msgpack.decode(data);
 
 	data.forEach(tagData => {
@@ -44,15 +46,15 @@ export default function (circuitBoard, data) {
 		tag.x = tagData.x;
 		tag.y = tagData.y;
 
-		circuitBoard.tags.push(tag);
+		circuitBoard.nodeTags.push(tag);
 
 		circuitBoard.circuit.addNode(tag.node);
 	});
 
 	data.forEach(tagData => {
 		tagData.node.outputs.forEach(output => {
-			circuitBoard.tags.find(tag => tag.id === tagData.node.id).node.connectTo(
-				circuitBoard.tags.find(tag => tag.id === output.nid).node,
+			circuitBoard.nodeTags.find(tag => tag.id === tagData.node.id).node.connectTo(
+				circuitBoard.nodeTags.find(tag => tag.id === output.nid).node,
 				output.to,
 				output.from
 			);

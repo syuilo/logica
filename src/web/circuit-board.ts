@@ -5,6 +5,8 @@ require('svg.draggable.js');
 
 import Circuit from '../core/circuit';
 
+import Package from '../core/nodes/package';
+
 import NodeTag from './node';
 
 import AndTag from './node-tags/and';
@@ -44,6 +46,10 @@ class X {
 		this.nodeTags.push(tag);
 		this.circuit.addNode(tag.node);
 		tag.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
+	}
+
+	loadPackage(data) {
+		this.addTag(new PackageTag(this, Package.import(data)));
 	}
 
 	addAnd() {

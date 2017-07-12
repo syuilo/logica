@@ -6,6 +6,8 @@ import CircuitBoard from './circuit-board';
 
 @autobind
 abstract class NodeTag extends EventEmitter {
+	id: string;
+
 	node: のーど;
 
 	el: any;

@@ -93,7 +93,7 @@
 		};
 
 		this.createPackage = () => {
-			if (Array.from(this.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
+			if (Array.from(this.circuitBoard.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuitBoard.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
 				alert('パッケージを作成するには、回路に一つ以上のPackageInputおよびPackageOutputが含まれている必要があります' + '\n' + 'To create a package, you must include PackageInput and PackageOutput.');
 				return;
 			}
@@ -102,7 +102,7 @@
 			const name = window.prompt('Package name');
 			const desc = window.prompt('Package description');
 
-			const data = expPkg(this.circuit.nodes, author, name, desc);
+			const data = expPkg(this.circuitBoard.circuit.nodes, author, name, desc);
 
 			console.log('あなたのパッケージはこちらです:');
 			console.log(Array.prototype.map.call(msgpack.encode(data), val => {
@@ -121,13 +121,11 @@
 
 			data = msgpack.decode(data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16)));
 
-			const pkg = Package.import(data);
-			this.nodeTags.push(new PackageTag(this, pkg));
-			this.circuit.addNode(pkg);
+			this.circuitBoard.loadPackage(data);
 		};
 
 		this.export = () => {
-			const data = exp(this.nodeTags);
+			const data = exp(this.circuitBoard.nodeTags);
 			console.log(Array.prototype.map.call(data, val => {
 				let hex = (val).toString(16).toUpperCase();
 				if (val < 16) hex = '0' + hex;
@@ -139,7 +137,7 @@
 		this.import = () => {
 			let data = window.prompt('');
 			data = data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16));
-			imp(this.draw, this.nodeTags, this.circuit, data);
+			imp(this.circuitBoard, data);
 		};
 	</script>
 </lo-main>

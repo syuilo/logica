@@ -1,12 +1,14 @@
 const msgpack = require('msgpack-lite');
 
-export default function (tags) {
-	tags.forEach((tag, i) => tag.node.id = i);
-	const data = tags
-		.map(tag => ({
-			x: tag.x,
-			y: tag.y,
-			node: tag.node.export()
+import NodeView from './node-view';
+
+export default function (views: NodeView[]) {
+	views.forEach((view, i) => view.node.id = i);
+	const data = views
+		.map(view => ({
+			x: view.x,
+			y: view.y,
+			node: view.node.export()
 		}));
 
 	return msgpack.encode(data);

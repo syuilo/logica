@@ -4,10 +4,10 @@ import autobind from 'autobind-decorator';
 import のーど from '../core/node';
 import Package from '../core/nodes/package';
 
-import CircuitBoard from './circuit-board';
+import CircuitView from './circuit-view';
 
 @autobind
-abstract class NodeTag extends EventEmitter {
+abstract class NodeView extends EventEmitter {
 	id: string;
 
 	node: のーど;
@@ -44,14 +44,14 @@ abstract class NodeTag extends EventEmitter {
 
 	rect: any;
 	removeButton: any;
-	circuitBoard: CircuitBoard;
+	circuitView: CircuitView;
 
-	constructor(circuitBoard: CircuitBoard, node: のーど, w: number, h: number) {
+	constructor(circuitView: CircuitView, node: のーど, w: number, h: number) {
 		super();
 
 		this.setMaxListeners(Infinity);
 
-		this.circuitBoard = circuitBoard;
+		this.circuitView = circuitView;
 		this.node = node;
 
 		node.on('state-updated', () => {
@@ -59,13 +59,13 @@ abstract class NodeTag extends EventEmitter {
 		});
 
 		node.on('connected', c => {
-			const targetTag = this.circuitBoard.nodeTags.find(tag => tag.node == c.node);
+			const targetView = this.circuitView.nodeViews.find(view => view.node == c.node);
 			this.outputs.push({
-				tag: targetTag,
+				view: targetView,
 				connection: c
 			});
 			this.drawLines();
-			targetTag.on('move', this.drawLines);
+			targetView.on('move', this.drawLines);
 			c.node.on('removed', () => {
 				this.outputs = this.outputs.filter(o => o.connection.node != c.node);
 				this.drawLines();
@@ -73,27 +73,27 @@ abstract class NodeTag extends EventEmitter {
 		});
 
 		node.on('disconnected', (target, targetPortId, myPortId) => {
-			const targetTag = this.circuitBoard.nodeTags.find(tag => tag.node == target);
-			this.outputs = this.outputs.filter(o => !(o.connection.node == targetTag.node && o.connection.from == myPortId && o.connection.to == targetPortId));
+			const targetView = this.circuitView.nodeViews.find(view => view.node == target);
+			this.outputs = this.outputs.filter(o => !(o.connection.node == targetView.node && o.connection.from == myPortId && o.connection.to == targetPortId));
 			this.drawLines();
-			targetTag.off('move', this.drawLines);
+			targetView.off('move', this.drawLines);
 		});
 
 		node.on('removed', () => {
 			this.outputs.forEach(o => {
-				o.tag.off('move', this.drawLines);
+				o.view.off('move', this.drawLines);
 			});
 			this.outputs = [];
 			this.lines.forEach(l => l.remove());
 			this.lines = [];
 			this.el.remove();
-			this.circuitBoard.nodeTags = this.circuitBoard.nodeTags.filter(tag => tag != this);
+			this.circuitView.nodeViews = this.circuitView.nodeViews.filter(view => view != this);
 		});
 
 		this.width = w;
 		this.height = h;
 
-		this.el = this.circuitBoard.draw.nested();
+		this.el = this.circuitView.draw.nested();
 
 		this.el.element('title').words(this.node.desc);
 
@@ -120,7 +120,7 @@ abstract class NodeTag extends EventEmitter {
 			const removeButtonSize = 12;
 			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
-				this.circuitBoard.circuit.removeNode(this.node);
+				this.circuitView.circuit.removeNode(this.node);
 			});
 		}
 
@@ -179,17 +179,17 @@ abstract class NodeTag extends EventEmitter {
 
 					let target: any = null;
 
-					this.circuitBoard.nodeTags.some(tag => {
+					this.circuitView.nodeViews.some(view => {
 						const asobi = 12;
-						const nearPort = tag.inputPorts.find(p =>
-							(p.el.x() + tag.x - asobi) < x &&
-							(p.el.y() + tag.y - asobi) < y &&
-							(p.el.x() + tag.x) + p.el.width() + asobi > x &&
-							(p.el.y() + tag.y) + p.el.height() + asobi > y);
+						const nearPort = view.inputPorts.find(p =>
+							(p.el.x() + view.x - asobi) < x &&
+							(p.el.y() + view.y - asobi) < y &&
+							(p.el.x() + view.x) + p.el.width() + asobi > x &&
+							(p.el.y() + view.y) + p.el.height() + asobi > y);
 
 						if (nearPort) {
 							target = {
-								tag: tag,
+								view: view,
 								portId: nearPort.id
 							};
 							return true;
@@ -199,22 +199,22 @@ abstract class NodeTag extends EventEmitter {
 					});
 
 					if (!target) {
-						const nearTag = this.circuitBoard.nodeTags.find(t =>
+						const nearView = this.circuitView.nodeViews.find(t =>
 							t.x < x &&
 							t.y < y &&
 							t.x + t.width > x &&
 							t.y + t.height > y);
 
-						if (nearTag) {
+						if (nearView) {
 							target = {
-								tag: nearTag,
+								view: nearView,
 								portId: null
 							};
 						}
 					}
 
 					if (target) {
-						this.node.connectTo(target.tag.node, target.portId, output.id);
+						this.node.connectTo(target.view.node, target.portId, output.id);
 					}
 				});
 
@@ -240,11 +240,11 @@ abstract class NodeTag extends EventEmitter {
 		this.lines.forEach(l => l.remove());
 		this.outputs.forEach(o => {
 			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
-			const inputPortIndex = o.tag.node.inputInfo.findIndex(info => o.connection.to === info.id);
+			const inputPortIndex = o.view.node.inputInfo.findIndex(info => o.connection.to === info.id);
 			const lineStartX = this.x + this.outputPorts[outputPortIndex].el.x() + (this.outputPorts[outputPortIndex].el.width() / 2);
 			const lineStartY = this.y + this.outputPorts[outputPortIndex].el.y() + (this.outputPorts[outputPortIndex].el.height() / 2);
-			const lineEndX = o.tag.x + o.tag.inputPorts[inputPortIndex].el.x() + (o.tag.inputPorts[inputPortIndex].el.width() / 2);
-			const lineEndY = o.tag.y + o.tag.inputPorts[inputPortIndex].el.y() + (o.tag.inputPorts[inputPortIndex].el.height() / 2);
+			const lineEndX = o.view.x + o.view.inputPorts[inputPortIndex].el.x() + (o.view.inputPorts[inputPortIndex].el.width() / 2);
+			const lineEndY = o.view.y + o.view.inputPorts[inputPortIndex].el.y() + (o.view.inputPorts[inputPortIndex].el.height() / 2);
 
 			const state = this.node.getState(o.connection.from);
 
@@ -253,17 +253,17 @@ abstract class NodeTag extends EventEmitter {
 			const lineColor = state ? '#7aff00' : '#627f84';
 
 			if (state) {
-				this.lines.push(cover = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(cover = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }).style('cursor: pointer;'));
 
-				this.lines.push(line = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(line = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: lineColor, width: 2 })
 					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite; pointer-events: none;'));
 			} else {
-				this.lines.push(cover = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(cover = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: 'transparent', width: 8 }).style('cursor: pointer;'));
 
-				this.lines.push(line = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(line = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: lineColor, width: 2 })
 					.style('stroke-dasharray: 5; animation: dash 1s linear infinite; pointer-events: none;'));
 			}
@@ -275,7 +275,7 @@ abstract class NodeTag extends EventEmitter {
 
 				const from = this.node.type === 'Package' ? (this.node as Package).packageName : this.node.type;
 				const to = o.connection.node.type === 'Package' ? (o.connection.node as Package).packageName : o.connection.node.type;
-				text = this.circuitBoard.draw
+				text = this.circuitView.draw
 					.text(`${ from }:${ o.connection.from } --> ${ to }:${ o.connection.to }`)
 					.fill('#fff')
 					.move(((lineStartX + lineEndX) / 2), ((lineStartY + lineEndY) / 2))
@@ -288,11 +288,11 @@ abstract class NodeTag extends EventEmitter {
 			});
 
 			cover.click(() => {
-				this.node.disconnectTo(o.tag.node, o.connection.to, o.connection.from);
+				this.node.disconnectTo(o.view.node, o.connection.to, o.connection.from);
 				text.remove();
 			});
 		});
 	}
 }
 
-export default NodeTag;
+export default NodeView;

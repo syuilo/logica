@@ -1,14 +1,14 @@
-import CircuitBoard from '../circuit-board';
-import NodeTag from '../node';
+import CircuitView from '../circuit-view';
+import NodeView from '../node-view';
 import PackageOutput from '../../core/nodes/package-output';
 
-export default class PackageOutputTag extends NodeTag {
+export default class PackageOutputView extends NodeView {
 	node: PackageOutput;
 
-	constructor(circuitBoard: CircuitBoard, node: PackageOutput);
-	constructor(circuitBoard: CircuitBoard, id: string, name: string, desc: string, index: number);
-	constructor(circuitBoard: CircuitBoard, x: PackageOutput | string, name?: string, desc?: string, index?: number) {
-		super(circuitBoard, typeof x == 'string' ? new PackageOutput(x, name, desc, index) : x, 96, 64);
+	constructor(circuitView: CircuitView, node: PackageOutput);
+	constructor(circuitView: CircuitView, id: string, name: string, desc: string, index: number);
+	constructor(circuitView: CircuitView, x: PackageOutput | string, name?: string, desc?: string, index?: number) {
+		super(circuitView, typeof x == 'string' ? new PackageOutput(x, name, desc, index) : x, 96, 64);
 
 		this.el.text('OUT: ' + this.node.outputName).fill('#fff').move(10, 4);
 
@@ -24,7 +24,7 @@ export default class PackageOutputTag extends NodeTag {
 		});
 	}
 
-	public static import(circuitBoard: CircuitBoard, data) {
-		return new PackageOutputTag(circuitBoard, PackageOutput.import(data.node));
+	public static import(circuitView: CircuitView, data) {
+		return new PackageOutputView(circuitView, PackageOutput.import(data.node));
 	}
 }

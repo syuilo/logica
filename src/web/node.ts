@@ -5,8 +5,6 @@ import のーど from '../core/node';
 export default abstract class NodeTag {
 	node: のーど;
 
-	draw: any;
-
 	el: any;
 
 	width: number;
@@ -39,9 +37,9 @@ export default abstract class NodeTag {
 
 	rect: any;
 	removeButton: any;
-	circuit: any;
+	circuitBoard: any;
 
-	constructor(draw, circuit, tags, node, w, h) {
+	constructor(circuitBoard, node, w, h) {
 		// BIND ---------------------------------------
 		this.onMouseover = this.onMouseover.bind(this);
 		this.drawLines = this.drawLines.bind(this);
@@ -49,7 +47,7 @@ export default abstract class NodeTag {
 
 		riot.observable(this);
 
-		this.circuit = circuit;
+		this.circuitBoard = circuitBoard;
 		this.node = node;
 
 		node.on('stateUpdated', () => {
@@ -57,7 +55,7 @@ export default abstract class NodeTag {
 		});
 
 		node.on('connected', c => {
-			const targetTag = tags.find(tag => tag.node == c.node);
+			const targetTag = this.circuitBoard.nodeTags.find(tag => tag.node == c.node);
 			this.outputs.push({
 				tag: targetTag,
 				connection: c
@@ -71,7 +69,7 @@ export default abstract class NodeTag {
 		});
 
 		node.on('disconnected', (target, targetPortId, myPortId) => {
-			const targetTag = tags.find(tag => tag.node == target);
+			const targetTag = this.circuitBoard.nodeTags.find(tag => tag.node == target);
 			this.outputs = this.outputs.filter(o => !(o.connection.node == targetTag.node && o.connection.from == myPortId && o.connection.to == targetPortId));
 			this.drawLines();
 			targetTag.off('move', this.drawLines);
@@ -85,19 +83,15 @@ export default abstract class NodeTag {
 			this.lines.forEach(l => l.remove());
 			this.lines = [];
 			this.el.remove();
+			this.circuitBoard.nodeTags = this.circuitBoard.nodeTags.filter(tag => tag != this);
+			console.log(this.circuitBoard.nodeTags);
 		});
-
-		this.draw = draw;
 
 		this.width = w;
 		this.height = h;
 
-		this.el = draw.nested();
-/*		this.el.draggable().on('dragmove', () => {
-			(this as any).trigger('move');
-			this.drawLines();
-		});
-*/
+		this.el = this.circuitBoard.draw.nested();
+
 		this.el.element('title').words(this.node.desc);
 
 		this.rect = this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
@@ -123,7 +117,7 @@ export default abstract class NodeTag {
 			const removeButtonSize = 12;
 			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
-				this.circuit.removeNode(this.node);
+				this.circuitBoard.circuit.removeNode(this.node);
 			});
 		}
 
@@ -182,7 +176,7 @@ export default abstract class NodeTag {
 
 					let target: any = null;
 
-					tags.some(tag => {
+					this.circuitBoard.nodeTags.some(tag => {
 						const asobi = 12;
 						const nearPort = tag.inputPorts.find(p =>
 							(p.el.x() + tag.x - asobi) < x &&
@@ -202,7 +196,7 @@ export default abstract class NodeTag {
 					});
 
 					if (!target) {
-						const nearTag = tags.find(t =>
+						const nearTag = this.circuitBoard.nodeTags.find(t =>
 							t.x < x &&
 							t.y < y &&
 							t.x + t.width > x &&
@@ -252,17 +246,17 @@ export default abstract class NodeTag {
 			const lineColor = state ? '#7aff00' : '#627f84';
 
 			if (state) {
-				this.lines.push(cover = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(cover = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }).style('cursor: pointer;'));
 
-				this.lines.push(line = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(line = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: lineColor, width: 2 })
 					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite; pointer-events: none;'));
 			} else {
-				this.lines.push(cover = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(cover = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: 'transparent', width: 8 }).style('cursor: pointer;'));
 
-				this.lines.push(line = this.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+				this.lines.push(line = this.circuitBoard.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
 					.stroke({ color: lineColor, width: 2 })
 					.style('stroke-dasharray: 5; animation: dash 1s linear infinite; pointer-events: none;'));
 			}

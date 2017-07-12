@@ -33,6 +33,12 @@ abstract class NodeView extends EventEmitter {
 		this.el.y(y);
 	}
 
+	// 0 ... ↑ (default)
+	// 1 ... →
+	// 2 ... ↓
+	// 3 ... ←
+	rotate: number;
+
 	outputs: any[] = [];
 
 	lines: any[] = [];

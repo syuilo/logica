@@ -309,6 +309,8 @@ abstract class NodeView extends EventEmitter {
 			}
 			p.el.move(x, y);
 		});
+
+		this.drawLines();
 	}
 
 	public onMouseover() {

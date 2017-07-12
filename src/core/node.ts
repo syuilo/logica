@@ -1,45 +1,13 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import autobind from 'autobind-decorator';
 
 import Package from './nodes/package';
 import PackageInput from './nodes/package-input';
 import PackageOutput from './nodes/package-output';
 import Pin from './nodes/pin';
 
-export type connection = {
-	/**
-	 * 相手のノード
-	 */
-	node: のーど;
-
-	/**
-	 * 出力ポートのID
-	 */
-	from: string;
-
-	/**
-	 * 入力ポートのID
-	 */
-	to: string;
-};
-
-export type port = {
-	/**
-	 * ポートID
-	 */
-	id: string;
-
-	/**
-	 * ポート名
-	 */
-	name: string;
-
-	/**
-	 * ポートの説明
-	 */
-	desc: string;
-};
-
-export default abstract class のーど extends EventEmitter {
+@autobind
+abstract class のーど extends EventEmitter {
 	/**
 	 * Type of this node
 	 */
@@ -142,7 +110,7 @@ export default abstract class のーど extends EventEmitter {
 
 		this.states[id] = state;
 
-		this.emit('stateUpdated');
+		this.emit('state-updated');
 	}
 
 	/**
@@ -297,3 +265,39 @@ export default abstract class のーど extends EventEmitter {
 
 	public static import: (data: any) => any;
 }
+
+export default のーど;
+
+export type connection = {
+	/**
+	 * 相手のノード
+	 */
+	node: のーど;
+
+	/**
+	 * 出力ポートのID
+	 */
+	from: string;
+
+	/**
+	 * 入力ポートのID
+	 */
+	to: string;
+};
+
+export type port = {
+	/**
+	 * ポートID
+	 */
+	id: string;
+
+	/**
+	 * ポート名
+	 */
+	name: string;
+
+	/**
+	 * ポートの説明
+	 */
+	desc: string;
+};

@@ -1,3 +1,4 @@
+import autobind from 'autobind-decorator';
 import のーど from '../node';
 
 export default class Pin extends のーど {
@@ -18,33 +19,26 @@ export default class Pin extends のーど {
 
 	isVirtual = true;
 
-	constructor() {
-		super();
-
-		// BIND -------------------------------------------------
-		this.emitStateUpdated = this.emitStateUpdated.bind(this);
-		// ------------------------------------------------------
-	}
-
 	update() {
 		throw 'Do not call this method because this node is virtual (at Pin)';
 	}
 
+	@autobind
 	private emitStateUpdated() {
-		this.emit('stateUpdated');
+		this.emit('state-updated');
 	}
 
 	public addInput(connection) {
 		this.inputs.push(connection);
-		this.emit('stateUpdated');
-		connection.node.on('stateUpdated', this.emitStateUpdated);
+		this.emit('state-updated');
+		connection.node.on('state-updated', this.emitStateUpdated);
 		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {
 		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
-		this.emit('stateUpdated');
-		connection.node.off('stateUpdated', this.emitStateUpdated);
+		this.emit('state-updated');
+		connection.node.off('state-updated', this.emitStateUpdated);
 		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
 	}
 

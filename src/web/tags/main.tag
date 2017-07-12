@@ -1,26 +1,26 @@
 <lo-main>
-	<header>
-		<button class="play" title={ autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ autoTick ? 'pause' : 'play' }"></i></button>
-		<button class="tick" title="Next Tick" onclick={ tick } disabled={ autoTick }><i class="fa fa-step-forward"></i></button>
+	<header if={ circuitBoard }>
+		<button class="play" title={ circuitBoard.autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitBoard.autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="tick" title="Next Tick" onclick={ tick } disabled={ circuitBoard.autoTick }><i class="fa fa-step-forward"></i></button>
 		<span>[</span>
-		<button onclick={ addAnd }>And</button>
-		<button onclick={ addAnd3 }>And3</button>
-		<button onclick={ addOr }>Or</button>
-		<button onclick={ addNot }>Not</button>
-		<button onclick={ addNor }>Nor</button>
-		<button onclick={ addNand }>Nand</button>
-		<button onclick={ addXor }>Xor</button>
-		<button onclick={ addNop }>Nop</button>
+		<button onclick={ circuitBoard.addAnd }>And</button>
+		<button onclick={ circuitBoard.addAnd3 }>And3</button>
+		<button onclick={ circuitBoard.addOr }>Or</button>
+		<button onclick={ circuitBoard.addNot }>Not</button>
+		<button onclick={ circuitBoard.addNor }>Nor</button>
+		<button onclick={ circuitBoard.addNand }>Nand</button>
+		<button onclick={ circuitBoard.addXor }>Xor</button>
+		<button onclick={ circuitBoard.addNop }>Nop</button>
 		<span>-</span>
-		<button onclick={ addRandom }>Rnd</button>
+		<button onclick={ circuitBoard.addRandom }>Rnd</button>
 		<span>-</span>
-		<button onclick={ addButton }>Button</button>
-		<button onclick={ addLed }>LED</button>
+		<button onclick={ circuitBoard.addButton }>Button</button>
+		<button onclick={ circuitBoard.addLed }>LED</button>
 		<span>-</span>
-		<button onclick={ addPin }>Pin</button>
+		<button onclick={ circuitBoard.addPin }>Pin</button>
 		<span>-</span>
-		<button onclick={ addPackageInput }>[PackageInput]</button>
-		<button onclick={ addPackageOutput }>[PackageOutput]</button>
+		<button onclick={ circuitBoard.addPackageInput }>[PackageInput]</button>
+		<button onclick={ circuitBoard.addPackageOutput }>[PackageOutput]</button>
 		<span>] --- [</span>
 		<button onclick={ appendPackage }>Append Package</button>
 		<button onclick={ createPackage }>Create Package</button>
@@ -72,147 +72,28 @@
 
 		const msgpack = require('msgpack-lite');
 
-		import Circuit from '../../core/circuit.ts';
-
-		import And from '../../core/nodes/and.ts';
-		import And3 from '../../core/nodes/and3.ts';
-		import Or from '../../core/nodes/or.ts';
-		import Not from '../../core/nodes/not.ts';
-		import Nor from '../../core/nodes/nor.ts';
-		import Nand from '../../core/nodes/nand.ts';
-		import Xor from '../../core/nodes/xor.ts';
-		import Nop from '../../core/nodes/nop.ts';
-		import Random from '../../core/nodes/random.ts';
-		import Button from '../../core/nodes/button.ts';
-		import Led from '../../core/nodes/led.ts';
-		import Pin from '../../core/nodes/pin.ts';
-		import Package from '../../core/nodes/package.ts';
-		import PackageInput from '../../core/nodes/package-input.ts';
-		import PackageOutput from '../../core/nodes/package-output.ts';
-
-		import AndTag from '../node-tags/and.ts';
-		import And3Tag from '../node-tags/and3.ts';
-		import OrTag from '../node-tags/or.ts';
-		import NotTag from '../node-tags/not.ts';
-		import NorTag from '../node-tags/nor.ts';
-		import NandTag from '../node-tags/nand.ts';
-		import XorTag from '../node-tags/xor.ts';
-		import NopTag from '../node-tags/nop.ts';
-		import RandomTag from '../node-tags/random.ts';
-		import ButtonTag from '../node-tags/button.ts';
-		import LedTag from '../node-tags/led.ts';
-		import PinTag from '../node-tags/pin.ts';
-		import PackageTag from '../node-tags/package.ts';
-		import PackageInputTag from '../node-tags/package-input.ts';
-		import PackageOutputTag from '../node-tags/package-output.ts';
+		import CircuitBoard from '../circuit-board.ts';
 
 		import imp from '../import.ts';
 		import exp from '../export.ts';
 		import expPkg from '../../core/export-package.ts';
 
-		this.nodeTags = [];
-
-		this.circuit = new Circuit();
-
-		this.autoTick = true;
-
 		this.on('mount', () => {
-			this.draw = SVG(this.refs.drawing).size(window.innerWidth, window.innerHeight);
-			//this.draw.rect(100, 100).attr({ fill: '#f06' });
-
-			setInterval(() => {
-				if (this.autoTick) this.circuit.tick();
-			}, 100);
+			this.circuitBoard = new CircuitBoard(this.refs.drawing, window.innerWidth, window.innerHeight);
+			this.update();
 		});
 
 		this.toggleAutoTick = () => {
-			this.update({
-				autoTick: !this.autoTick
-			});
+			this.circuitBoard.autoTick = !this.circuitBoard.autoTick;
+			this.update();
 		};
 
 		this.tick = () => {
-			this.circuit.tick();
-		};
-
-		this.addTag = tag => {
-			this.nodeTags.push(tag);
-			this.circuit.addNode(tag.node);
-			tag.el.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
-		};
-
-		this.addAnd = () => {
-			this.addTag(new AndTag(this.draw, this.circuit, this.nodeTags, new And()));
-		};
-
-		this.addAnd3 = () => {
-			this.addTag(new And3Tag(this.draw, this.circuit, this.nodeTags, new And3()));
-		};
-
-		this.addOr = () => {
-			this.addTag(new OrTag(this.draw, this.circuit, this.nodeTags, new Or()));
-		};
-
-		this.addNot = () => {
-			this.addTag(new NotTag(this.draw, this.circuit, this.nodeTags, new Not()));
-		};
-
-		this.addNor = () => {
-			this.addTag(new NorTag(this.draw, this.circuit, this.nodeTags, new Nor()));
-		};
-
-		this.addNand = () => {
-			this.addTag(new NandTag(this.draw, this.circuit, this.nodeTags, new Nand()));
-		};
-
-		this.addXor = () => {
-			this.addTag(new XorTag(this.draw, this.circuit, this.nodeTags, new Xor()));
-		};
-
-		this.addNop = () => {
-			this.addTag(new NopTag(this.draw, this.circuit, this.nodeTags, new Nop()));
-		};
-
-		this.addRandom = () => {
-			this.addTag(new RandomTag(this.draw, this.circuit, this.nodeTags, new Random()));
-		};
-
-		this.addButton = () => {
-			this.addTag(new ButtonTag(this.draw, this.circuit, this.nodeTags, new Button()));
-		};
-
-		this.addLed = () => {
-			this.addTag(new LedTag(this.draw, this.circuit, this.nodeTags, new Led()));
-		};
-
-		this.addPin = () => {
-			this.addTag(new PinTag(this.draw, this.circuit, this.nodeTags, new Pin()));
-		};
-
-		this.addPackageInput = () => {
-			const name = window.prompt('Input name');
-			const id = window.prompt('Input ID');
-			const desc = window.prompt('Input description');
-			const packageInput = new PackageInput();
-			packageInput.inputId = id;
-			packageInput.inputName = name;
-			packageInput.inputDesc = desc;
-			this.addTag(new PackageInputTag(this.draw, this.circuit, this.nodeTags, packageInput));
-		};
-
-		this.addPackageOutput = () => {
-			const name = window.prompt('Output name');
-			const id = window.prompt('Output ID');
-			const desc = window.prompt('Output description');
-			const packageOutput = new PackageOutput();
-			packageOutput.outputId = id;
-			packageOutput.outputName = name;
-			packageOutput.outputDesc = desc;
-			this.addTag(new PackageOutputTag(this.draw, this.circuit, this.nodeTags, packageOutput));
+			this.circuitBoard.circuit.tick();
 		};
 
 		this.createPackage = () => {
-			if (Array.from(this.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
+			if (Array.from(this.circuitBoard.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuitBoard.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
 				alert('パッケージを作成するには、回路に一つ以上のPackageInputおよびPackageOutputが含まれている必要があります' + '\n' + 'To create a package, you must include PackageInput and PackageOutput.');
 				return;
 			}
@@ -221,7 +102,7 @@
 			const name = window.prompt('Package name');
 			const desc = window.prompt('Package description');
 
-			const data = expPkg(this.circuit.nodes, author, name, desc);
+			const data = expPkg(this.circuitBoard.circuit.nodes, author, name, desc);
 
 			console.log('あなたのパッケージはこちらです:');
 			console.log(Array.prototype.map.call(msgpack.encode(data), val => {
@@ -240,13 +121,11 @@
 
 			data = msgpack.decode(data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16)));
 
-			const pkg = Package.import(data);
-			this.nodeTags.push(new PackageTag(this.draw, this.circuit, this.nodeTags, pkg));
-			this.circuit.addNode(pkg);
+			this.circuitBoard.loadPackage(data);
 		};
 
 		this.export = () => {
-			const data = exp(this.nodeTags);
+			const data = exp(this.circuitBoard.nodeTags);
 			console.log(Array.prototype.map.call(data, val => {
 				let hex = (val).toString(16).toUpperCase();
 				if (val < 16) hex = '0' + hex;
@@ -258,7 +137,7 @@
 		this.import = () => {
 			let data = window.prompt('');
 			data = data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16));
-			imp(this.draw, this.nodeTags, this.circuit, data);
+			imp(this.circuitBoard, data);
 		};
 	</script>
 </lo-main>

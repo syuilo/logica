@@ -16,7 +16,7 @@ export default class Package extends のーど {
 
 	public nodes: Set<のーど>;
 
-	constructor(nodes: Set<のーど>, packageName, packageDesc, packageAuthor) {
+	constructor(nodes: Set<のーど>, packageName: string, packageDesc: string, packageAuthor: string) {
 		super();
 
 		this.nodes = nodes;
@@ -53,8 +53,8 @@ export default class Package extends のーど {
 
 		Array.from(this.nodes)
 			.filter(n => n.outputs.find(c => c.node.type === 'PackageOutput'))
-			.forEach(n => n.on('stateUpdated', () => {
-				this.emit('stateUpdated');
+			.forEach(n => n.on('state-updated', () => {
+				this.emit('state-updated');
 			}))
 	}
 

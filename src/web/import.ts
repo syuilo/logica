@@ -47,7 +47,8 @@ export default function (circuitView: CircuitView, data) {
 		view.id = viewData.node.id;
 		view.x = viewData.x;
 		view.y = viewData.y;
-		view.setRotate(viewData.r);
+		// 互換性のためのチェック
+		if (viewData.hasOwnProperty('r')) view.setRotate(viewData.r);
 
 		circuitView.nodeViews.push(view);
 

@@ -12,6 +12,7 @@ import NodeView from './node-view';
 import AndView from './node-views/and';
 import And3View from './node-views/and3';
 import OrView from './node-views/or';
+import Or3View from './node-views/or3';
 import NotView from './node-views/not';
 import NorView from './node-views/nor';
 import NandView from './node-views/nand';
@@ -63,6 +64,10 @@ class CircuitView {
 
 	addOr() {
 		this.addNode(new OrView(this));
+	}
+
+	addOr3() {
+		this.addNode(new Or3View(this));
 	}
 
 	addNot() {

@@ -9,6 +9,7 @@ import CircuitView from './circuit-view';
 import AndView from './node-views/and';
 import And3View from './node-views/and3';
 import OrView from './node-views/or';
+import Or3View from './node-views/or3';
 import NotView from './node-views/not';
 import NorView from './node-views/nor';
 import NandView from './node-views/nand';
@@ -30,6 +31,7 @@ export default function (circuitView: CircuitView, data) {
 		if (viewData.node.type === 'And') view = AndView.import(circuitView, viewData);
 		if (viewData.node.type === 'And3') view = And3View.import(circuitView, viewData);
 		if (viewData.node.type === 'Or') view = OrView.import(circuitView, viewData);
+		if (viewData.node.type === 'Or3') view = Or3View.import(circuitView, viewData);
 		if (viewData.node.type === 'Not') view = NotView.import(circuitView, viewData);
 		if (viewData.node.type === 'Nor') view = NorView.import(circuitView, viewData);
 		if (viewData.node.type === 'Nand') view = NandView.import(circuitView, viewData);

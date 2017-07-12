@@ -2,6 +2,7 @@ import のーど from './node';
 import And from './nodes/and';
 import And3 from './nodes/and3';
 import Or from './nodes/or';
+import Or3 from './nodes/or3';
 import Not from './nodes/not';
 import Nor from './nodes/nor';
 import Nand from './nodes/nand';
@@ -21,6 +22,7 @@ export default function(nodesData): のーど[] {
 		if (n.type === 'And') node = And.import(n);
 		if (n.type === 'And3') node = And3.import(n);
 		if (n.type === 'Or') node = Or.import(n);
+		if (n.type === 'Or3') node = Or3.import(n);
 		if (n.type === 'Not') node = Not.import(n);
 		if (n.type === 'Nor') node = Nor.import(n);
 		if (n.type === 'Nand') node = Nand.import(n);

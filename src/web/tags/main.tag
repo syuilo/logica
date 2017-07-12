@@ -6,6 +6,7 @@
 		<button onclick={ circuitView.addAnd }>And</button>
 		<button onclick={ circuitView.addAnd3 }>And3</button>
 		<button onclick={ circuitView.addOr }>Or</button>
+		<button onclick={ circuitView.addOr3 }>Or3</button>
 		<button onclick={ circuitView.addNot }>Not</button>
 		<button onclick={ circuitView.addNor }>Nor</button>
 		<button onclick={ circuitView.addNand }>Nand</button>

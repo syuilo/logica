@@ -117,8 +117,7 @@
 		this.autoTick = true;
 
 		this.on('mount', () => {
-			this.draw = SVG(this.refs.drawing).size(window.innerWidth, window.innerHeight);
-			//this.draw.rect(100, 100).attr({ fill: '#f06' });
+			this.circuitBoard = new CircuitBoard(this.refs.drawing, window.innerWidth, window.innerHeight);
 
 			setInterval(() => {
 				if (this.autoTick) this.circuit.tick();

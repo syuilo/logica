@@ -289,6 +289,7 @@ abstract class NodeTag extends EventEmitter {
 
 			cover.click(() => {
 				this.node.disconnectTo(o.tag.node, o.connection.to, o.connection.from);
+				text.remove();
 			});
 		});
 	}

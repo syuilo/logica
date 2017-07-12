@@ -10,7 +10,7 @@ export default class PackageInputView extends NodeView {
 	constructor(circuitView: CircuitView, x: PackageInput | string, name?: string, desc?: string, index?: number) {
 		super(circuitView, typeof x == 'string' ? new PackageInput(x, name, desc, index) : x, 96, 64);
 
-		this.el.text('IN: ' + this.node.inputName).fill('#fff').move(10, 4);
+		this.el.text('IN: ' + this.node.inputName).fill('#fff').style('pointer-events: none;').move(10, 4);
 
 		this.rect.dblclick(() => {
 			const name = window.prompt('Input name', this.node.inputName);

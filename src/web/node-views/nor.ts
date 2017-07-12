@@ -6,7 +6,7 @@ export default class NorView extends NodeView {
 	constructor(circuitView: CircuitView, node?: Nor) {
 		super(circuitView, node || new Nor(), 64, 64);
 
-		this.el.text('Nor').fill('#fff').move(10, 4);
+		this.el.text('Nor').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

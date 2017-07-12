@@ -6,7 +6,7 @@ export default class OrView extends NodeView {
 	constructor(circuitView: CircuitView, node?: Or) {
 		super(circuitView, node || new Or(), 64, 64);
 
-		this.el.text('Or').fill('#fff').move(10, 4);
+		this.el.text('Or').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

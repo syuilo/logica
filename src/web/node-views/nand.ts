@@ -6,7 +6,7 @@ export default class NandView extends NodeView {
 	constructor(circuitView: CircuitView, node?: Nand) {
 		super(circuitView, node || new Nand(), 64, 64);
 
-		this.el.text('Nand').fill('#fff').move(10, 4);
+		this.el.text('Nand').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

@@ -6,7 +6,7 @@ export default class XorView extends NodeView {
 	constructor(circuitView: CircuitView, node?: Xor) {
 		super(circuitView, node || new Xor(), 64, 64);
 
-		this.el.text('Xor').fill('#fff').move(10, 4);
+		this.el.text('Xor').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

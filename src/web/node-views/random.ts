@@ -6,7 +6,7 @@ export default class RandomView extends NodeView {
 	constructor(circuitView: CircuitView, node?: Random) {
 		super(circuitView, node || new Random(), 64, 64);
 
-		this.el.text('Rnd').fill('#fff').move(10, 4);
+		this.el.text('Rnd').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

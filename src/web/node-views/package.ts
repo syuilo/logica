@@ -19,7 +19,7 @@ export default class PackageView extends NodeView {
 
 		super(circuitView, pkg, 96, height);
 
-		this.el.text(this.node.packageName).fill('#fff').move(10, 4);
+		this.el.text(this.node.packageName).fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

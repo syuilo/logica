@@ -6,7 +6,7 @@ export default class And3View extends NodeView {
 	constructor(circuitView: CircuitView, node?: And3) {
 		super(circuitView, node || new And3(), 64, 128);
 
-		this.el.text('And3').fill('#fff').move(10, 4);
+		this.el.text('And3').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
 	public static import(circuitView: CircuitView, data) {

@@ -1,7 +1,7 @@
 <lo-main>
 	<header>
-		<button class="play" title={ autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ autoTick ? 'pause' : 'play' }"></i></button>
-		<button class="tick" title="Next Tick" onclick={ tick } disabled={ autoTick }><i class="fa fa-step-forward"></i></button>
+		<button class="play" title={ circuitBoard.autoTick ? 'Pause' : 'Play' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitBoard.autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="tick" title="Next Tick" onclick={ tick } disabled={ circuitBoard.autoTick }><i class="fa fa-step-forward"></i></button>
 		<span>[</span>
 		<button onclick={ addAnd }>And</button>
 		<button onclick={ addAnd3 }>And3</button>
@@ -72,8 +72,6 @@
 
 		const msgpack = require('msgpack-lite');
 
-		import Circuit from '../../core/circuit.ts';
-
 		import And from '../../core/nodes/and.ts';
 		import And3 from '../../core/nodes/and3.ts';
 		import Or from '../../core/nodes/or.ts';
@@ -110,28 +108,17 @@
 		import exp from '../export.ts';
 		import expPkg from '../../core/export-package.ts';
 
-		this.nodeTags = [];
-
-		this.circuit = new Circuit();
-
-		this.autoTick = true;
-
 		this.on('mount', () => {
 			this.circuitBoard = new CircuitBoard(this.refs.drawing, window.innerWidth, window.innerHeight);
-
-			setInterval(() => {
-				if (this.autoTick) this.circuit.tick();
-			}, 100);
 		});
 
 		this.toggleAutoTick = () => {
-			this.update({
-				autoTick: !this.autoTick
-			});
+			this.circuitBoard.autoTick = !this.circuitBoard.autoTick;
+			this.update();
 		};
 
 		this.tick = () => {
-			this.circuit.tick();
+			this.circuitBoard.circuit.tick();
 		};
 
 		this.addTag = tag => {

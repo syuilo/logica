@@ -33,6 +33,14 @@ export default class PackageOutput extends のーど {
 		throw 'Do not call this method because this node is virtual (at PackageOutput)';
 	}
 
+	public addInput(connection) {
+		this.inputs.push(connection);
+	}
+
+	public removeInput(connection) {
+		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+	}
+
 	export() {
 		const data = super.export();
 		data.outputId = this.outputId;

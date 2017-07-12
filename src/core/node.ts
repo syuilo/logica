@@ -55,6 +55,12 @@ abstract class のーど extends EventEmitter {
 
 	protected states: { [id: string]: boolean } = {};
 
+	constructor() {
+		super();
+
+		this.setMaxListeners(Infinity);
+	}
+
 	/**
 	 * ノードの状態を初期化します
 	 */

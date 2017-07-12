@@ -47,6 +47,8 @@ abstract class NodeTag extends EventEmitter {
 	constructor(circuitBoard: CircuitBoard, node: のーど, w: number, h: number) {
 		super();
 
+		this.setMaxListeners(Infinity);
+
 		this.circuitBoard = circuitBoard;
 		this.node = node;
 

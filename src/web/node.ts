@@ -35,13 +35,56 @@ export default abstract class NodeTag {
 	inputPorts: any[] = [];
 	outputPorts: any[] = [];
 
-	constructor(draw, tags, node, w, h) {
+	mouseoutTimer = null;
+
+	rect: any;
+	removeButton: any;
+	circuit: any;
+
+	constructor(draw, circuit, tags, node, w, h) {
+		// BIND ---------------------------------------
+		this.onMouseover = this.onMouseover.bind(this);
+		this.drawLines = this.drawLines.bind(this);
+		// --------------------------------------------
+
 		riot.observable(this);
 
+		this.circuit = circuit;
 		this.node = node;
 
 		node.on('stateUpdated', () => {
 			this.drawLines();
+		});
+
+		node.on('connected', c => {
+			const targetTag = tags.find(tag => tag.node == c.node);
+			this.outputs.push({
+				tag: targetTag,
+				connection: c
+			});
+			this.drawLines();
+			targetTag.on('move', this.drawLines);
+			c.node.on('removed', () => {
+				this.outputs = this.outputs.filter(o => o.connection.node != c.node);
+				this.drawLines();
+			});
+		});
+
+		node.on('disconnected', (target, targetPortId, myPortId) => {
+			const targetTag = tags.find(tag => tag.node == target);
+			this.outputs = this.outputs.filter(o => !(o.connection.node == targetTag.node && o.connection.from == myPortId && o.connection.to == targetPortId));
+			this.drawLines();
+			targetTag.off('move', this.drawLines);
+		});
+
+		node.on('removed', () => {
+			this.outputs.forEach(o => {
+				o.tag.off('move', this.drawLines);
+			});
+			this.outputs = [];
+			this.lines.forEach(l => l.remove());
+			this.lines = [];
+			this.el.remove();
 		});
 
 		this.draw = draw;
@@ -50,14 +93,50 @@ export default abstract class NodeTag {
 		this.height = h;
 
 		this.el = draw.nested();
-		this.el.draggable().on('dragmove', () => {
+/*		this.el.draggable().on('dragmove', () => {
 			(this as any).trigger('move');
 			this.drawLines();
 		});
-
+*/
 		this.el.element('title').words(this.node.desc);
 
-		this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
+		this.rect = this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
+
+		{
+			let x;
+			let y;
+
+			this.rect.draggable().on('dragstart', e => {
+				x = this.x - e.detail.p.x;
+				y = this.y - e.detail.p.y;
+			});
+
+			this.rect.draggable().on('dragmove', e => {
+				e.preventDefault();
+				this.el.move(x + e.detail.p.x, y + e.detail.p.y);
+				(this as any).trigger('move');
+				this.drawLines();
+			});
+		}
+
+		{
+			const removeButtonSize = 12;
+			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
+			this.removeButton.click(() => {
+				this.circuit.removeNode(this.node);
+			});
+		}
+
+		{
+			this.rect.on('mouseover', this.onMouseover);
+
+			this.rect.mouseout(() => {
+				this.mouseoutTimer = setTimeout(() => {
+					this.removeButton.style('display: none;');
+					this.rect.on('mouseover', this.onMouseover);
+				}, 500);
+			});
+		}
 
 		const diameter = 8;
 
@@ -138,7 +217,7 @@ export default abstract class NodeTag {
 					}
 
 					if (target) {
-						this.connectTo(target.tag, target.portId, output.id);
+						this.node.connectTo(target.tag.node, target.portId, output.id);
 					}
 				});
 
@@ -150,21 +229,10 @@ export default abstract class NodeTag {
 		}
 	}
 
-	connectTo(targetTag, targetPortId, myPortId) {
-		const c = this.node.connectTo(targetTag.node, targetPortId, myPortId);
-		this.outputs.push({
-			tag: targetTag,
-			connection: c
-		});
-		this.drawLines();
-		targetTag.on('move', this.drawLines());
-	}
-
-	disconnectTo(targetTag, targetPortId, myPortId) {
-		this.node.disconnectTo(targetTag.node, targetPortId, myPortId);
-		this.outputs = this.outputs.filter(o => !(o.connection.node == targetTag.node && o.connection.from == myPortId && o.connection.to == targetPortId));
-		this.drawLines();
-		targetTag.off('move', this.drawLines());
+	public onMouseover() {
+		this.removeButton.style('display: block; cursor: pointer;');
+		this.rect.off('mouseover', this.onMouseover);
+		if (this.mouseoutTimer) clearTimeout(this.mouseoutTimer);
 	}
 
 	drawLines() {
@@ -208,7 +276,7 @@ export default abstract class NodeTag {
 			});
 
 			cover.click(() => {
-				this.disconnectTo(o.tag, o.connection.to, o.connection.from);
+				this.node.disconnectTo(o.tag.node, o.connection.to, o.connection.from);
 			});
 		});
 	}

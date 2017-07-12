@@ -142,51 +142,51 @@
 		};
 
 		this.addAnd = () => {
-			this.addTag(new AndTag(this.draw, this.nodeTags, new And()));
+			this.addTag(new AndTag(this.draw, this.circuit, this.nodeTags, new And()));
 		};
 
 		this.addAnd3 = () => {
-			this.addTag(new And3Tag(this.draw, this.nodeTags, new And3()));
+			this.addTag(new And3Tag(this.draw, this.circuit, this.nodeTags, new And3()));
 		};
 
 		this.addOr = () => {
-			this.addTag(new OrTag(this.draw, this.nodeTags, new Or()));
+			this.addTag(new OrTag(this.draw, this.circuit, this.nodeTags, new Or()));
 		};
 
 		this.addNot = () => {
-			this.addTag(new NotTag(this.draw, this.nodeTags, new Not()));
+			this.addTag(new NotTag(this.draw, this.circuit, this.nodeTags, new Not()));
 		};
 
 		this.addNor = () => {
-			this.addTag(new NorTag(this.draw, this.nodeTags, new Nor()));
+			this.addTag(new NorTag(this.draw, this.circuit, this.nodeTags, new Nor()));
 		};
 
 		this.addNand = () => {
-			this.addTag(new NandTag(this.draw, this.nodeTags, new Nand()));
+			this.addTag(new NandTag(this.draw, this.circuit, this.nodeTags, new Nand()));
 		};
 
 		this.addXor = () => {
-			this.addTag(new XorTag(this.draw, this.nodeTags, new Xor()));
+			this.addTag(new XorTag(this.draw, this.circuit, this.nodeTags, new Xor()));
 		};
 
 		this.addNop = () => {
-			this.addTag(new NopTag(this.draw, this.nodeTags, new Nop()));
+			this.addTag(new NopTag(this.draw, this.circuit, this.nodeTags, new Nop()));
 		};
 
 		this.addRandom = () => {
-			this.addTag(new RandomTag(this.draw, this.nodeTags, new Random()));
+			this.addTag(new RandomTag(this.draw, this.circuit, this.nodeTags, new Random()));
 		};
 
 		this.addButton = () => {
-			this.addTag(new ButtonTag(this.draw, this.nodeTags, new Button()));
+			this.addTag(new ButtonTag(this.draw, this.circuit, this.nodeTags, new Button()));
 		};
 
 		this.addLed = () => {
-			this.addTag(new LedTag(this.draw, this.nodeTags, new Led()));
+			this.addTag(new LedTag(this.draw, this.circuit, this.nodeTags, new Led()));
 		};
 
 		this.addPin = () => {
-			this.addTag(new PinTag(this.draw, this.nodeTags, new Pin()));
+			this.addTag(new PinTag(this.draw, this.circuit, this.nodeTags, new Pin()));
 		};
 
 		this.addPackageInput = () => {
@@ -197,7 +197,7 @@
 			packageInput.inputId = id;
 			packageInput.inputName = name;
 			packageInput.inputDesc = desc;
-			this.addTag(new PackageInputTag(this.draw, this.nodeTags, packageInput));
+			this.addTag(new PackageInputTag(this.draw, this.circuit, this.nodeTags, packageInput));
 		};
 
 		this.addPackageOutput = () => {
@@ -208,7 +208,7 @@
 			packageOutput.outputId = id;
 			packageOutput.outputName = name;
 			packageOutput.outputDesc = desc;
-			this.addTag(new PackageOutputTag(this.draw, this.nodeTags, packageOutput));
+			this.addTag(new PackageOutputTag(this.draw, this.circuit, this.nodeTags, packageOutput));
 		};
 
 		this.createPackage = () => {
@@ -241,7 +241,7 @@
 			data = msgpack.decode(data.split(/(..)/).filter(x => x != '').map(chr => parseInt(chr, 16)));
 
 			const pkg = Package.import(data);
-			this.nodeTags.push(new PackageTag(this.draw, this.nodeTags, pkg));
+			this.nodeTags.push(new PackageTag(this.draw, this.circuit, this.nodeTags, pkg));
 			this.circuit.addNode(pkg);
 		};
 

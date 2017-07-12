@@ -197,6 +197,8 @@ export default abstract class のーど extends EventEmitter {
 			to: targetInputId
 		});
 
+		this.emit('connected', connection);
+
 		return connection;
 	}
 
@@ -208,6 +210,8 @@ export default abstract class のーど extends EventEmitter {
 			from: myOutputId,
 			to: targetInputId
 		});
+
+		this.emit('disconnected', target, targetInputId, myOutputId);
 	}
 
 	public getActualPreviousNodeState(portId: string): boolean {
@@ -263,6 +267,19 @@ export default abstract class のーど extends EventEmitter {
 	public removeInput(connection: connection) {
 		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
 		this.requestUpdateAtNextTick();
+	}
+
+	public remove() {
+		this.inputs = [];
+		this.outputs.forEach(c => {
+			c.node.removeInput({
+				node: this,
+				from: c.from,
+				to: c.to
+			});
+		});
+		this.outputs = [];
+		this.emit('removed');
 	}
 
 	public export(): any {

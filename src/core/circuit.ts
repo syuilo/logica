@@ -106,4 +106,9 @@ export default class Circuit {
 
 		dive(node);
 	}
+
+	public removeNode(node: のーど) {
+		this.nodes.delete(node);
+		node.remove();
+	}
 }

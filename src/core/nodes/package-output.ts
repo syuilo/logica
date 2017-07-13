@@ -1,8 +1,9 @@
 import のーど from '../node';
+import VirtualNode from '../virtual-node';
 import Package from './package';
 
 
-export default class PackageOutput extends のーど {
+export default class PackageOutput extends VirtualNode {
 	type = 'PackageOutput';
 	desc = 'output of a package パッケージ外部へ出力するためのインターフェースです';
 
@@ -21,8 +22,6 @@ export default class PackageOutput extends のーど {
 
 	public parent: Package;
 
-	isVirtual = true;
-
 	constructor(id: string, name: string, desc: string, index: number) {
 		super();
 		this.outputId = id;
@@ -31,11 +30,7 @@ export default class PackageOutput extends のーど {
 		this.outputIndex = index;
 	}
 
-	update() {
-		throw 'Do not call this method because this node is virtual (at PackageOutput)';
-	}
-
-	public getActualNodes(): のーど[] {
+	public getActualInputNodes(): のーど[] {
 		if (this.parent == null) {
 			return [];
 		} else {

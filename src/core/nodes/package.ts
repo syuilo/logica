@@ -1,10 +1,11 @@
 import のーど from '../node';
+import VirtualNode from '../virtual-node';
 import PackageInput from './package-input';
 import PackageOutput from './package-output';
 import importNodes from '../import';
 import exportNodes from '../export';
 
-export default class Package extends のーど {
+export default class Package extends VirtualNode {
 	type = 'Package';
 	desc = '回路の集合。';
 
@@ -15,8 +16,6 @@ export default class Package extends のーど {
 	public packageDesc: string;
 
 	public nodes: Set<のーど>;
-
-	isVirtual = true;
 
 	constructor(nodes: Set<のーど>, packageName: string, packageDesc: string, packageAuthor: string) {
 		super();
@@ -62,10 +61,6 @@ export default class Package extends のーど {
 			}))
 	}
 
-	update() {
-		throw 'Do not call this method because this node is virtual (at Package)';
-	}
-
 	public getState(portId?: string) {
 		if (portId == null) {
 			if (this.outputInfo.length === 1) {
@@ -81,7 +76,7 @@ export default class Package extends のーど {
 		return internalOutputNode.getInput();
 	}
 
-	public getActualNodes(portId?: string): のーど[] {
+	public getActualInputNodes(portId?: string): のーど[] {
 		if (portId == null) {
 			if (this.inputInfo.length === 1) {
 				portId = this.inputInfo[0].id;
@@ -98,7 +93,7 @@ export default class Package extends のーど {
 
 	public addInput(connection) {
 		this.inputs.push(connection);
-		this.getActualNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
+		this.getActualInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {

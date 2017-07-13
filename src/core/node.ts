@@ -1,6 +1,8 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import autobind from 'autobind-decorator';
 
+import VirtualNode from './virtual-node';
+
 import Package from './nodes/package';
 import PackageInput from './nodes/package-input';
 import PackageOutput from './nodes/package-output';
@@ -57,7 +59,6 @@ abstract class のーど extends EventEmitter {
 
 	constructor() {
 		super();
-
 		this.setMaxListeners(Infinity);
 	}
 
@@ -78,7 +79,7 @@ abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				id = this.outputInfo[0].id;
 			} else {
-				throw 'このノードは出力ポートを複数持っているので、出力ポートIDを省略することはできません';
+				throw 'このノードは複数の出力ポートを持っているので、出力ポートIDを省略することはできません';
 			}
 		}
 
@@ -90,7 +91,7 @@ abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				id = this.outputInfo[0].id;
 			} else {
-				throw 'このノードの出力ポートが複数あるので、出力ポートIDを省略することはできません';
+				throw 'このノードは複数の出力ポートを持っているので、出力ポートIDを省略することはできません';
 			}
 		}
 
@@ -125,7 +126,7 @@ abstract class のーど extends EventEmitter {
 					throw 'ターゲット ノードの入力ポートはすべて既に接続されていて、空きがないため接続できません';
 				}
 			} else {
-				throw 'ターゲット ノードの入力ポートが複数ある(かつ交換法則を満たさない)ので、入力ポートIDを省略することはできません';
+				throw 'ターゲット ノードが複数の入力ポートを持っている(かつ交換法則を満たさない)ので、入力ポートIDを省略することはできません';
 			}
 		}
 
@@ -133,7 +134,7 @@ abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				myOutputId = this.outputInfo[0].id;
 			} else {
-				throw `このノード(${ this.type })の出力ポートが複数あるので、出力ポートIDを省略することはできません`;
+				throw `このノードは複数(${ this.type })の出力ポートを持っているので、出力ポートIDを省略することはできません`;
 			}
 		}
 
@@ -180,7 +181,7 @@ abstract class のーど extends EventEmitter {
 			} else if (this.inputInfo.length === 0) {
 				throw 'このノードに入力ポートがありません';
 			} else {
-				throw 'このノードは入力ポートを複数持っているので、入力ポートIDを省略することはできません';
+				throw 'このノードは複数の入力ポートを持っているので、入力ポートIDを省略することはできません';
 			}
 		}
 
@@ -205,21 +206,15 @@ abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				portId = this.outputInfo[0].id;
 			} else {
-				throw 'このノードは出力ポートを複数持っているので、出力ポートIDを省略することはできません';
+				throw 'このノードは複数の出力ポートを持っているので、出力ポートIDを省略することはできません';
 			}
 		}
 
 		return this.outputs
 			.filter(c => c.from === portId)
-			.map(c => c.node.isVirtual ? c.node.getActualNodes(c.to) : [c.node])
+			.map(c => c.node.isVirtual ? (c.node as VirtualNode).getActualInputNodes(c.to) : [c.node])
 			.reduce((a, b) => a.concat(b), []);
 	}
-
-	/**
-	 * 入力が来たとき、それが実際に接続されることになるノードを取得します。
-	 * @param portId このノードの入力ポートID
-	 */
-	public abstract getActualNodes(portId?: string): のーど[];
 
 	public addInput(connection: connection) {
 		this.inputs.push(connection);

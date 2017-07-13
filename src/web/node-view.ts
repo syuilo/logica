@@ -38,7 +38,7 @@ abstract class NodeView extends EventEmitter {
 
 	/**
 	 * この値を操作しないでください
-	 * 
+	 *
 	 * 0 ... ↑ (default)
 	 * 1 ... →
 	 * 2 ... ↓

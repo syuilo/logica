@@ -64,27 +64,43 @@ export default class Package extends のーど {
 		throw 'Do not call this method because this node is virtual (at Package)';
 	}
 
+	public getState(portId?: string) {
+		if (portId == null) {
+			if (this.outputInfo.length === 1) {
+				portId = this.outputInfo[0].id;
+			} else {
+				throw 'このパッケージは出力ポートを複数持っているので、出力ポートIDを省略することはできません';
+			}
+		}
+
+		const internalOutputNode = Array.from(this.nodes)
+			.find(n => n.type === 'PackageOutput' && (n as PackageOutput).outputId === portId);
+
+		return internalOutputNode.getInput();
+	}
+
+	public getRealNodes(portId?: string): のーど[] {
+		if (portId == null) {
+			if (this.inputInfo.length === 1) {
+				portId = this.inputInfo[0].id;
+			} else {
+				throw 'このパッケージは入力ポートを複数持っているので、入力ポートIDを省略することはできません';
+			}
+		}
+
+		const n = Array.from(this.nodes)
+			.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === portId);
+
+		return n.getActualNextNodes();
+	}
+
 	public addInput(connection) {
 		this.inputs.push(connection);
-		this.getActualInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
+		this.getInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {
 		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
-	}
-
-	public getActualInputNodes(portId: string): のーど[] {
-		const n = Array.from(this.nodes)
-			.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === portId);
-
-		return n.getActualNextNodes('x');
-	}
-
-	public getActualOutputNodeState(portId: string): boolean {
-		const n = Array.from(this.nodes)
-			.find(n => n.type === 'PackageOutput' && (n as PackageOutput).outputId === portId);
-
-		return n.getActualPreviousNodeState('x');
 	}
 
 	export() {

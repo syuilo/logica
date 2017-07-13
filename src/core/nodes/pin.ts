@@ -1,7 +1,8 @@
 import autobind from 'autobind-decorator';
 import のーど from '../node';
+import VirtualNode from '../virtual-node';
 
-export default class Pin extends のーど {
+export default class Pin extends VirtualNode {
 	type = 'Pin';
 	desc = 'Nothing to do';
 
@@ -17,10 +18,12 @@ export default class Pin extends のーど {
 		desc: 'Input'
 	}];
 
-	isVirtual = true;
+	public getState() {
+		return this.getInput();
+	}
 
-	update() {
-		throw 'Do not call this method because this node is virtual (at Pin)';
+	public getActualInputNodes(): のーど[] {
+		return this.getActualNextNodes();
 	}
 
 	@autobind
@@ -32,14 +35,14 @@ export default class Pin extends のーど {
 		this.inputs.push(connection);
 		this.emit('state-updated');
 		connection.node.on('state-updated', this.emitStateUpdated);
-		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
+		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {
 		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
 		this.emit('state-updated');
 		connection.node.off('state-updated', this.emitStateUpdated);
-		this.getActualNextNodes('x').forEach(n => n.requestUpdateAtNextTick());
+		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public static import(data): Pin {

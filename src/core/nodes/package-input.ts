@@ -1,7 +1,8 @@
 import のーど from '../node';
+import VirtualNode from '../virtual-node';
 import Package from './package';
 
-export default class PackageInput extends のーど {
+export default class PackageInput extends VirtualNode {
 	type = 'PackageInput';
 	desc = 'input of a package パッケージ外部からの入力を受け付けるインターフェースです';
 
@@ -20,8 +21,6 @@ export default class PackageInput extends のーど {
 
 	public parent: Package;
 
-	isVirtual = true;
-
 	constructor(id: string, name: string, desc: string, index: number) {
 		super();
 		this.inputId = id;
@@ -30,8 +29,16 @@ export default class PackageInput extends のーど {
 		this.inputIndex = index;
 	}
 
-	update() {
-		throw 'Do not call this method because this node is virtual (at PackageInput)';
+	public getState() {
+		if (this.parent == null) {
+			return false;
+		} else {
+			return this.parent.getInput(this.inputId);
+		}
+	}
+
+	public getActualInputNodes(): のーど[] {
+		throw '';
 	}
 
 	export() {

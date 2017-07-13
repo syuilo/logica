@@ -58,7 +58,7 @@ abstract class のーど extends EventEmitter {
 	}
 
 	/**
-	 * 入力が交換法則を満たすか否かを表します
+	 * 入力ポートが交換法則を満たすか否かを表します
 	 */
 	public readonly isInputCommutative: boolean = false;
 

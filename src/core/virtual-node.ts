@@ -17,7 +17,7 @@ abstract class VirtualNode extends のーど {
 	public abstract getActualInputNodes(portId?: string): のーど[];
 
 	update() {
-		throw `Do not call this method because this node (${ this.type }) is virtual`;
+		throw `Do not update this node because it (${ this.type }) is virtual`;
 	}
 }
 

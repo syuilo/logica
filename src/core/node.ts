@@ -37,8 +37,14 @@ abstract class のーど extends EventEmitter {
 	 */
 	public outputs: connection[] = [];
 
+	/**
+	 * 入力ポート情報
+	 */
 	public inputInfo: port[];
 
+	/**
+	 * 出力ポート情報
+	 */
 	public outputInfo: port[];
 
 	/**
@@ -67,10 +73,18 @@ abstract class のーど extends EventEmitter {
 	 */
 	public readonly isForceUpdate: boolean = false;
 
+	/**
+	 * VirtualNodeか否か
+	 * Whether it is VirtualNode
+	 */
 	protected readonly isVirtual: boolean = false;
 
 	public requestUpdateAtNextTick: () => void = () => {};
 
+	/**
+	 * ポート毎の出力状態
+	 * Output state each ports
+	 */
 	protected states: { [id: string]: boolean } = {};
 
 	constructor() {
@@ -255,6 +269,9 @@ abstract class のーど extends EventEmitter {
 		this.emit('removed');
 	}
 
+	/**
+	 * このノード インスタンスを表すデータを取得します
+	 */
 	public export(): any {
 		return {
 			type: this.type,
@@ -268,6 +285,9 @@ abstract class のーど extends EventEmitter {
 		};
 	}
 
+	/**
+	 * エクスポートされたデータからこのノードのインスタンスを生成します
+	 */
 	public static import: (data: any) => any;
 }
 

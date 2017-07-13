@@ -101,6 +101,7 @@ export default class Circuit {
 	 */
 	public reset() {
 		const dive = node => {
+			delete node._previousStates;
 			node.init();
 			node.emit('state-updated');
 			node.emit('input-updated');
@@ -112,6 +113,7 @@ export default class Circuit {
 				});
 			}
 		};
+
 		this.nodes.forEach(n => dive(n));
 
 		this.shouldUpdates.clear();

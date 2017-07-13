@@ -189,7 +189,7 @@ abstract class のーど extends EventEmitter {
 		if (c == null) {
 			return false;
 		} else {
-			return c.node.getState(portId);
+			return c.node.getState(c.from);
 		}
 	}
 

@@ -7,7 +7,7 @@ import exportNodes from '../export';
 
 export default class Package extends VirtualNode {
 	type = 'Package';
-	desc = '回路の集合。';
+	desc = 'ある機能を実現するために構築された回路をひとつのノードとして扱えるように纏めたもの。';
 
 	public packageName: string;
 

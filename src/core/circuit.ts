@@ -26,54 +26,62 @@ export default class Circuit {
 	 */
 	public tick(n: number = 1) {
 		for (let i = 0; i < n; i++) {
-
-			//console.log('======================');
-			/*console.log(Array.from(this.shouldUpdates).map((n: any) => {
-				let log = `${n.type} ${n.name || '-'}`;
-				if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
-				return log;
-			}).join('\n'));*/
+			this._tick();
+		}
+	}
 
 
-			const inputs = [];
+	/**
+	 * 回路の状態を1ステップ進めます
+	 */
+	private _tick() {
 
-			Array.from(this.shouldUpdates).forEach((node, i) => {
-				inputs[i] = {};
-				if (node.inputInfo != null && node.inputInfo.length !== 0) {
-					node.inputInfo.forEach(info => {
-						inputs[i][info.id] = node.getInput(info.id);
-					});
-				}
-			});
+		//console.log('======================');
+		/*console.log(Array.from(this.shouldUpdates).map((n: any) => {
+			let log = `${n.type} ${n.name || '-'}`;
+			if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
+			return log;
+		}).join('\n'));*/
 
-			const updatedNodes = [];
 
-			Array.from(new Set(this.shouldUpdates)).forEach((node, i) => {
-				this.shouldUpdates.delete(node);
-				node.update(inputs[i]);
-				updatedNodes.push(node);
-			});
+		const inputs = [];
 
-			updatedNodes.forEach(node => {
-				if (node.outputInfo != null && node.outputInfo.length !== 0) {
-					node.outputInfo.forEach(o => {
-						if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
-						if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
-						(node as any)._previousStates[o.id] = node.getState(o.id);
+		Array.from(this.shouldUpdates).forEach((node, i) => {
+			inputs[i] = {};
+			if (node.inputInfo != null && node.inputInfo.length !== 0) {
+				node.inputInfo.forEach(info => {
+					inputs[i][info.id] = node.getInput(info.id);
+				});
+			}
+		});
 
-						const next = node.getActualNextNodes(o.id);
-						next.forEach(n => (n as any)._reason = node);
-						next.forEach(n => this.shouldUpdates.add(n));
-					});
-				}
-			});
+		const updatedNodes = [];
+
+		Array.from(new Set(this.shouldUpdates)).forEach((node, i) => {
+			this.shouldUpdates.delete(node);
+			node.update(inputs[i]);
+			updatedNodes.push(node);
+		});
+
+		updatedNodes.forEach(node => {
+			if (node.outputInfo != null && node.outputInfo.length !== 0) {
+				node.outputInfo.forEach(o => {
+					if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
+					if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
+					(node as any)._previousStates[o.id] = node.getState(o.id);
+
+					const next = node.getActualNextNodes(o.id);
+					next.forEach(n => (n as any)._reason = node);
+					next.forEach(n => this.shouldUpdates.add(n));
+				});
+			}
+		});
 
 /*
 		console.log('======================');
 		console.log(Array.from(this.nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));
 		console.log('======================');
 */
-		}
 	}
 
 	/**

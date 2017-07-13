@@ -49,6 +49,8 @@ abstract class のーど extends EventEmitter {
 	 */
 	public readonly isForceUpdate: boolean = false;
 
+	protected readonly isVirtual: boolean = false;
+
 	public requestUpdateAtNextTick: () => void = () => {};
 
 	protected states: { [id: string]: boolean } = {};
@@ -207,19 +209,17 @@ abstract class のーど extends EventEmitter {
 			}
 		}
 
-		return this.outputs.filter(c => c.from === portId).map(c => {
-			const node = c.node;
-			return node.getRealNodes(c.to);
-		}).reduce((a, b) => a.concat(b), []);
+		return this.outputs
+			.filter(c => c.from === portId)
+			.map(c => c.node.isVirtual ? c.node.getActualNodes(c.to) : [c.node])
+			.reduce((a, b) => a.concat(b), []);
 	}
 
 	/**
 	 * 入力が来たとき、それが実際に接続されることになるノードを取得します。
 	 * @param portId このノードの入力ポートID
 	 */
-	public getRealNodes(portId?: string): のーど[] {
-		return [this];
-	}
+	public abstract getActualNodes(portId?: string): のーど[];
 
 	public addInput(connection: connection) {
 		this.inputs.push(connection);

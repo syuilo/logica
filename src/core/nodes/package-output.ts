@@ -35,6 +35,14 @@ export default class PackageOutput extends のーど {
 		throw 'Do not call this method because this node is virtual (at PackageOutput)';
 	}
 
+	public getActualNodes(): のーど[] {
+		if (this.parent == null) {
+			return [];
+		} else {
+			return this.parent.getActualNextNodes(this.outputId);
+		}
+	}
+
 	public addInput(connection) {
 		this.inputs.push(connection);
 	}

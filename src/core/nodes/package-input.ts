@@ -34,6 +34,14 @@ export default class PackageInput extends のーど {
 		throw 'Do not call this method because this node is virtual (at PackageInput)';
 	}
 
+	public getState() {
+		if (this.parent == null) {
+			return false;
+		} else {
+			return this.parent.getInput(this.inputId);
+		}
+	}
+
 	export() {
 		const data = super.export();
 		data.inputId = this.inputId;

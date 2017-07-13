@@ -16,6 +16,8 @@ export default class Package extends のーど {
 
 	public nodes: Set<のーど>;
 
+	isVirtual = true;
+
 	constructor(nodes: Set<のーど>, packageName: string, packageDesc: string, packageAuthor: string) {
 		super();
 
@@ -69,7 +71,7 @@ export default class Package extends のーど {
 			if (this.outputInfo.length === 1) {
 				portId = this.outputInfo[0].id;
 			} else {
-				throw 'このパッケージは出力ポートを複数持っているので、出力ポートIDを省略することはできません';
+				throw 'このパッケージは複数の出力ポートを持っているので、出力ポートIDを省略することはできません';
 			}
 		}
 
@@ -79,12 +81,12 @@ export default class Package extends のーど {
 		return internalOutputNode.getInput();
 	}
 
-	public getRealNodes(portId?: string): のーど[] {
+	public getActualNodes(portId?: string): のーど[] {
 		if (portId == null) {
 			if (this.inputInfo.length === 1) {
 				portId = this.inputInfo[0].id;
 			} else {
-				throw 'このパッケージは入力ポートを複数持っているので、入力ポートIDを省略することはできません';
+				throw 'このパッケージは複数の入力ポートを持っているので、入力ポートIDを省略することはできません';
 			}
 		}
 
@@ -96,7 +98,7 @@ export default class Package extends のーど {
 
 	public addInput(connection) {
 		this.inputs.push(connection);
-		this.getInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
+		this.getActualNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection) {

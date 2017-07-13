@@ -42,6 +42,22 @@ abstract class のーど extends EventEmitter {
 	public outputInfo: port[];
 
 	/**
+	 * 入力ポートがあるか否か
+	 * Whether it has input port(s)
+	 */
+	public get hasInputPorts(): boolean {
+		return this.inputInfo != null && this.inputInfo.length > 0;
+	}
+
+	/**
+	 * 出力ポートがあるか否か
+	 * Whether it has output port(s)
+	 */
+	public get hasOutputPorts(): boolean {
+		return this.outputInfo != null && this.outputInfo.length > 0;
+	}
+
+	/**
 	 * 入力が交換法則を満たすか否かを表します
 	 */
 	public readonly isInputCommutative: boolean = false;
@@ -107,11 +123,11 @@ abstract class のーど extends EventEmitter {
 	 * @param myOutputId このノードの出力ポートID
 	 */
 	public connectTo(target: のーど, targetInputId?: string, myOutputId?: string) {
-		if (target.inputInfo == null || target.inputInfo.length === 0) {
+		if (!target.hasInputPorts) {
 			throw 'ターゲット ノードは入力ポートを持たないので接続できません';
 		}
 
-		if (this.outputInfo == null || this.outputInfo.length === 0) {
+		if (!this.hasOutputPorts) {
 			throw 'このノードは出力ポートを持たないので接続できません';
 		}
 

@@ -150,14 +150,14 @@ abstract class NodeView extends EventEmitter {
 			});
 		}
 
-		if (node.inputInfo) {
+		if (node.hasInputPorts) {
 			this.inputPorts = node.inputInfo.map((input, i) => ({
 				el: this.el.circle(diameter).fill('#0bf1c2').style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);'),
 				id: input.id
 			}));
 		}
 
-		if (node.outputInfo) {
+		if (node.hasOutputPorts) {
 			this.outputPorts = node.outputInfo.map((output, i) => {
 				const o = this.el.circle(diameter).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3); cursor: crosshair;');
 				let line = null;

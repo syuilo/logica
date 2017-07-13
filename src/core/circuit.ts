@@ -48,7 +48,7 @@ export default class Circuit {
 
 		Array.from(this.shouldUpdates).forEach((node, i) => {
 			inputs[i] = {};
-			if (node.inputInfo != null && node.inputInfo.length !== 0) {
+			if (node.hasInputPorts) {
 				node.inputInfo.forEach(info => {
 					inputs[i][info.id] = node.getInput(info.id);
 				});
@@ -64,7 +64,7 @@ export default class Circuit {
 		});
 
 		updatedNodes.forEach(node => {
-			if (node.outputInfo != null && node.outputInfo.length !== 0) {
+			if (node.hasOutputPorts) {
 				node.outputInfo.forEach(o => {
 					if ((node as any).hasOwnProperty('_previousStates') && (node as any)._previousStates[o.id] === node.getState(o.id)) return;
 					if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};

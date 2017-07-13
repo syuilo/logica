@@ -28,22 +28,24 @@ export default function (circuitView: CircuitView, data) {
 
 	data.forEach(viewData => {
 		let view = null;
-		if (viewData.node.type === 'And') view = AndView.import(circuitView, viewData);
-		if (viewData.node.type === 'And3') view = And3View.import(circuitView, viewData);
-		if (viewData.node.type === 'Or') view = OrView.import(circuitView, viewData);
-		if (viewData.node.type === 'Or3') view = Or3View.import(circuitView, viewData);
-		if (viewData.node.type === 'Not') view = NotView.import(circuitView, viewData);
-		if (viewData.node.type === 'Nor') view = NorView.import(circuitView, viewData);
-		if (viewData.node.type === 'Nand') view = NandView.import(circuitView, viewData);
-		if (viewData.node.type === 'Xor') view = XorView.import(circuitView, viewData);
-		if (viewData.node.type === 'Nop') view = NopView.import(circuitView, viewData);
-		if (viewData.node.type === 'Random') view = RandomView.import(circuitView, viewData);
-		if (viewData.node.type === 'Button') view = ButtonView.import(circuitView, viewData);
-		if (viewData.node.type === 'Led') view = LedView.import(circuitView, viewData);
-		if (viewData.node.type === 'Pin') view = PinView.import(circuitView, viewData);
-		if (viewData.node.type === 'Package') view = PackageView.import(circuitView, viewData);
-		if (viewData.node.type === 'PackageInput') view = PackageInputView.import(circuitView, viewData);
-		if (viewData.node.type === 'PackageOutput') view = PackageOutputView.import(circuitView, viewData);
+		switch (viewData.node.type) {
+			case 'And': view = AndView.import(circuitView, viewData); break;
+			case 'And3': view = And3View.import(circuitView, viewData); break;
+			case 'Or': view = OrView.import(circuitView, viewData); break;
+			case 'Or3': view = Or3View.import(circuitView, viewData); break;
+			case 'Not': view = NotView.import(circuitView, viewData); break;
+			case 'Nor': view = NorView.import(circuitView, viewData); break;
+			case 'Nand': view = NandView.import(circuitView, viewData); break;
+			case 'Xor': view = XorView.import(circuitView, viewData); break;
+			case 'Nop': view = NopView.import(circuitView, viewData); break;
+			case 'Random': view = RandomView.import(circuitView, viewData); break;
+			case 'Button': view = ButtonView.import(circuitView, viewData); break;
+			case 'Led': view = LedView.import(circuitView, viewData); break;
+			case 'Pin': view = PinView.import(circuitView, viewData); break;
+			case 'Package': view = PackageView.import(circuitView, viewData); break;
+			case 'PackageInput': view = PackageInputView.import(circuitView, viewData); break;
+			case 'PackageOutput': view = PackageOutputView.import(circuitView, viewData); break;
+		}
 		view.id = viewData.node.id;
 		view.x = viewData.x;
 		view.y = viewData.y;

@@ -134,7 +134,7 @@ abstract class のーど extends EventEmitter {
 			if (this.outputInfo.length === 1) {
 				myOutputId = this.outputInfo[0].id;
 			} else {
-				throw `このノードは複数(${ this.type })の出力ポートを持っているので、出力ポートIDを省略することはできません`;
+				throw 'このノードは複数の出力ポートを持っているので、出力ポートIDを省略することはできません';
 			}
 		}
 

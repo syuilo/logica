@@ -45,7 +45,7 @@ export default class Circuit {
 		 * B から見た入力は HIGH として取得されなければなりませんが、
 		 * もし A を更新した時に A の出力が LOW になった場合、
 		 * 次(といっても同じtick中)に B を更新した時 B が現在の A の
-		 * 出力状態を見てしまうので本来ならHIGHが取得されるべきところを
+		 * 出力状態を見てしまうので本来なら HIGH が取得されるべきところを
 		 * LOW として取得してしまうようなことが起きます。
 		 * これは例えると画像のガウスブラーを計算するときと似ていて、
 		 * ブラーをかけるとき各々のピクセルについて周囲の(近傍の)ピクセル
@@ -93,6 +93,7 @@ export default class Circuit {
 		 **********************************************************/
 
 		updatedNodes.forEach(node => {
+			// 出力ポートを持たなかったらスキップ
 			if (!node.hasOutputPorts) return;
 
 			const previousStates = this.previousStatesList
@@ -104,11 +105,11 @@ export default class Circuit {
 				const previousState = previousStates[o.id];
 
 				// 現在の状態
-				const currentState = node.getState(o.id)
+				const currentState = node.getState(o.id);
 
 				// 前回の状態から変化がなかったら更新は発生させない
 				if (currentState === previousState) {
-					return
+					return;
 				} else {
 					previousStates[o.id] = currentState;
 				}

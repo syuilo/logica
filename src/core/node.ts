@@ -257,6 +257,9 @@ abstract class のーど extends EventEmitter {
 		this.requestUpdateAtNextTick();
 	}
 
+	/**
+	 * このメソッドは呼び出さないでください(代わりにCircuitのremoveNodeメソッドを利用してください)
+	 */
 	public remove() {
 		this.inputs = [];
 		this.outputs.forEach(c => {

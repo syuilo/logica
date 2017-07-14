@@ -36,13 +36,9 @@ export default class Circuit {
 	 */
 	private _tick() {
 
-		//console.log('======================');
-		/*console.log(Array.from(this.shouldUpdates).map((n: any) => {
-			let log = `${n.type} ${n.name || '-'}`;
-			if (n._reason) log += ` (${n._reason.type} ${n._reason.name || '-'}によって)`;
-			return log;
-		}).join('\n'));*/
-
+		/**********************************************************
+		 1 全てのノードの現在の入力を記憶しておく
+		 **********************************************************/
 
 		const inputs = [];
 
@@ -55,6 +51,29 @@ export default class Circuit {
 			}
 		});
 
+		/**********************************************************
+		 2 更新をリクエストされているノードを捌く
+		 * ここで各々のノードを更新しますが、各々のノードが入力を逐一取得すると
+		 * このtick時点での本来の入力とは違った入力状態が取得されることになって
+		 * しまうので(例えばA,Bのノードがあり、Bの入力がAの出力に繋がれている
+		 * 場合を考えると、tick開始時点でのAの出力がHIGHだとしたらこのtick
+		 * においてはBの入力はHIGHにならなければなりませんが、もしAを更新した
+		 * 時にAの出力がLOWになった場合、次(といっても同じtick中)にBを
+		 * 更新した時Bが現在のAの出力状態を見てしまうので本来ならHIGHが取得
+		 * されるべきところをLOWとして取得してしまうようなことが起きます。
+		 * これは例えると画像のガウスブラーを計算するときと似ていて、ブラーを
+		 * かけるとき各々のピクセルについて周囲の(近傍の)ピクセルの平均の色を
+		 * 適用することになりますが、もしピクセルを参照する時に既に処理済みの
+		 * ピクセルを採用してしまうと結果がおかしくなります。これを防ぐには
+		 * 参照するピクセルを処理前の画像のものにすれば良いわけです)、
+		 * 1で記憶しておいたtick開始前時点での入力状態を渡して、
+		 * それに基づいて自分の状態を更新してもらうようにします。
+		 * 記憶しておいた出力状態なら、各々のノードを更新して捌いていく中で
+		 * ノードの出力状態が変わってもそれ(記憶)は影響を受けることがありません
+		 * ので、どんな順番でtick内の更新すべきノードを捌いていっても結果が
+		 * 変わらないようにできます。
+		 **********************************************************/
+
 		const updatedNodes = [];
 
 		Array.from(new Set(this.shouldUpdates)).forEach((node, i) => {
@@ -63,6 +82,12 @@ export default class Circuit {
 			updatedNodes.push(node);
 		});
 
+		/**********************************************************
+		 3 更新したノードが出力を変化させた場合、
+		 * そのノードよりひとつあとのノードが影響を受けることになるので、
+		 * それらのノードを次回のtickの時に更新するよう記憶しておく
+		 **********************************************************/
+
 		updatedNodes.forEach(node => {
 			if (node.hasOutputPorts) {
 				node.outputInfo.forEach(o => {
@@ -70,18 +95,13 @@ export default class Circuit {
 					if (!(node as any).hasOwnProperty('_previousStates')) (node as any)._previousStates = {};
 					(node as any)._previousStates[o.id] = node.getState(o.id);
 
+					// このノードの出力として繋がれている全ての
+					// ノードを取得して次回の更新予定リストに登録
 					const next = node.getActualNextNodes(o.id);
-					next.forEach(n => (n as any)._reason = node);
 					next.forEach(n => this.shouldUpdates.add(n));
 				});
 			}
 		});
-
-/*
-		console.log('======================');
-		console.log(Array.from(this.nodes).map((n: any) => `${n.type} ${n.name || '-'} ${JSON.stringify(n.states)}`).join('\n'));
-		console.log('======================');
-*/
 	}
 
 	/**

@@ -3,11 +3,6 @@ import autobind from 'autobind-decorator';
 
 import VirtualNode from './virtual-node';
 
-import Package from './nodes/package';
-import PackageInput from './nodes/package-input';
-import PackageOutput from './nodes/package-output';
-import Pin from './nodes/pin';
-
 /**
  * 回路上に設置でき入力または出力をもつもの全ての基底クラス
  */

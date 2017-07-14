@@ -64,16 +64,15 @@ export default class Circuit {
 		 1 全ての更新対象ノードの現在の入力状態を記憶しておく
 		 **********************************************************/
 
-		const inputs = [];
-
-		Array.from(this.shouldUpdates).forEach((node, i) => {
-			inputs[i] = {};
-			if (node.hasInputPorts) {
+		const inputsList = Array.from(this.shouldUpdates)
+			.filter(node => node.hasInputPorts)
+			.map(node => {
+				const inputs = {};
 				node.inputInfo.forEach(info => {
-					inputs[i][info.id] = node.getInput(info.id);
+					inputs[info.id] = node.getInput(info.id);
 				});
-			}
-		});
+				return inputs;
+			});
 
 		/**********************************************************
 		 2 更新をリクエストされているノードを捌く
@@ -83,7 +82,7 @@ export default class Circuit {
 		const updatedNodes = Array.from(this.shouldUpdates)
 			.map((node, i) => {
 				this.shouldUpdates.delete(node);
-				node.update(inputs[i]);
+				node.update(inputsList[i] || {});
 				return node;
 			});
 

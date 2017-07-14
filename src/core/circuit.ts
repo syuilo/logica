@@ -30,7 +30,6 @@ export default class Circuit {
 		}
 	}
 
-
 	/**
 	 * 回路の状態を1ステップ進めます
 	 */

@@ -7,6 +7,8 @@ import Not from './nodes/not';
 import Nor from './nodes/nor';
 import Nand from './nodes/nand';
 import Xor from './nodes/xor';
+import True from './nodes/true';
+import False from './nodes/false';
 import Nop from './nodes/nop';
 import Random from './nodes/random';
 import Button from './nodes/button';
@@ -28,6 +30,8 @@ export default function(nodesData): のーど[] {
 			case 'Nor':           node = Nor.import(n);           break;
 			case 'Nand':          node = Nand.import(n);          break;
 			case 'Xor':           node = Xor.import(n);           break;
+			case 'True':          node = True.import(n);          break;
+			case 'False':         node = False.import(n);         break;
 			case 'Nop':           node = Nop.import(n);           break;
 			case 'Random':        node = Random.import(n);        break;
 			case 'Button':        node = Button.import(n);        break;

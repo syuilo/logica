@@ -12,10 +12,11 @@
 		<button onclick={ circuitView.addNor }>Nor</button>
 		<button onclick={ circuitView.addNand }>Nand</button>
 		<button onclick={ circuitView.addXor }>Xor</button>
+		<span>-</span>
+		<button onclick={ circuitView.addTrue }>True</button>
+		<button onclick={ circuitView.addFalse }>False</button>
 		<button onclick={ circuitView.addNop }>Nop</button>
-		<span>-</span>
 		<button onclick={ circuitView.addRandom }>Rnd</button>
-		<span>-</span>
 		<button onclick={ circuitView.addButton }>Button</button>
 		<button onclick={ circuitView.addLed }>LED</button>
 		<span>-</span>

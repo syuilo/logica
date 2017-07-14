@@ -17,6 +17,8 @@ import NotView from './node-views/not';
 import NorView from './node-views/nor';
 import NandView from './node-views/nand';
 import XorView from './node-views/xor';
+import TrueView from './node-views/true';
+import FalseView from './node-views/false';
 import NopView from './node-views/nop';
 import RandomView from './node-views/random';
 import ButtonView from './node-views/button';
@@ -84,6 +86,14 @@ class CircuitView {
 
 	addXor() {
 		this.addNode(new XorView(this));
+	}
+
+	addTrue() {
+		this.addNode(new TrueView(this));
+	}
+
+	addFalse() {
+		this.addNode(new FalseView(this));
 	}
 
 	addNop() {

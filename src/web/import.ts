@@ -14,6 +14,8 @@ import NotView from './node-views/not';
 import NorView from './node-views/nor';
 import NandView from './node-views/nand';
 import XorView from './node-views/xor';
+import TrueView from './node-views/true';
+import FalseView from './node-views/false';
 import NopView from './node-views/nop';
 import RandomView from './node-views/random';
 import ButtonView from './node-views/button';
@@ -37,6 +39,8 @@ export default function (circuitView: CircuitView, data) {
 			case 'Nor': view = NorView.import(circuitView, viewData); break;
 			case 'Nand': view = NandView.import(circuitView, viewData); break;
 			case 'Xor': view = XorView.import(circuitView, viewData); break;
+			case 'True': view = TrueView.import(circuitView, viewData); break;
+			case 'False': view = FalseView.import(circuitView, viewData); break;
 			case 'Nop': view = NopView.import(circuitView, viewData); break;
 			case 'Random': view = RandomView.import(circuitView, viewData); break;
 			case 'Button': view = ButtonView.import(circuitView, viewData); break;

@@ -248,6 +248,14 @@ abstract class のーど extends EventEmitter {
 	}
 
 	public addInput(connection: connection) {
+		if (!this.hasInputPorts) {
+			throw 'このノードは入力ポートを持たないので接続されることはできません';
+		}
+
+		if (this.inputs.find(c => c.to === connection.to) != null) {
+			throw 'このノードの指定された入力ポートは接続済みです';
+		}
+
 		this.inputs.push(connection);
 		this.requestUpdateAtNextTick();
 	}

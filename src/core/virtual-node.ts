@@ -1,7 +1,7 @@
 import のーど from './node';
 
 /**
- * 更新の対象にならないノード
+ * 更新の対象にならない(=遅延を発生させない)ノード
  */
 abstract class VirtualNode extends のーど {
 	isVirtual = true;

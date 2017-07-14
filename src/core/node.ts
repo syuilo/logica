@@ -8,6 +8,9 @@ import PackageInput from './nodes/package-input';
 import PackageOutput from './nodes/package-output';
 import Pin from './nodes/pin';
 
+/**
+ * 回路上に設置でき入力または出力をもつもの全ての基底クラス
+ */
 @autobind
 abstract class のーど extends EventEmitter {
 	/**
@@ -201,15 +204,17 @@ abstract class のーど extends EventEmitter {
 
 	/**
 	 * このノードの指定された入力ポートに接続されているノードの状態を取得します。
-	 * @param portId 遡る起点となる自分の入力ポートID
+	 * @param portId 入力ポートID
 	 * @return 状態
 	 */
 	public getInput(portId?: string): boolean {
+		if (!this.hasInputPorts) {
+			throw 'このノードには入力ポートがありません';
+		}
+
 		if (portId == null) {
 			if (this.inputInfo.length === 1) {
 				portId = this.inputInfo[0].id;
-			} else if (this.inputInfo.length === 0) {
-				throw 'このノードに入力ポートがありません';
 			} else {
 				throw 'このノードは複数の入力ポートを持っているので、入力ポートIDを省略することはできません';
 			}
@@ -225,11 +230,12 @@ abstract class のーど extends EventEmitter {
 
 	/**
 	 * 自分の指定された出力ポートに接続されているすべての「実際の」ノードを取得します。
-	 * @param portId 自分の出力ポートID
+	 * @param portId 出力ポートID
+	 * @return ノードの配列
 	 */
 	public getActualNextNodes(portId?: string): のーど[] {
-		if (this.outputs == null || this.outputs.length === 0) {
-			return [];
+		if (!this.hasOutputPorts) {
+			throw 'このノードには出力ポートがありません';
 		}
 
 		if (portId == null) {

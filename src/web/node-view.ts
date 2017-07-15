@@ -397,7 +397,7 @@ class Wire {
 	}
 
 	public update() {
-		this.state = this.parent.node.getState(this.connection.from)
+		this.state = this.parent.node.getState(this.connection.from);
 		this.render();
 	}
 

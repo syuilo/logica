@@ -102,7 +102,12 @@ abstract class のーど extends EventEmitter {
 	 */
 	public abstract update(inputs: {[id: string]: boolean}): void;
 
-	public getState(id?: string) {
+	/**
+	 * このノードの指定された出力ポートの出力状態を取得します
+	 * @param id 出力ポートID
+	 * @return 状態
+	 */
+	public getState(id?: string): boolean {
 		if (id == null) {
 			if (this.outputInfo.length === 1) {
 				id = this.outputInfo[0].id;
@@ -188,6 +193,12 @@ abstract class のーど extends EventEmitter {
 		return connection;
 	}
 
+	/**
+	 * このノードの指定された出力を指定されたノードの指定された入力から切断します
+	 * @param target 対象のノード
+	 * @param targetInputId 対象の入力ポートID
+	 * @param myOutputId 自分の出力ポートID
+	 */
 	public disconnectTo(target: のーど, targetInputId: string, myOutputId: string) {
 		this.outputs = this.outputs
 			.filter(c => !(c.node == target && c.from == myOutputId && c.to == targetInputId));
@@ -251,6 +262,10 @@ abstract class のーど extends EventEmitter {
 			.reduce((a, b) => a.concat(b), []);
 	}
 
+	/**
+	 * このノードに入力を追加します
+	 * @param connection 追加する接続
+	 */
 	public addInput(connection: connection) {
 		if (!this.hasInputPorts) {
 			throw 'このノードは入力ポートを持たないので接続されることはできません';
@@ -264,6 +279,10 @@ abstract class のーど extends EventEmitter {
 		this.requestUpdateAtNextTick();
 	}
 
+	/**
+	 * このノードのから入力を削除します
+	 * @param connection 削除する接続
+	 */
 	public removeInput(connection: connection) {
 		this.inputs = this.inputs
 			.filter(c => !(

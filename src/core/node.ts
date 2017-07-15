@@ -147,7 +147,10 @@ abstract class のーど extends EventEmitter {
 			if (target.inputInfo.length === 1) {
 				targetInputId = target.inputInfo[0].id;
 			} else if (target.isInputCommutative) {
-				const availablePort = target.inputInfo.find(i => target.inputs.filter(j => j.to === i.id).length === 0);
+				const availablePort = target.inputInfo
+					.find(i => target.inputs
+						.filter(j => j.to === i.id).length === 0);
+
 				if (availablePort != null) {
 					targetInputId = availablePort.id;
 				} else {
@@ -186,7 +189,8 @@ abstract class のーど extends EventEmitter {
 	}
 
 	public disconnectTo(target: のーど, targetInputId: string, myOutputId: string) {
-		this.outputs = this.outputs.filter(c => !(c.node == target && c.from == myOutputId && c.to == targetInputId));
+		this.outputs = this.outputs
+			.filter(c => !(c.node == target && c.from == myOutputId && c.to == targetInputId));
 
 		target.removeInput({
 			node: this,
@@ -261,7 +265,12 @@ abstract class のーど extends EventEmitter {
 	}
 
 	public removeInput(connection: connection) {
-		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+		this.inputs = this.inputs
+			.filter(c => !(
+				c.node == connection.node &&
+				c.from == connection.from &&
+				c.to == connection.to));
+
 		this.requestUpdateAtNextTick();
 	}
 

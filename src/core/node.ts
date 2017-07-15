@@ -280,7 +280,7 @@ abstract class のーど extends EventEmitter {
 	}
 
 	/**
-	 * このノードのから入力を削除します
+	 * このノードから入力を削除します
 	 * @param connection 削除する接続
 	 */
 	public removeInput(connection: connection) {

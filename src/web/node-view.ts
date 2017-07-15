@@ -2,6 +2,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import autobind from 'autobind-decorator';
 
 import のーど from '../core/node';
+import { connection } from '../core/node';
 import Package from '../core/nodes/package';
 
 import CircuitView from './circuit-view';
@@ -46,10 +47,6 @@ abstract class NodeView extends EventEmitter {
 	 */
 	public rotate: number = 0;
 
-	outputs: any[] = [];
-
-	lines: any[] = [];
-
 	inputPorts: any[] = [];
 	outputPorts: any[] = [];
 
@@ -67,38 +64,9 @@ abstract class NodeView extends EventEmitter {
 		this.circuitView = circuitView;
 		this.node = node;
 
-		node.on('state-updated', () => {
-			this.drawLines();
-		});
-
-		node.on('connected', c => {
-			const targetView = this.circuitView.nodeViews.find(view => view.node == c.node);
-			this.outputs.push({
-				view: targetView,
-				connection: c
-			});
-			this.drawLines();
-			targetView.on('move', this.drawLines);
-			c.node.on('removed', () => {
-				this.outputs = this.outputs.filter(o => o.connection.node != c.node);
-				this.drawLines();
-			});
-		});
-
-		node.on('disconnected', (target, targetPortId, myPortId) => {
-			const targetView = this.circuitView.nodeViews.find(view => view.node == target);
-			this.outputs = this.outputs.filter(o => !(o.connection.node == targetView.node && o.connection.from == myPortId && o.connection.to == targetPortId));
-			this.drawLines();
-			targetView.off('move', this.drawLines);
-		});
+		node.on('connected', this.onNodeConnected);
 
 		node.on('removed', () => {
-			this.outputs.forEach(o => {
-				o.view.off('move', this.drawLines);
-			});
-			this.outputs = [];
-			this.lines.forEach(l => l.remove());
-			this.lines = [];
 			this.el.remove();
 			this.circuitView.nodeViews = this.circuitView.nodeViews.filter(view => view != this);
 		});
@@ -126,8 +94,6 @@ abstract class NodeView extends EventEmitter {
 			this.rect.draggable().on('dragmove', e => {
 				e.preventDefault();
 				this.move(x + e.detail.p.x, y + e.detail.p.y);
-				this.emit('move');
-				this.drawLines();
 			});
 		}
 
@@ -235,6 +201,27 @@ abstract class NodeView extends EventEmitter {
 		this.updatePortPosition();
 	}
 
+	/**
+	 * このノードがノードに繋がれた時
+	 * @param connection 接続
+	 */
+	private onNodeConnected(connection: connection) {
+		/**********************************************************
+		 * 導線要素を作成
+		 **********************************************************/
+
+		const targetView = this.circuitView.nodeViews
+			.find(view => view.node == connection.node);
+
+		const wire = new Wire(this, connection, targetView);
+		wire.update();
+	}
+
+	/**
+	 * 移動します
+	 * @param x X位置
+	 * @param y Y位置
+	 */
 	public move(x: number, y: number) {
 		if (this.circuitView.snapToGrid) {
 			const gridSize = 16;
@@ -242,9 +229,14 @@ abstract class NodeView extends EventEmitter {
 			y = Math.round(y / gridSize) * gridSize;
 		}
 		this.el.move(x, y);
+		this.emit('moved');
 	}
 
-	setRotate(r: number) {
+	/**
+	 * 回転します
+	 * @param r 0~4
+	 */
+	public setRotate(r: number) {
 		if (r > 3) r = 0;
 		if (this.rotate !== r) {
 			this.rect.attr({
@@ -258,10 +250,10 @@ abstract class NodeView extends EventEmitter {
 		}
 		this.rotate = r;
 		this.updatePortPosition();
-		this.emit('move');
+		this.emit('moved');
 	}
 
-	updatePortPosition() {
+	private updatePortPosition() {
 		this.inputPorts.forEach((p, i) => {
 			let x: number;
 			let y: number;
@@ -309,8 +301,6 @@ abstract class NodeView extends EventEmitter {
 			}
 			p.el.move(x, y);
 		});
-
-		this.drawLines();
 	}
 
 	public onMouseover() {
@@ -318,64 +308,127 @@ abstract class NodeView extends EventEmitter {
 		this.rect.off('mouseover', this.onMouseover);
 		if (this.mouseoutTimer) clearTimeout(this.mouseoutTimer);
 	}
-
-	drawLines() {
-		this.lines.forEach(l => l.remove());
-		this.outputs.forEach(o => {
-			const outputPortIndex = this.node.outputInfo.findIndex(info => o.connection.from === info.id);
-			const inputPortIndex = o.view.node.inputInfo.findIndex(info => o.connection.to === info.id);
-			const lineStartX = this.x + this.outputPorts[outputPortIndex].el.x() + (this.outputPorts[outputPortIndex].el.width() / 2);
-			const lineStartY = this.y + this.outputPorts[outputPortIndex].el.y() + (this.outputPorts[outputPortIndex].el.height() / 2);
-			const lineEndX = o.view.x + o.view.inputPorts[inputPortIndex].el.x() + (o.view.inputPorts[inputPortIndex].el.width() / 2);
-			const lineEndY = o.view.y + o.view.inputPorts[inputPortIndex].el.y() + (o.view.inputPorts[inputPortIndex].el.height() / 2);
-
-			const state = this.node.getState(o.connection.from);
-
-			let line;
-			let cover;
-			const lineColor = state ? '#7aff00' : '#627f84';
-
-			if (state) {
-				this.lines.push(cover = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: 'rgba(34, 111, 50, 0.3)', width: 8 }).style('cursor: pointer;'));
-
-				this.lines.push(line = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: lineColor, width: 2 })
-					.style('stroke-dasharray: 5; animation: dash 0.5s linear infinite; pointer-events: none;'));
-			} else {
-				this.lines.push(cover = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: 'transparent', width: 8 }).style('cursor: pointer;'));
-
-				this.lines.push(line = this.circuitView.draw.path(`M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
-					.stroke({ color: lineColor, width: 2 })
-					.style('stroke-dasharray: 5; animation: dash 1s linear infinite; pointer-events: none;'));
-			}
-
-			let text;
-
-			cover.mouseover(() => {
-				line.stroke({ color: '#f00' });
-
-				const from = this.node.type === 'Package' ? (this.node as Package).packageName : this.node.type;
-				const to = o.connection.node.type === 'Package' ? (o.connection.node as Package).packageName : o.connection.node.type;
-				text = this.circuitView.draw
-					.text(`${ from }:${ o.connection.from } --> ${ to }:${ o.connection.to }`)
-					.fill('#fff')
-					.move(((lineStartX + lineEndX) / 2), ((lineStartY + lineEndY) / 2))
-					.style('pointer-events: none;');
-			});
-
-			cover.mouseout(() => {
-				line.stroke({ color: lineColor });
-				text.remove();
-			});
-
-			cover.click(() => {
-				this.node.disconnectTo(o.view.node, o.connection.to, o.connection.from);
-				text.remove();
-			});
-		});
-	}
 }
 
 export default NodeView;
+
+/**
+ * 導線
+ */
+@autobind
+class Wire {
+	private inactiveCoverColor = 'transparent';
+	private inactiveLineColor = '#627f84';
+	private activeCoverColor = 'rgba(34, 111, 50, 0.3)';
+	private activeLineColor = '#7aff00';
+
+	private parent: NodeView;
+	private connection: connection;
+	private targetView: NodeView;
+	private state: boolean;
+
+	private coverElement: any;
+	private lineElement: any;
+
+	constructor(panrent: NodeView, connection: connection, targetView: NodeView) {
+		this.parent = panrent;
+		this.connection = connection;
+		this.targetView = targetView;
+
+		this.coverElement = this.parent.circuitView.draw
+			.path()
+			.stroke({ width: 8 })
+			.style('cursor: pointer;');
+
+		this.lineElement = this.parent.circuitView.draw
+			.path()
+			.stroke({ width: 2 })
+			.style('pointer-events: none;');
+
+		//let text;
+
+		this.coverElement.mouseover(() => {
+			this.lineElement.stroke({ color: '#f00' });
+
+			/*const from = this.node.type === 'Package' ? (this.node as Package).packageName : this.node.type;
+			const to = c.node.type === 'Package' ? (c.node as Package).packageName : c.node.type;
+			text = this.circuitView.draw
+				.text(`${ from }:${ c.from } --> ${ to }:${ c.to }`)
+				.fill('#fff')
+				.move(((lineStartX + lineEndX) / 2), ((lineStartY + lineEndY) / 2))
+				.style('pointer-events: none;');*/
+		});
+
+		this.coverElement.mouseout(() => {
+			this.lineElement.stroke({ color: this.currentStateLineColor });
+			//text.remove();
+		});
+
+		this.coverElement.click(() => {
+			this.parent.node.disconnectTo(this.targetView.node, this.connection.to, this.connection.from);
+			//text.remove();
+		});
+
+		this.parent.node.on('state-updated', () => {
+			this.update();
+		});
+
+		this.parent.node.on('disconnected', (target, targetPortId, myPortId) => {
+			if (target === this.connection.node && targetPortId === this.connection.to && myPortId === this.connection.from) {
+				this.dispose();
+			}
+		});
+
+		this.parent.on('moved', () => {
+			this.render();
+		});
+
+		this.parent.node.on('removed', () => {
+			this.dispose();
+		});
+
+		this.targetView.on('moved', () => {
+			this.render();
+		});
+
+		this.connection.node.on('removed', () => {
+			this.dispose();
+		});
+	}
+
+	public update() {
+		this.state = this.parent.node.getState(this.connection.from)
+		this.render();
+	}
+
+	public render() {
+		const outputPortIndex = this.parent.node.outputInfo.findIndex(info => this.connection.from === info.id);
+		const inputPortIndex = this.targetView.node.inputInfo.findIndex(info => this.connection.to === info.id);
+		const lineStartX = this.parent.x + this.parent.outputPorts[outputPortIndex].el.x() + (this.parent.outputPorts[outputPortIndex].el.width() / 2);
+		const lineStartY = this.parent.y + this.parent.outputPorts[outputPortIndex].el.y() + (this.parent.outputPorts[outputPortIndex].el.height() / 2);
+		const lineEndX = this.targetView.x + this.targetView.inputPorts[inputPortIndex].el.x() + (this.targetView.inputPorts[inputPortIndex].el.width() / 2);
+		const lineEndY = this.targetView.y + this.targetView.inputPorts[inputPortIndex].el.y() + (this.targetView.inputPorts[inputPortIndex].el.height() / 2);
+
+		this.coverElement
+			.attr('d', `M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+			.stroke({ color: this.currentStateCoverColor, width: 8 });
+
+		this.lineElement
+			.attr('d', `M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
+			.stroke({ color: this.currentStateLineColor, width: 2 })
+			.style(`stroke-dasharray: 5; animation: dash ${ this.state ? '0.5' : '1' }s linear infinite;`);
+	}
+
+	private get currentStateCoverColor() {
+		return this.state ? this.activeCoverColor : this.inactiveCoverColor;
+	}
+
+	private get currentStateLineColor() {
+		return this.state ? this.activeLineColor : this.inactiveLineColor;
+	}
+
+	public dispose() {
+		this.coverElement.remove();
+		this.lineElement.remove();
+	}
+}

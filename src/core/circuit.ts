@@ -2,8 +2,6 @@ import autobind from 'autobind-decorator';
 
 import のーど from './node';
 import Package from './nodes/package';
-import PackageInput from './nodes/package-input';
-import PackageOutput from './nodes/package-output';
 
 /**
  * 回路

@@ -201,7 +201,10 @@ abstract class のーど extends EventEmitter {
 	 */
 	public disconnectTo(target: のーど, targetInputId: string, myOutputId: string) {
 		this.outputs = this.outputs
-			.filter(c => !(c.node == target && c.from == myOutputId && c.to == targetInputId));
+			.filter(c => !(
+				c.node == target &&
+				c.from == myOutputId &&
+				c.to == targetInputId));
 
 		target.removeInput({
 			node: this,

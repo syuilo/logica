@@ -369,31 +369,18 @@ class Wire {
 			//text.remove();
 		});
 
-		this.parent.node.on('state-updated', () => {
-			this.update();
-		});
+		this.parent.on('moved', this.render);
+		this.parent.node.on('state-updated', this.update);
+		this.parent.node.on('disconnected', this.onParentNodeDisconnected);
+		this.parent.node.on('removed', this.dispose);
+		this.targetView.on('moved', this.render);
+		this.connection.node.on('removed', this.dispose);
+	}
 
-		this.parent.node.on('disconnected', (target, targetPortId, myPortId) => {
-			if (target === this.connection.node && targetPortId === this.connection.to && myPortId === this.connection.from) {
-				this.dispose();
-			}
-		});
-
-		this.parent.on('moved', () => {
-			this.render();
-		});
-
-		this.parent.node.on('removed', () => {
+	private onParentNodeDisconnected(target, targetPortId, myPortId) {
+		if (target === this.connection.node && targetPortId === this.connection.to && myPortId === this.connection.from) {
 			this.dispose();
-		});
-
-		this.targetView.on('moved', () => {
-			this.render();
-		});
-
-		this.connection.node.on('removed', () => {
-			this.dispose();
-		});
+		}
 	}
 
 	public update() {
@@ -430,5 +417,12 @@ class Wire {
 	public dispose() {
 		this.coverElement.remove();
 		this.lineElement.remove();
+
+		this.parent.off('moved', this.render);
+		this.parent.node.off('state-updated', this.update);
+		this.parent.node.off('disconnected', this.onParentNodeDisconnected);
+		this.parent.node.off('removed', this.dispose);
+		this.targetView.off('moved', this.render);
+		this.connection.node.off('removed', this.dispose);
 	}
 }

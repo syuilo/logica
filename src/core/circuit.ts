@@ -160,9 +160,22 @@ export default class Circuit {
 		this.nodes.forEach(n => this.scan(n));
 	}
 
+	/**
+	 * この回路にノードを追加します
+	 * @param node 追加するノード
+	 */
 	public addNode(node: のーど) {
 		this.nodes.add(node);
 		this.scan(node);
+	}
+
+	/**
+	 * この回路からノードを削除します
+	 * @param node 削除するノード
+	 */
+	public removeNode(node: のーど) {
+		this.nodes.delete(node);
+		node.remove();
 	}
 
 	private scan(node: のーど) {
@@ -180,10 +193,5 @@ export default class Circuit {
 				this.scan(n);
 			});
 		}
-	}
-
-	public removeNode(node: のーど) {
-		this.nodes.delete(node);
-		node.remove();
 	}
 }

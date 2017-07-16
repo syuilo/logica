@@ -174,19 +174,11 @@ export default abstract class のーど extends EventEmitter {
 			}
 		}
 
-		const connection = {
-			node: target,
-			from: myOutputId,
-			to: targetInputId
-		};
+		const connection = new Connection(target, myOutputId, targetInputId);
 
 		this.outputs.push(connection);
 
-		target.addInput({
-			node: this,
-			from: myOutputId,
-			to: targetInputId
-		});
+		target.addInput(new Connection(this, myOutputId, targetInputId));
 
 		this.emit('connected', connection);
 
@@ -336,40 +328,37 @@ export default abstract class のーど extends EventEmitter {
  */
 export class Connection {
 	/**
-	 * 相手のノード
+	 * 出力する側
 	 */
-	public node: のーど;
+	public from: {
+		node: のーど;
+		port: string;
+	};
 
 	/**
-	 * 自分の出力ポートのID
+	 * 入力される側
 	 */
-	public from: string;
-
-	/**
-	 * 相手の入力ポートのID
-	 */
-	public to: string;
+	public to: {
+		node: のーど;
+		port: string;
+	};
 
 	/**
 	 * このクラスのインスタンスを作成します。
-	 * @param node 相手のノード
-	 * @param from 自分の出力ポートID
-	 * @param to 相手の入力ポートID
+	 * @param fromNode 入力する側のノード
+	 * @param fromPort 入力する側のノードの出力ポートID
+	 * @param toNode 入力される側のノード
+	 * @param toPort 入力される側のノードの入力ポートID
 	 */
-	constructor(node: のーど, from: string, to: string) {
-		this.node = node;
-		this.from = from;
-		this.to = to;
-	}
-
-	/**
-	 * 与えられた接続とこの接続が等しいか検証します
-	 * @param connection 比較する接続
-	 */
-	public isEquivalentTo(connection: Connection) {
-		return connection.node === this.node &&
-			connection.from === this.from &&
-			connection.to === this.to;
+	constructor(fromNode: のーど, fromPort: string, toNode: のーど, toPort: string) {
+		this.from = {
+			node: fromNode,
+			port: fromPort
+		};
+		this.to = {
+			node: toNode,
+			port: toPort
+		};
 	}
 }
 

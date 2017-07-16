@@ -15254,8 +15254,10 @@ let Circuit = class Circuit {
          1 全ての更新対象ノードの現在の入力状態を記憶しておく
          **********************************************************/
         const inputsList = Array.from(this.shouldUpdates)
-            .filter(node => node.hasInputPorts)
             .map(node => {
+            // 入力ポートを持たないならスキップ
+            if (!node.hasInputPorts)
+                return null;
             const inputs = {};
             node.inputInfo.forEach(info => {
                 inputs[info.id] = node.getInput(info.id);

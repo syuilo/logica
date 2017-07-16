@@ -4,12 +4,13 @@ import のーど from './node';
 import Package from './nodes/package';
 
 /**
- * 回路
+ * 基板。
+ * すべてのノードを統制して更新する責務があり、回路の動作を司ります。
  */
 @autobind
 export default class Circuit {
 	/**
-	 * この回路に含まれているノード
+	 * この基板に含まれているノード
 	 */
 	public nodes: Set<のーど> = new Set();
 
@@ -17,6 +18,10 @@ export default class Circuit {
 
 	private previousStatesList: any[] = [];
 
+	/**
+	 * 新たなCircuitインスタンスを作成します。
+	 * @param nodes この基板に追加したいノードの配列
+	 */
 	constructor(nodes?: のーど[]) {
 		if (nodes) nodes.forEach(n => this.addNode(n));
 	}
@@ -124,18 +129,6 @@ export default class Circuit {
 	}
 
 	/**
-	 * 回路の状態の変化がなくなるまでtickします
-	 */
-	public calc(): number {
-		let count = 0;
-		while (this.shouldUpdates.size != 0) {
-			this.tick();
-			count++;
-		}
-		return count;
-	}
-
-	/**
 	 * 回路の状態を初期状態に戻します
 	 */
 	public reset() {
@@ -163,7 +156,7 @@ export default class Circuit {
 	}
 
 	/**
-	 * この回路にノードを追加します
+	 * この基板にノードを追加します
 	 * @param node 追加するノード
 	 */
 	public addNode(node: のーど) {
@@ -172,7 +165,7 @@ export default class Circuit {
 	}
 
 	/**
-	 * この回路からノードを削除します
+	 * この基板からノードを削除します
 	 * @param node 削除するノード
 	 */
 	public removeNode(node: のーど) {

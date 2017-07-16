@@ -291,11 +291,7 @@ export default abstract class のーど extends EventEmitter {
 	public remove() {
 		this.inputs = [];
 		this.outputs.forEach(c => {
-			c.node.removeInput({
-				node: this,
-				from: c.from,
-				to: c.to
-			});
+			c.to.node.removeInput(c);
 		});
 		this.outputs = [];
 		this.emit('removed');
@@ -310,7 +306,7 @@ export default abstract class のーど extends EventEmitter {
 			id: this.id,
 			name: this.name,
 			outputs: this.outputs.map(c => ({
-				nid: c.node.id,
+				nid: c.to.node.id,
 				from: c.from,
 				to: c.to
 			}))

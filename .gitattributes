@@ -1,5 +1,0 @@
-*.svg -diff -text
-*.psd -diff -text
-*.ai -diff -text
-
-*.tag linguist-language=HTML

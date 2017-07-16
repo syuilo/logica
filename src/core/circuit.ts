@@ -181,10 +181,15 @@ export default class Circuit {
 	private scan(node: のーど) {
 		node.requestUpdateAtNextTick = () => this.shouldUpdates.add(node);
 
-		this.previousStatesList.push({
-			node: node,
-			states: {}
-		});
+		const exist = this.previousStatesList
+			.find(pss => pss.node == node) != null;
+
+		if (!exist) {
+			this.previousStatesList.push({
+				node: node,
+				states: {}
+			});
+		}
 
 		if (node.isForceUpdate) this.shouldUpdates.add(node);
 

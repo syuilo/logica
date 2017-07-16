@@ -8,7 +8,9 @@ Import / Export are now supported, so you can save your circuit and share it wit
 This project is still under construction.
 If you are interested in logica, you're welcome to participate in the development of logica!
 
-How to Use
+[Playground](https://syuilo.com/logica)
+
+Run the playground in your local host
 ----------------------------------------------------------------
 1. Clone or download this repository
 2. Run `npm install` and `npm run build`

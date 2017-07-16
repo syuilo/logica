@@ -1,4 +1,5 @@
 import のーど from '../node';
+import { Connection } from '../node';
 import VirtualNode from '../virtual-node';
 import PackageInput from './package-input';
 import PackageOutput from './package-output';
@@ -91,12 +92,13 @@ export default class Package extends VirtualNode {
 		return n.getActualNextNodes();
 	}
 
-	public addInput(connection) {
+	public addInput(connection: Connection) {
 		this.inputs.push(connection);
-		this.getActualInputNodes(connection.to).forEach(n => n.requestUpdateAtNextTick());
+		this.getActualInputNodes(connection.to.port)
+			.forEach(n => n.requestUpdateAtNextTick());
 	}
 
-	public removeInput(connection) {
+	public removeInput(connection: Connection) {
 		this.inputs = this.inputs.filter(c => c !== connection);
 	}
 

@@ -1,7 +1,7 @@
 import のーど from '../node';
+import { Connection } from '../node';
 import VirtualNode from '../virtual-node';
 import Package from './package';
-
 
 export default class PackageOutput extends VirtualNode {
 	type = 'PackageOutput';
@@ -38,11 +38,11 @@ export default class PackageOutput extends VirtualNode {
 		}
 	}
 
-	public addInput(connection) {
+	public addInput(connection: Connection) {
 		this.inputs.push(connection);
 	}
 
-	public removeInput(connection) {
+	public removeInput(connection: Connection) {
 		this.inputs = this.inputs.filter(c => c !== connection);
 	}
 

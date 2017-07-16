@@ -12,7 +12,7 @@ How to Use
 ----------------------------------------------------------------
 1. Clone or download this repository
 2. Run `npm install` and `npm run build`
-  * Ensure that Node.js and npm are installed
+   * Ensure that Node.js and npm are installed
 3. Open `./built/web/index.html` in your web browser
 4. That is it! Enjoy.
 

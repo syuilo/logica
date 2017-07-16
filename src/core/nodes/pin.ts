@@ -1,5 +1,6 @@
 import autobind from 'autobind-decorator';
 import のーど from '../node';
+import { Connection } from '../node';
 import VirtualNode from '../virtual-node';
 
 export default class Pin extends VirtualNode {
@@ -31,17 +32,17 @@ export default class Pin extends VirtualNode {
 		this.emit('state-updated');
 	}
 
-	public addInput(connection) {
+	public addInput(connection: Connection) {
 		this.inputs.push(connection);
 		this.emit('state-updated');
-		connection.node.on('state-updated', this.emitStateUpdated);
+		connection.from.node.on('state-updated', this.emitStateUpdated);
 		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 
-	public removeInput(connection) {
-		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+	public removeInput(connection: Connection) {
+		this.inputs = this.inputs.filter(c => c !== connection);
 		this.emit('state-updated');
-		connection.node.off('state-updated', this.emitStateUpdated);
+		connection.from.node.off('state-updated', this.emitStateUpdated);
 		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 

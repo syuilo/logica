@@ -7,7 +7,7 @@ import VirtualNode from './virtual-node';
  * 回路上に設置でき入力または出力をもつもの全ての基底クラス
  */
 @autobind
-abstract class のーど extends EventEmitter {
+export default abstract class のーど extends EventEmitter {
 	/**
 	 * Type of this node
 	 */
@@ -28,12 +28,12 @@ abstract class のーど extends EventEmitter {
 	/**
 	 * このノードに入力されている接続
 	 */
-	public inputs: connection[] = [];
+	public inputs: Connection[] = [];
 
 	/**
 	 * このノードから出力されている接続
 	 */
-	public outputs: connection[] = [];
+	public outputs: Connection[] = [];
 
 	/**
 	 * 入力ポート情報
@@ -154,7 +154,7 @@ abstract class のーど extends EventEmitter {
 			} else if (target.isInputCommutative) {
 				const availablePort = target.inputInfo
 					.find(i => target.inputs
-						.filter(j => j.to === i.id).length === 0);
+						.filter(j => j.to.port === i.id).length === 0);
 
 				if (availablePort != null) {
 					targetInputId = availablePort.id;
@@ -174,49 +174,43 @@ abstract class のーど extends EventEmitter {
 			}
 		}
 
-		const connection = {
-			node: target,
-			from: myOutputId,
-			to: targetInputId
-		};
+		const connection = new Connection(this, myOutputId, target, targetInputId);
 
-		this.outputs.push(connection);
-
-		target.addInput({
-			node: this,
-			from: myOutputId,
-			to: targetInputId
-		});
-
-		this.emit('connected', connection);
+		this.addOutput(connection);
+		target.addInput(connection);
 
 		return connection;
 	}
 
 	/**
-	 * このノードの指定された出力を指定されたノードの指定された入力から切断します
+	 * このノードの指定された出力を指定されたノードの指定された入力ポートから切断します
 	 * @param target 対象のノード
 	 * @param targetInputId 対象の入力ポートID
 	 * @param myOutputId 自分の出力ポートID
 	 */
-	public disconnectTo(target: のーど, targetInputId: string, myOutputId: string) {
+	public disconnectFrom(target: のーど, targetInputId: string, myOutputId: string) {
+		// 当該接続を検索
+		const connection = this.outputs
+			.find(c =>
+				c.from.node === this &&
+				c.from.port === myOutputId &&
+				c.to.node === target &&
+				c.to.port === targetInputId);
+
+		if (connection == null) {
+			throw '指定された接続は見つかりませんでした。';
+		}
+
 		this.outputs = this.outputs
-			.filter(c => !(
-				c.node == target &&
-				c.from == myOutputId &&
-				c.to == targetInputId));
+			.filter(c => c !== connection);
 
-		target.removeInput({
-			node: this,
-			from: myOutputId,
-			to: targetInputId
-		});
+		target.removeInput(connection);
 
-		this.emit('disconnected', target, targetInputId, myOutputId);
+		this.emit('disconnected', connection);
 	}
 
 	/**
-	 * このノードの指定された入力ポートに接続されているノードの状態を取得します。
+	 * このノードの指定された入力ポートの入力状態を取得します。
 	 * @param portId 入力ポートID
 	 * @return 状態
 	 */
@@ -233,11 +227,11 @@ abstract class のーど extends EventEmitter {
 			}
 		}
 
-		const c = this.inputs.find(c => c.to === portId);
+		const c = this.inputs.find(c => c.to.port === portId);
 		if (c == null) {
 			return false;
 		} else {
-			return c.node.getState(c.from);
+			return c.from.node.getState(c.from.port);
 		}
 	}
 
@@ -260,16 +254,18 @@ abstract class のーど extends EventEmitter {
 		}
 
 		return this.outputs
-			.filter(c => c.from === portId)
-			.map(c => c.node.isVirtual ? (c.node as VirtualNode).getActualInputNodes(c.to) : [c.node])
+			.filter(c => c.from.port === portId)
+			.map(c => c.to.node.isVirtual
+				? (c.to.node as VirtualNode).getActualInputNodes(c.to.port)
+				: [c.to.node])
 			.reduce((a, b) => a.concat(b), []);
 	}
 
 	/**
 	 * このノードに入力を追加します
-	 * @param connection 追加する接続
+	 * @param Connection 追加する接続
 	 */
-	public addInput(connection: connection) {
+	public addInput(connection: Connection) {
 		if (!this.hasInputPorts) {
 			throw 'このノードは入力ポートを持たないので接続されることはできません';
 		}
@@ -284,16 +280,26 @@ abstract class のーど extends EventEmitter {
 
 	/**
 	 * このノードから入力を削除します
-	 * @param connection 削除する接続
+	 * @param Connection 削除する接続
 	 */
-	public removeInput(connection: connection) {
+	public removeInput(connection: Connection) {
 		this.inputs = this.inputs
-			.filter(c => !(
-				c.node == connection.node &&
-				c.from == connection.from &&
-				c.to == connection.to));
+			.filter(c => c !== connection);
 
 		this.requestUpdateAtNextTick();
+	}
+
+	public addOutput(connection: Connection) {
+		this.outputs.push(connection);
+
+		this.emit('connected', connection);
+	}
+
+	public removeOutput(connection: Connection) {
+		this.outputs = this.outputs
+			.filter(c => c !== connection);
+
+		this.emit('disconnected', connection);
 	}
 
 	/**
@@ -302,11 +308,7 @@ abstract class のーど extends EventEmitter {
 	public remove() {
 		this.inputs = [];
 		this.outputs.forEach(c => {
-			c.node.removeInput({
-				node: this,
-				from: c.from,
-				to: c.to
-			});
+			c.to.node.removeInput(c);
 		});
 		this.outputs = [];
 		this.emit('removed');
@@ -321,7 +323,7 @@ abstract class のーど extends EventEmitter {
 			id: this.id,
 			name: this.name,
 			outputs: this.outputs.map(c => ({
-				nid: c.node.id,
+				nid: c.to.node.id,
 				from: c.from,
 				to: c.to
 			}))
@@ -334,24 +336,66 @@ abstract class のーど extends EventEmitter {
 	public static import: (data: any) => any;
 }
 
-export default のーど;
-
-export type connection = {
+/**
+ * ノードのポート間の接続を表すクラス
+ */
+export class Connection {
 	/**
-	 * 相手のノード
+	 * 出力する側
 	 */
-	node: のーど;
+	public from: {
+		/**
+		 * ノード
+		 */
+		node: のーど;
+
+		/**
+		 * ポートID
+		 */
+		port: string;
+	};
 
 	/**
-	 * 出力ポートのID
+	 * 入力される側
 	 */
-	from: string;
+	public to: {
+		/**
+		 * ノード
+		 */
+		node: のーど;
+
+		/**
+		 * ポートID
+		 */
+		port: string;
+	};
 
 	/**
-	 * 入力ポートのID
+	 * このクラスのインスタンスを作成します。
+	 * @param fromNode 入力する側のノード
+	 * @param fromPort 入力する側のノードの出力ポートID
+	 * @param toNode 入力される側のノード
+	 * @param toPort 入力される側のノードの入力ポートID
 	 */
-	to: string;
-};
+	constructor(fromNode: のーど, fromPort: string, toNode: のーど, toPort: string) {
+		this.from = {
+			node: fromNode,
+			port: fromPort
+		};
+		this.to = {
+			node: toNode,
+			port: toPort
+		};
+	}
+
+	/**
+	 * この接続を削除します
+	 */
+	public destroy() {
+		this.from.node.removeOutput(this);
+		this.to.node.removeInput(this);
+	}
+}
 
 export type port = {
 	/**

@@ -39,7 +39,7 @@ export default class Pin extends VirtualNode {
 	}
 
 	public removeInput(connection) {
-		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+		this.inputs = this.inputs.filter(c => c !== connection);
 		this.emit('state-updated');
 		connection.node.off('state-updated', this.emitStateUpdated);
 		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());

@@ -55,7 +55,7 @@ export default class Package extends VirtualNode {
 			}));
 
 		Array.from(this.nodes)
-			.filter(n => n.outputs.find(c => c.node.type === 'PackageOutput'))
+			.filter(n => n.outputs.find(c => c.to.node.type === 'PackageOutput'))
 			.forEach(n => n.on('state-updated', () => {
 				this.emit('state-updated');
 			}))
@@ -97,7 +97,7 @@ export default class Package extends VirtualNode {
 	}
 
 	public removeInput(connection) {
-		this.inputs = this.inputs.filter(c => !(c.node == connection.node && c.from == connection.from && c.to == connection.to));
+		this.inputs = this.inputs.filter(c => c !== connection);
 	}
 
 	export() {

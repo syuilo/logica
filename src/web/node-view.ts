@@ -2,7 +2,7 @@ import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import autobind from 'autobind-decorator';
 
 import のーど from '../core/node';
-import { connection } from '../core/node';
+import { Connection } from '../core/node';
 import Package from '../core/nodes/package';
 
 import CircuitView from './circuit-view';
@@ -205,13 +205,13 @@ abstract class NodeView extends EventEmitter {
 	 * このノードがノードに繋がれた時
 	 * @param connection 接続
 	 */
-	private onNodeConnected(connection: connection) {
+	private onNodeConnected(connection: Connection) {
 		/**********************************************************
 		 * 導線要素を作成
 		 **********************************************************/
 
 		const targetView = this.circuitView.nodeViews
-			.find(view => view.node == connection.node);
+			.find(view => view.node == connection.to.node);
 
 		const wire = new Wire(this, connection, targetView);
 		wire.update();
@@ -325,14 +325,14 @@ class Wire {
 	private activeLineColor = '#7aff00';
 
 	private parent: NodeView;
-	private connection: connection;
+	private connection: Connection;
 	private targetView: NodeView;
 	private state: boolean;
 
 	private coverElement: any;
 	private lineElement: any;
 
-	constructor(panrent: NodeView, connection: connection, targetView: NodeView) {
+	constructor(panrent: NodeView, connection: Connection, targetView: NodeView) {
 		this.parent = panrent;
 		this.connection = connection;
 		this.targetView = targetView;
@@ -367,7 +367,7 @@ class Wire {
 		});
 
 		this.coverElement.click(() => {
-			this.parent.node.disconnectTo(this.targetView.node, this.connection.to, this.connection.from);
+			this.connection.destroy();
 			//text.remove();
 		});
 
@@ -376,23 +376,23 @@ class Wire {
 		this.parent.node.on('disconnected', this.onParentNodeDisconnected);
 		this.parent.node.on('removed', this.dispose);
 		this.targetView.on('moved', this.render);
-		this.connection.node.on('removed', this.dispose);
+		this.connection.to.node.on('removed', this.dispose);
 	}
 
-	private onParentNodeDisconnected(target, targetPortId, myPortId) {
-		if (target === this.connection.node && targetPortId === this.connection.to && myPortId === this.connection.from) {
+	private onParentNodeDisconnected(connection) {
+		if (this.connection === connection) {
 			this.dispose();
 		}
 	}
 
 	public update() {
-		this.state = this.parent.node.getState(this.connection.from);
+		this.state = this.parent.node.getState(this.connection.from.port);
 		this.render();
 	}
 
 	public render() {
-		const outputPortIndex = this.parent.node.outputInfo.findIndex(info => this.connection.from === info.id);
-		const inputPortIndex = this.targetView.node.inputInfo.findIndex(info => this.connection.to === info.id);
+		const outputPortIndex = this.parent.node.outputInfo.findIndex(info => this.connection.from.port === info.id);
+		const inputPortIndex = this.targetView.node.inputInfo.findIndex(info => this.connection.to.port === info.id);
 		const lineStartX = this.parent.x + this.parent.outputPorts[outputPortIndex].el.x() + (this.parent.outputPorts[outputPortIndex].el.width() / 2);
 		const lineStartY = this.parent.y + this.parent.outputPorts[outputPortIndex].el.y() + (this.parent.outputPorts[outputPortIndex].el.height() / 2);
 		const lineEndX = this.targetView.x + this.targetView.inputPorts[inputPortIndex].el.x() + (this.targetView.inputPorts[inputPortIndex].el.width() / 2);
@@ -425,6 +425,6 @@ class Wire {
 		this.parent.node.off('disconnected', this.onParentNodeDisconnected);
 		this.parent.node.off('removed', this.dispose);
 		this.targetView.off('moved', this.render);
-		this.connection.node.off('removed', this.dispose);
+		this.connection.to.node.off('removed', this.dispose);
 	}
 }

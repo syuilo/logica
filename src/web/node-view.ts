@@ -228,8 +228,10 @@ abstract class NodeView extends EventEmitter {
 			x = Math.round(x / gridSize) * gridSize;
 			y = Math.round(y / gridSize) * gridSize;
 		}
-		this.el.move(x, y);
-		this.emit('moved');
+		if (x !== this.x || y !== this.y) {
+			this.el.move(x, y);
+			this.emit('moved');
+		}
 	}
 
 	/**

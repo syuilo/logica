@@ -7,7 +7,7 @@ import VirtualNode from './virtual-node';
  * 回路上に設置でき入力または出力をもつもの全ての基底クラス
  */
 @autobind
-abstract class のーど extends EventEmitter {
+export default abstract class のーど extends EventEmitter {
 	/**
 	 * Type of this node
 	 */
@@ -28,12 +28,12 @@ abstract class のーど extends EventEmitter {
 	/**
 	 * このノードに入力されている接続
 	 */
-	public inputs: connection[] = [];
+	public inputs: Connection[] = [];
 
 	/**
 	 * このノードから出力されている接続
 	 */
-	public outputs: connection[] = [];
+	public outputs: Connection[] = [];
 
 	/**
 	 * 入力ポート情報
@@ -267,9 +267,9 @@ abstract class のーど extends EventEmitter {
 
 	/**
 	 * このノードに入力を追加します
-	 * @param connection 追加する接続
+	 * @param Connection 追加する接続
 	 */
-	public addInput(connection: connection) {
+	public addInput(connection: Connection) {
 		if (!this.hasInputPorts) {
 			throw 'このノードは入力ポートを持たないので接続されることはできません';
 		}
@@ -284,14 +284,11 @@ abstract class のーど extends EventEmitter {
 
 	/**
 	 * このノードから入力を削除します
-	 * @param connection 削除する接続
+	 * @param Connection 削除する接続
 	 */
-	public removeInput(connection: connection) {
+	public removeInput(connection: Connection) {
 		this.inputs = this.inputs
-			.filter(c => !(
-				c.node == connection.node &&
-				c.from == connection.from &&
-				c.to == connection.to));
+			.filter(c => !c.isEquivalentTo(connection));
 
 		this.requestUpdateAtNextTick();
 	}
@@ -334,24 +331,47 @@ abstract class のーど extends EventEmitter {
 	public static import: (data: any) => any;
 }
 
-export default のーど;
-
-export type connection = {
+/**
+ * ノードのポート間の接続を表すクラス
+ */
+export class Connection {
 	/**
 	 * 相手のノード
 	 */
-	node: のーど;
+	public node: のーど;
 
 	/**
-	 * 出力ポートのID
+	 * 自分の出力ポートのID
 	 */
-	from: string;
+	public from: string;
 
 	/**
-	 * 入力ポートのID
+	 * 相手の入力ポートのID
 	 */
-	to: string;
-};
+	public to: string;
+
+	/**
+	 * このクラスのインスタンスを作成します。
+	 * @param node 相手のノード
+	 * @param from 自分の出力ポートID
+	 * @param to 相手の入力ポートID
+	 */
+	constructor(node: のーど, from: string, to: string) {
+		this.node = node;
+		this.from = from;
+		this.to = to;
+	}
+
+	/**
+	 * 与えられた接続とこの接続が等しいか検証します
+	 * @param connection 比較する接続
+	 */
+	public isEquivalentTo(connection: Connection) {
+		return connection.node === this.node &&
+			connection.from === this.from &&
+			connection.to === this.to;
+	}
+}
 
 export type port = {
 	/**

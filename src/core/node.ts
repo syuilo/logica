@@ -87,6 +87,8 @@ export default abstract class のーど extends EventEmitter {
 
 	constructor() {
 		super();
+
+		// To avoid memory leak warnings
 		this.setMaxListeners(Infinity);
 	}
 

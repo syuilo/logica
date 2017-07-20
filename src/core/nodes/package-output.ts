@@ -39,11 +39,11 @@ export default class PackageOutput extends VirtualNode {
 	}
 
 	public addInput(connection: Connection) {
-		this.inputs.push(connection);
+		this.inputs.add(connection);
 	}
 
 	public removeInput(connection: Connection) {
-		this.inputs = this.inputs.filter(c => c !== connection);
+		this.inputs.delete(connection);
 	}
 
 	export() {

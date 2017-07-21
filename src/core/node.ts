@@ -320,8 +320,8 @@ export default abstract class のーど extends EventEmitter {
 			name: this.name,
 			outputs: Array.from(this.outputs).map(c => ({
 				nid: c.to.node.id,
-				from: c.from,
-				to: c.to
+				from: c.from.port,
+				to: c.to.port
 			}))
 		};
 	}

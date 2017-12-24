@@ -42,7 +42,7 @@ export default abstract class NodesView {
 	/**
 	 * このビューに含まれるノードのビュー
 	 */
-	nodeViews: NodeView[] = [];
+	public nodeViews: NodeView[] = [];
 
 	/**
 	 * このビューに含まれるノード

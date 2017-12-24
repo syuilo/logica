@@ -27,7 +27,10 @@
 		<span>]</span>
 	</header>
 
-	<div ref="drawing"></div>
+	<div ref="main" onmousedown={ onmousedown }>
+		<div ref="drawing"></div>
+		<div class="selection" ref="selection"></div>
+	</div>
 
 	<style>
 		:scope
@@ -35,6 +38,21 @@
 			width 512px
 			height 512px
 			box-shadow 0 0 16px #000
+
+			> div
+				position relative
+
+				> .selection
+					$color = #00ff72
+
+					display none
+					position absolute
+					z-index 1000
+					top 0
+					left 0
+					border solid 1px $color
+					background rgba($color, 0.5)
+					pointer-events none
 	</style>
 
 	<script>
@@ -55,5 +73,55 @@
 			this.update();
 		});
 
+		this.onmousedown = e => {
+			this.view.nodeViews.forEach(v => v.drawUnSelected());
+			const rect = this.refs.main.getBoundingClientRect();
+			const left = e.pageX + this.refs.main.scrollLeft - rect.left - window.pageXOffset;
+			const top = e.pageY + this.refs.main.scrollTop - rect.top - window.pageYOffset;
+			const move = e => {
+				this.refs.selection.style.display = 'block';
+				const cursorX = e.pageX + this.refs.main.scrollLeft - rect.left - window.pageXOffset;
+				const cursorY = e.pageY + this.refs.main.scrollTop - rect.top - window.pageYOffset;
+				const w = cursorX - left;
+				const h = cursorY - top;
+				if (w > 0) {
+					this.refs.selection.style.width = w + 'px';
+					this.refs.selection.style.left = left + 'px';
+				} else {
+					this.refs.selection.style.width = -w + 'px';
+					this.refs.selection.style.left = cursorX + 'px';
+				}
+				if (h > 0) {
+					this.refs.selection.style.height = h + 'px';
+					this.refs.selection.style.top = top + 'px';
+				} else {
+					this.refs.selection.style.height = -h + 'px';
+					this.refs.selection.style.top = cursorY + 'px';
+				}
+
+				const boxLeft = w > 0 ? left : cursorX;
+				const boxTop = h > 0 ? top : cursorY;
+				const boxWidth = Math.abs(w);
+				const boxHeight = Math.abs(h);
+
+				const selects = this.view.nodeViews.filter(v =>
+					v.x + v.width > boxLeft &&
+					v.x < boxLeft + boxWidth &&
+					v.y + v.height > boxTop &&
+					v.y < boxTop + boxHeight);
+
+				selects.forEach(v => {
+					v.drawSelected();
+				});
+				console.log(selects);
+			};
+			const up = e => {
+				document.documentElement.removeEventListener('mousemove', move);
+				document.documentElement.removeEventListener('mouseup', up);
+				this.refs.selection.style.display = 'none';
+			};
+			document.documentElement.addEventListener('mousemove', move);
+			document.documentElement.addEventListener('mouseup', up);
+		};
 	</script>
 </lo-nodes>

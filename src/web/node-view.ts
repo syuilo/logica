@@ -19,8 +19,8 @@ abstract class NodeView extends EventEmitter {
 
 	el: any;
 
-	private width: number;
-	private height: number;
+	private _width: number;
+	private _height: number;
 
 	get x() {
 		return this.el.x();
@@ -36,6 +36,14 @@ abstract class NodeView extends EventEmitter {
 
 	set y(y) {
 		this.el.y(y);
+	}
+
+	get width() {
+		return this._width;
+	}
+
+	get height() {
+		return this._height;
 	}
 
 	/**
@@ -75,14 +83,14 @@ abstract class NodeView extends EventEmitter {
 			this.nodesView.nodeViews = this.nodesView.nodeViews.filter(view => view != this);
 		});
 
-		this.width = w;
-		this.height = h;
+		this._width = w;
+		this._height = h;
 
 		this.el = this.nodesView.draw.nested();
 
 		this.el.element('title').words(this.node.desc);
 
-		this.rect = this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
+		this.rect = this.el.rect(this._width, this._height).fill('#355556').radius(6).style('cursor: move;');
 
 		this.rect.dblclick(() => this.setRotate(this.rotate + 1));
 
@@ -103,7 +111,7 @@ abstract class NodeView extends EventEmitter {
 
 		{
 			const removeButtonSize = 12;
-			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
+			this.removeButton = this.el.circle(removeButtonSize).move(this._width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
 				this.nodesView.removeNode(this);
 			});
@@ -179,8 +187,8 @@ abstract class NodeView extends EventEmitter {
 						const nearView = this.nodesView.nodeViews.find(t =>
 							t.x < x &&
 							t.y < y &&
-							t.x + t.width > x &&
-							t.y + t.height > y);
+							t.x + t._width > x &&
+							t.y + t._height > y);
 
 						if (nearView) {
 							target = {
@@ -203,6 +211,19 @@ abstract class NodeView extends EventEmitter {
 		}
 
 		this.updatePortPosition();
+	}
+
+	public drawSelected() {
+		this.rect.stroke({
+			color: '#00ff72',
+			width: 2
+		});
+	}
+
+	public drawUnSelected() {
+		this.rect.stroke({
+			width: 0
+		});
 	}
 
 	/**
@@ -246,13 +267,13 @@ abstract class NodeView extends EventEmitter {
 		if (r > 3) r = 0;
 		if (this.rotate !== r) {
 			this.rect.attr({
-				width: this.height,
-				height: this.width
+				width: this._height,
+				height: this._width
 			});
-			const w = this.width;
-			const h = this.height;
-			this.width = h;
-			this.height = w;
+			const w = this._width;
+			const h = this._height;
+			this._width = h;
+			this._height = w;
 		}
 		this.rotate = r;
 		this.updatePortPosition();
@@ -266,19 +287,19 @@ abstract class NodeView extends EventEmitter {
 			switch (this.rotate) {
 				case 0:
 					x = -(diameter / 2);
-					y = ((i + 1) / (this.node.inputInfo.length + 1) * this.height) - (diameter / 2);
+					y = ((i + 1) / (this.node.inputInfo.length + 1) * this._height) - (diameter / 2);
 					break;
 				case 1:
-					x = ((i + 1) / (this.node.inputInfo.length + 1) * this.width) - (diameter / 2);
+					x = ((i + 1) / (this.node.inputInfo.length + 1) * this._width) - (diameter / 2);
 					y = -(diameter / 2);
 					break;
 				case 2:
-					x = this.width - (diameter / 2);
-					y = ((i + 1) / (this.node.inputInfo.length + 1) * this.height) - (diameter / 2);
+					x = this._width - (diameter / 2);
+					y = ((i + 1) / (this.node.inputInfo.length + 1) * this._height) - (diameter / 2);
 					break;
 				case 3:
-					x = ((i + 1) / (this.node.inputInfo.length + 1) * this.width) - (diameter / 2);
-					y = this.height - (diameter / 2);
+					x = ((i + 1) / (this.node.inputInfo.length + 1) * this._width) - (diameter / 2);
+					y = this._height - (diameter / 2);
 					break;
 			}
 			p.el.move(x, y);
@@ -289,19 +310,19 @@ abstract class NodeView extends EventEmitter {
 			let y: number;
 			switch (this.rotate) {
 				case 0:
-					x = this.width - (diameter / 2);
-					y = ((i + 1) / (this.node.outputInfo.length + 1) * this.height) - (diameter / 2);
+					x = this._width - (diameter / 2);
+					y = ((i + 1) / (this.node.outputInfo.length + 1) * this._height) - (diameter / 2);
 					break;
 				case 1:
-					x = ((i + 1) / (this.node.outputInfo.length + 1) * this.width) - (diameter / 2);
-					y = this.height - (diameter / 2);
+					x = ((i + 1) / (this.node.outputInfo.length + 1) * this._width) - (diameter / 2);
+					y = this._height - (diameter / 2);
 					break;
 				case 2:
 					x = -(diameter / 2);
-					y = ((i + 1) / (this.node.outputInfo.length + 1) * this.height) - (diameter / 2);
+					y = ((i + 1) / (this.node.outputInfo.length + 1) * this._height) - (diameter / 2);
 					break;
 				case 3:
-					x = ((i + 1) / (this.node.outputInfo.length + 1) * this.width) - (diameter / 2);
+					x = ((i + 1) / (this.node.outputInfo.length + 1) * this._width) - (diameter / 2);
 					y = -(diameter / 2);
 					break;
 			}

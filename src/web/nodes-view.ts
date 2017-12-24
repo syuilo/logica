@@ -44,6 +44,11 @@ export default abstract class NodesView {
 	 */
 	public nodeViews: NodeView[] = [];
 
+	private _selectedNodeViews: NodeView[] = [];
+	public get selectedNodeViews() {
+		return this._selectedNodeViews;
+	}
+
 	/**
 	 * このビューに含まれるノード
 	 */
@@ -56,6 +61,23 @@ export default abstract class NodesView {
 	constructor(config: Config, svg, w, h) {
 		this.config = config;
 		this.draw = SVG(svg).size(w, h);
+	}
+
+	public selectNodeViews(nodeViews: NodeView[]) {
+		this._selectedNodeViews.forEach(v => {
+			v.drawUnSelected();
+		});
+		nodeViews.forEach(v => {
+			v.drawSelected();
+		});
+		this._selectedNodeViews = nodeViews;
+	}
+
+	public unSelectAllNodeViews() {
+		this._selectedNodeViews.forEach(v => {
+			v.drawUnSelected();
+		});
+		this._selectedNodeViews = [];
 	}
 
 	addNode(nodeView: NodeView) {

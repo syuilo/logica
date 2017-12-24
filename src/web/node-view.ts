@@ -97,15 +97,29 @@ abstract class NodeView extends EventEmitter {
 		{
 			let x;
 			let y;
+			let otherSelectedNodeViewsPositions = [];
 
 			this.rect.draggable().on('dragstart', e => {
 				x = this.x - e.detail.p.x;
 				y = this.y - e.detail.p.y;
+				otherSelectedNodeViewsPositions = this.nodesView.selectedNodeViews
+					.filter(v => v != this)
+					.map(v => ({
+						v: v,
+						x: v.x - e.detail.p.x,
+						y: v.y - e.detail.p.y
+					}));
 			});
 
 			this.rect.draggable().on('dragmove', e => {
 				e.preventDefault();
 				this.move(x + e.detail.p.x, y + e.detail.p.y);
+
+				// 選択されているほかのノードも移動
+				this.nodesView.selectedNodeViews.filter(v => v != this).forEach(v => {
+					const base = otherSelectedNodeViewsPositions.find(x => x.v == v);
+					v.move(base.x + e.detail.p.x, base.y + e.detail.p.y);
+				});
 			});
 		}
 
@@ -253,6 +267,7 @@ abstract class NodeView extends EventEmitter {
 			x = Math.round(x / gridSize) * gridSize;
 			y = Math.round(y / gridSize) * gridSize;
 		}
+
 		if (x !== this.x || y !== this.y) {
 			this.el.move(x, y);
 			this.emit('moved');

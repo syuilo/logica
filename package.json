@@ -23,6 +23,7 @@
     "typescript": "2.4.1"
   },
   "dependencies": {
+    "animejs": "^2.2.0",
     "autobind-decorator": "2.1.0",
     "eventemitter2": "4.1.0",
     "msgpack-lite": "0.1.26",

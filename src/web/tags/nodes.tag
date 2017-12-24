@@ -27,7 +27,7 @@
 		<span>]</span>
 	</header>
 
-	<div ref="main" onmousedown={ onmousedown }>
+	<div ref="main" onmousedown={ onmousedown } oncontextmenu={ oncontextmenu }>
 		<div ref="drawing"></div>
 		<div class="selection" ref="selection"></div>
 	</div>
@@ -74,7 +74,10 @@
 		});
 
 		this.onmousedown = e => {
-			this.view.nodeViews.forEach(v => v.drawUnSelected());
+			if (e.button !== 0) return;
+
+			this.view.unSelectAllNodeViews();
+
 			const rect = this.refs.main.getBoundingClientRect();
 			const left = e.pageX + this.refs.main.scrollLeft - rect.left - window.pageXOffset;
 			const top = e.pageY + this.refs.main.scrollTop - rect.top - window.pageYOffset;
@@ -110,10 +113,7 @@
 					v.y + v.height > boxTop &&
 					v.y < boxTop + boxHeight);
 
-				selects.forEach(v => {
-					v.drawSelected();
-				});
-				console.log(selects);
+				this.view.selectNodeViews(selects);
 			};
 			const up = e => {
 				document.documentElement.removeEventListener('mousemove', move);
@@ -123,5 +123,45 @@
 			document.documentElement.addEventListener('mousemove', move);
 			document.documentElement.addEventListener('mouseup', up);
 		};
+
+		this.oncontextmenu = e => {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			const ctx = riot.mount(document.body.appendChild(document.createElement('lo-nodes-view-contextmenu')), {
+				nodesView: this
+			})[0];
+			ctx.open({
+				x: e.pageX - window.pageXOffset,
+				y: e.pageY - window.pageYOffset
+			});
+			return false;
+		};
+
 	</script>
 </lo-nodes>
+
+<lo-nodes-view-contextmenu>
+	<lo-contextmenu ref="ctx">
+		<ul>
+			<li onclick={ parent.packaging }>
+				<p>パッケージング</p>
+			</li>
+		</ul>
+	</lo-contextmenu>
+	<script>
+		this.browser = this.opts.browser;
+		this.on('mount', () => {
+			this.refs.ctx.on('closed', () => {
+				this.trigger('closed');
+				this.unmount();
+			});
+		});
+		this.open = pos => {
+			this.refs.ctx.open(pos);
+		};
+		this.packaging = () => {
+			this.browser.createFolder();
+			this.refs.ctx.close();
+		};
+	</script>
+</lo-nodes-view-contextmenu>

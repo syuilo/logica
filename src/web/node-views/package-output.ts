@@ -1,14 +1,15 @@
-import CircuitView from '../circuit-view';
+import NodesView from '../nodes-view';
 import NodeView from '../node-view';
+import Config from '../config';
 import PackageOutput from '../../core/nodes/package-output';
 
 export default class PackageOutputView extends NodeView {
 	node: PackageOutput;
 
-	constructor(circuitView: CircuitView, node: PackageOutput);
-	constructor(circuitView: CircuitView, id: string, name: string, desc: string, index: number);
-	constructor(circuitView: CircuitView, x: PackageOutput | string, name?: string, desc?: string, index?: number) {
-		super(circuitView, typeof x == 'string' ? new PackageOutput(x, name, desc, index) : x, 96, 64);
+	constructor(config: Config, nodesView: NodesView, node: PackageOutput);
+	constructor(config: Config, nodesView: NodesView, id: string, name: string, desc: string, index: number);
+	constructor(config: Config, nodesView: NodesView, x: PackageOutput | string, name?: string, desc?: string, index?: number) {
+		super(config, nodesView, typeof x == 'string' ? new PackageOutput(x, name, desc, index) : x, 96, 64);
 
 		this.el.text('OUT: ' + this.node.outputName).fill('#fff').style('pointer-events: none;').move(10, 4);
 
@@ -24,7 +25,7 @@ export default class PackageOutputView extends NodeView {
 		});
 	}
 
-	public static import(circuitView: CircuitView, data) {
-		return new PackageOutputView(circuitView, PackageOutput.import(data.node));
+	public static import(config: Config, nodesView: NodesView, data) {
+		return new PackageOutputView(config, nodesView, PackageOutput.import(data.node));
 	}
 }

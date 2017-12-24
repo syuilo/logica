@@ -5,7 +5,8 @@ import のーど from '../core/node';
 import { Connection } from '../core/node';
 import Package from '../core/nodes/package';
 
-import CircuitView from './circuit-view';
+import NodesView from './nodes-view';
+import Config from './config';
 
 // ポートの直径
 const diameter = 8;
@@ -54,27 +55,30 @@ abstract class NodeView extends EventEmitter {
 
 	rect: any;
 	removeButton: any;
-	circuitView: CircuitView;
+	nodesView: NodesView;
 
-	constructor(circuitView: CircuitView, node: のーど, w: number, h: number) {
+	config: Config;
+
+	constructor(config: Config, nodesView: NodesView, node: のーど, w: number, h: number) {
 		super();
 
 		this.setMaxListeners(Infinity);
 
-		this.circuitView = circuitView;
+		this.config = config;
+		this.nodesView = nodesView;
 		this.node = node;
 
 		node.on('connected', this.onNodeConnected);
 
 		node.on('removed', () => {
 			this.el.remove();
-			this.circuitView.nodeViews = this.circuitView.nodeViews.filter(view => view != this);
+			this.nodesView.nodeViews = this.nodesView.nodeViews.filter(view => view != this);
 		});
 
 		this.width = w;
 		this.height = h;
 
-		this.el = this.circuitView.draw.nested();
+		this.el = this.nodesView.draw.nested();
 
 		this.el.element('title').words(this.node.desc);
 
@@ -101,7 +105,7 @@ abstract class NodeView extends EventEmitter {
 			const removeButtonSize = 12;
 			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
-				this.circuitView.circuit.removeNode(this.node);
+				this.nodesView.removeNode(this);
 			});
 		}
 
@@ -152,7 +156,7 @@ abstract class NodeView extends EventEmitter {
 
 					let target: any = null;
 
-					this.circuitView.nodeViews.some(view => {
+					this.nodesView.nodeViews.some(view => {
 						const asobi = 12;
 						const nearPort = view.inputPorts.find(p =>
 							(p.el.x() + view.x - asobi) < x &&
@@ -172,7 +176,7 @@ abstract class NodeView extends EventEmitter {
 					});
 
 					if (!target) {
-						const nearView = this.circuitView.nodeViews.find(t =>
+						const nearView = this.nodesView.nodeViews.find(t =>
 							t.x < x &&
 							t.y < y &&
 							t.x + t.width > x &&
@@ -210,7 +214,7 @@ abstract class NodeView extends EventEmitter {
 		 * 導線要素を作成
 		 **********************************************************/
 
-		const targetView = this.circuitView.nodeViews
+		const targetView = this.nodesView.nodeViews
 			.find(view => view.node == connection.to.node);
 
 		const wire = new Wire(this, connection, targetView);
@@ -223,7 +227,7 @@ abstract class NodeView extends EventEmitter {
 	 * @param y Y位置
 	 */
 	public move(x: number, y: number) {
-		if (this.circuitView.snapToGrid) {
+		if (this.config.snapToGrid) {
 			const gridSize = 16;
 			x = Math.round(x / gridSize) * gridSize;
 			y = Math.round(y / gridSize) * gridSize;
@@ -337,12 +341,12 @@ class Wire {
 		this.connection = connection;
 		this.targetView = targetView;
 
-		this.coverElement = this.parent.circuitView.draw
+		this.coverElement = this.parent.nodesView.draw
 			.path()
 			.stroke({ width: 8 })
 			.style('cursor: pointer;');
 
-		this.lineElement = this.parent.circuitView.draw
+		this.lineElement = this.parent.nodesView.draw
 			.path()
 			.stroke({ width: 2 })
 			.style('pointer-events: none;');

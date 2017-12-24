@@ -1,11 +1,12 @@
-import CircuitView from '../circuit-view';
+import NodesView from '../nodes-view';
 import NodeView from '../node-view';
+import Config from '../config';
 import Led from '../../core/nodes/led';
 
 export default class LedView extends NodeView {
-	constructor(circuitView: CircuitView, node?: Led) {
+	constructor(config: Config, nodesView: NodesView, node?: Led) {
 		const led = node || new Led();
-		super(circuitView, led, 64, 64);
+		super(config, nodesView, led, 64, 64);
 
 		const rect = this.el.rect(48, 48).move(8, 8).fill('#0c1319').radius(2).style('pointer-events: none;');
 
@@ -14,7 +15,7 @@ export default class LedView extends NodeView {
 		});
 	}
 
-	public static import(circuitView: CircuitView, data) {
-		return new LedView(circuitView, Led.import(data.node));
+	public static import(config: Config, nodesView: NodesView, data) {
+		return new LedView(config, nodesView, Led.import(data.node));
 	}
 }

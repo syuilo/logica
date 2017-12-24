@@ -4,13 +4,13 @@ import Config from '../config';
 import のーど from '../../core/node';
 import Package from '../../core/nodes/package';
 
-export default class PackageView extends NodeView {
+export default class ModuleView extends NodeView {
 	node: Package;
 
-	constructor(config: Config, nodesView: NodesView, node: Package);
-	constructor(config: Config, nodesView: NodesView, packageNodes: Set<のーど>, packageName: string, packageDesc: string, packageAuthor: string);
-	constructor(config: Config, nodesView: NodesView, x: Package | Set<のーど>, packageName?: string, packageDesc?: string, packageAuthor?: string) {
-		const pkg = x instanceof Set ? new Package(x, packageName, packageDesc, packageAuthor): x;
+	nodeViews: NodeView[];
+
+	constructor(config: Config, nodesView: NodesView, childNodeViews: NodeView[], packageName: string, packageDesc: string, packageAuthor: string) {
+		const pkg = new Package(new Set(childNodeViews.map(v => v.node)), packageName, packageDesc, packageAuthor);
 
 		let height = 96;
 
@@ -23,7 +23,11 @@ export default class PackageView extends NodeView {
 		this.el.text(this.node.packageName).fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 
+	public removeNode(nodeView: NodeView) {
+		this.node.removeNode(nodeView.node);
+	}
+
 	public static import(config: Config, nodesView: NodesView, data) {
-		return new PackageView(config, nodesView, Package.import(data.node));
+		return new ModuleView(config, nodesView, data.childNodeViews, data.packageName, data.packageDesc, data.packageAuthor);
 	}
 }

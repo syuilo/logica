@@ -1,39 +1,15 @@
 <lo-main>
-	<header if={ circuitView }>
-		<button class="reset" title="Reset" onclick={ circuitView.circuit.reset }><i class="fa fa-repeat"></i></button>
-		<button class="autoTick" title={ circuitView.autoTick ? 'Pause' : 'Resume' } onclick={ toggleAutoTick }><i class="fa fa-{ circuitView.autoTick ? 'pause' : 'play' }"></i></button>
-		<button class="tick" title="Next Tick" onclick={ tick } disabled={ circuitView.autoTick }><i class="fa fa-step-forward"></i></button>
+	<header>
+		<button class="reset" title="Reset" onclick={ refs.circuit.view.reset }><i class="fa fa-repeat"></i></button>
+		<button class="autoTick" title={ config.autoTick ? 'Pause' : 'Resume' } onclick={ toggleAutoTick }><i class="fa fa-{ config.autoTick ? 'pause' : 'play' }"></i></button>
+		<button class="tick" title="Next Tick" onclick={ tick } disabled={ config.autoTick }><i class="fa fa-step-forward"></i></button>
 		<span>[</span>
-		<button onclick={ circuitView.addAnd }>And</button>
-		<button onclick={ circuitView.addAnd3 }>And3</button>
-		<button onclick={ circuitView.addOr }>Or</button>
-		<button onclick={ circuitView.addOr3 }>Or3</button>
-		<button onclick={ circuitView.addNot }>Not</button>
-		<button onclick={ circuitView.addNor }>Nor</button>
-		<button onclick={ circuitView.addNand }>Nand</button>
-		<button onclick={ circuitView.addXor }>Xor</button>
-		<span>-</span>
-		<button onclick={ circuitView.addTrue }>True</button>
-		<button onclick={ circuitView.addFalse }>False</button>
-		<button onclick={ circuitView.addNop }>Nop</button>
-		<button onclick={ circuitView.addRandom }>Rnd</button>
-		<button onclick={ circuitView.addButton }>Button</button>
-		<button onclick={ circuitView.addLed }>LED</button>
-		<span>-</span>
-		<button onclick={ circuitView.addPin }>Pin</button>
-		<span>-</span>
-		<button onclick={ circuitView.addPackageInput }>[PackageIn]</button>
-		<button onclick={ circuitView.addPackageOutput }>[PackageOut]</button>
-		<span>] --- [</span>
-		<button onclick={ appendPackage }>Append Package</button>
-		<button onclick={ createPackage }>Create Package</button>
-		<span>] --- [</span>
 		<button onclick={ import }>Import</button>
 		<button onclick={ export }>Export</button>
 		<span>]   </span>
-		<label><input type="checkbox" checked={ circuitView.snapToGrid } onchange={ onChangeSnapToGrid }>Snap to grid</label>
+		<label><input type="checkbox" checked={ config.snapToGrid } onchange={ onChangeSnapToGrid }>Snap to grid</label>
 	</header>
-	<div ref="drawing"></div>
+	<lo-nodes ref="circuit" circuit={ circuit }></lo-nodes>
 	<style>
 		:scope
 			> header
@@ -77,28 +53,26 @@
 
 		const msgpack = require('msgpack-lite');
 
-		import CircuitView from '../circuit-view.ts';
-
+		import Circuit from '../../core/circuit.ts';
 		import imp from '../import.ts';
 		import exp from '../export.ts';
 		import expPkg from '../../core/export-package.ts';
 
-		this.on('mount', () => {
-			this.circuitView = new CircuitView(this.refs.drawing, window.innerWidth, window.innerHeight);
-			this.update();
-		});
+		this.mixin('config');
+
+		this.circuit = new Circuit();
 
 		this.toggleAutoTick = () => {
-			this.circuitView.autoTick = !this.circuitView.autoTick;
+			this.config.autoTick = !this.config.autoTick;
 			this.update();
 		};
 
 		this.tick = () => {
-			this.circuitView.circuit.tick();
+			this.circuit.tick();
 		};
 
 		this.createPackage = () => {
-			if (Array.from(this.circuitView.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuitView.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
+			if (Array.from(this.circuit.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.circuit.nodes).find(n => n.type === 'PackageOutput') == null) {
 				alert('パッケージを作成するには、回路に一つ以上のPackageInputおよびPackageOutputが含まれている必要があります' + '\n' + 'To create a package, you must include PackageInput and PackageOutput.');
 				return;
 			}

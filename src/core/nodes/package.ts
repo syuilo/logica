@@ -16,6 +16,9 @@ export default class Package extends VirtualNode {
 
 	public packageDesc: string;
 
+	/**
+	 * このパッケージに含まれるノード
+	 */
 	public nodes: Set<のーど>;
 
 	constructor(nodes: Set<のーど>, packageName: string, packageDesc: string, packageAuthor: string) {
@@ -100,6 +103,11 @@ export default class Package extends VirtualNode {
 
 	public removeInput(connection: Connection) {
 		this.inputs.delete(connection);
+	}
+
+	public removeNode(node: のーど) {
+		this.nodes.delete(node);
+		node.remove();
 	}
 
 	export() {

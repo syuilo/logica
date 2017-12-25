@@ -6,6 +6,7 @@ import { Connection } from '../core/node';
 import Package from '../core/nodes/package';
 
 import NodesView from './nodes-view';
+import NodeViewModel from './node-view-model';
 import Config from './config';
 
 // ポートの直径
@@ -13,38 +14,8 @@ const diameter = 8;
 
 @autobind
 abstract class NodeView extends EventEmitter {
-	id: string;
-
-	node: のーど;
-
+	viewModel: NodeViewModel;
 	el: any;
-
-	private _width: number;
-	private _height: number;
-
-	get x() {
-		return this.el.x();
-	}
-
-	get y() {
-		return this.el.y();
-	}
-
-	set x(x) {
-		this.el.x(x);
-	}
-
-	set y(y) {
-		this.el.y(y);
-	}
-
-	get width() {
-		return this._width;
-	}
-
-	get height() {
-		return this._height;
-	}
 
 	/**
 	 * この値を操作しないでください
@@ -67,30 +38,31 @@ abstract class NodeView extends EventEmitter {
 
 	config: Config;
 
-	constructor(config: Config, nodesView: NodesView, node: のーど, w: number, h: number) {
+	width: number;
+	height: number;
+
+	constructor(config: Config, nodeViewModel: NodeViewModel, w: number, h: number) {
 		super();
 
 		this.setMaxListeners(Infinity);
 
 		this.config = config;
-		this.nodesView = nodesView;
-		this.node = node;
+		this.viewModel = nodeViewModel;
+		this.width = w;
+		this.height = h;
 
-		node.on('connected', this.onNodeConnected);
+		this.viewModel.node.on('connected', this.onNodeConnected);
 
-		node.on('removed', () => {
+		this.viewModel.node.on('removed', () => {
 			this.el.remove();
 			this.nodesView.nodeViews = this.nodesView.nodeViews.filter(view => view != this);
 		});
 
-		this._width = w;
-		this._height = h;
-
 		this.el = this.nodesView.draw.nested();
 
-		this.el.element('title').words(this.node.desc);
+		this.el.element('title').words(this.viewModel.node.desc);
 
-		this.rect = this.el.rect(this._width, this._height).fill('#355556').radius(6).style('cursor: move;');
+		this.rect = this.el.rect(this.width, this.height).fill('#355556').radius(6).style('cursor: move;');
 
 		this.rect.dblclick(() => this.setRotate(this.rotate + 1));
 
@@ -100,14 +72,14 @@ abstract class NodeView extends EventEmitter {
 			let otherSelectedNodeViewsPositions = [];
 
 			this.rect.draggable().on('dragstart', e => {
-				x = this.x - e.detail.p.x;
-				y = this.y - e.detail.p.y;
+				x = this.viewModel.x - e.detail.p.x;
+				y = this.viewModel.y - e.detail.p.y;
 				otherSelectedNodeViewsPositions = this.nodesView.selectedNodeViews
 					.filter(v => v != this)
 					.map(v => ({
 						v: v,
-						x: v.x - e.detail.p.x,
-						y: v.y - e.detail.p.y
+						x: v.viewModel.x - e.detail.p.x,
+						y: v.viewModel.y - e.detail.p.y
 					}));
 			});
 
@@ -125,7 +97,7 @@ abstract class NodeView extends EventEmitter {
 
 		{
 			const removeButtonSize = 12;
-			this.removeButton = this.el.circle(removeButtonSize).move(this._width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
+			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
 				this.nodesView.removeNode(this);
 			});
@@ -142,15 +114,15 @@ abstract class NodeView extends EventEmitter {
 			});
 		}
 
-		if (node.hasInputPorts) {
-			this.inputPorts = node.inputInfo.map((input, i) => ({
+		if (this.viewModel.node.hasInputPorts) {
+			this.inputPorts = this.viewModel.node.inputInfo.map((input, i) => ({
 				el: this.el.circle(diameter).fill('#0bf1c2').style('stroke-width: 10px; stroke: rgba(11, 241, 194, 0.3);'),
 				id: input.id
 			}));
 		}
 
-		if (node.hasOutputPorts) {
-			this.outputPorts = node.outputInfo.map((output, i) => {
+		if (this.viewModel.node.hasOutputPorts) {
+			this.outputPorts = this.viewModel.node.outputInfo.map((output, i) => {
 				const o = this.el.circle(diameter).attr({ fill: '#ffa000' }).style('stroke-width: 10px; stroke: rgba(255, 160, 0, 0.3); cursor: crosshair;');
 				let line = null;
 
@@ -173,18 +145,18 @@ abstract class NodeView extends EventEmitter {
 
 				o.draggable().on('dragend', (e) => {
 					line.remove();
-					const x = this.x + e.detail.p.x;
-					const y = this.y + e.detail.p.y;
+					const x = this.viewModel.x + e.detail.p.x;
+					const y = this.viewModel.y + e.detail.p.y;
 
 					let target: any = null;
 
 					this.nodesView.nodeViews.some(view => {
 						const asobi = 12;
 						const nearPort = view.inputPorts.find(p =>
-							(p.el.x() + view.x - asobi) < x &&
-							(p.el.y() + view.y - asobi) < y &&
-							(p.el.x() + view.x) + p.el.width() + asobi > x &&
-							(p.el.y() + view.y) + p.el.height() + asobi > y);
+							(p.el.x() + view.viewModel.x - asobi) < x &&
+							(p.el.y() + view.viewModel.y - asobi) < y &&
+							(p.el.x() + view.viewModel.x) + p.el.width() + asobi > x &&
+							(p.el.y() + view.viewModel.y) + p.el.height() + asobi > y);
 
 						if (nearPort) {
 							target = {
@@ -198,11 +170,11 @@ abstract class NodeView extends EventEmitter {
 					});
 
 					if (!target) {
-						const nearView = this.nodesView.nodeViews.find(t =>
-							t.x < x &&
-							t.y < y &&
-							t.x + t._width > x &&
-							t.y + t._height > y);
+						const nearView = this.nodesView.nodeViews.find(v =>
+							v.viewModel.x < x &&
+							v.viewModel.y < y &&
+							v.viewModel.x + v.width > x &&
+							v.viewModel.y + v.height > y);
 
 						if (nearView) {
 							target = {
@@ -213,7 +185,7 @@ abstract class NodeView extends EventEmitter {
 					}
 
 					if (target) {
-						this.node.connectTo(target.view.node, target.portId, output.id);
+						this.viewModel.node.connectTo(target.view.node, target.portId, output.id);
 					}
 				});
 
@@ -250,7 +222,7 @@ abstract class NodeView extends EventEmitter {
 		 **********************************************************/
 
 		const targetView = this.nodesView.nodeViews
-			.find(view => view.node == connection.to.node);
+			.find(view => view.viewModel.node == connection.to.node);
 
 		const wire = new Wire(this, connection, targetView);
 		wire.update();
@@ -268,7 +240,7 @@ abstract class NodeView extends EventEmitter {
 			y = Math.round(y / gridSize) * gridSize;
 		}
 
-		if (x !== this.x || y !== this.y) {
+		if (x !== this.viewModel.x || y !== this.viewModel.y) {
 			this.el.move(x, y);
 			this.emit('moved');
 		}
@@ -282,13 +254,13 @@ abstract class NodeView extends EventEmitter {
 		if (r > 3) r = 0;
 		if (this.rotate !== r) {
 			this.rect.attr({
-				width: this._height,
-				height: this._width
+				width: this.height,
+				height: this.width
 			});
-			const w = this._width;
-			const h = this._height;
-			this._width = h;
-			this._height = w;
+			const w = this.width;
+			const h = this.height;
+			this.width = h;
+			this.height = w;
 		}
 		this.rotate = r;
 		this.updatePortPosition();
@@ -302,19 +274,19 @@ abstract class NodeView extends EventEmitter {
 			switch (this.rotate) {
 				case 0:
 					x = -(diameter / 2);
-					y = ((i + 1) / (this.node.inputInfo.length + 1) * this._height) - (diameter / 2);
+					y = ((i + 1) / (this.viewModel.node.inputInfo.length + 1) * this.height) - (diameter / 2);
 					break;
 				case 1:
-					x = ((i + 1) / (this.node.inputInfo.length + 1) * this._width) - (diameter / 2);
+					x = ((i + 1) / (this.viewModel.node.inputInfo.length + 1) * this.width) - (diameter / 2);
 					y = -(diameter / 2);
 					break;
 				case 2:
-					x = this._width - (diameter / 2);
-					y = ((i + 1) / (this.node.inputInfo.length + 1) * this._height) - (diameter / 2);
+					x = this.width - (diameter / 2);
+					y = ((i + 1) / (this.viewModel.node.inputInfo.length + 1) * this.height) - (diameter / 2);
 					break;
 				case 3:
-					x = ((i + 1) / (this.node.inputInfo.length + 1) * this._width) - (diameter / 2);
-					y = this._height - (diameter / 2);
+					x = ((i + 1) / (this.viewModel.node.inputInfo.length + 1) * this.width) - (diameter / 2);
+					y = this.height - (diameter / 2);
 					break;
 			}
 			p.el.move(x, y);
@@ -325,19 +297,19 @@ abstract class NodeView extends EventEmitter {
 			let y: number;
 			switch (this.rotate) {
 				case 0:
-					x = this._width - (diameter / 2);
-					y = ((i + 1) / (this.node.outputInfo.length + 1) * this._height) - (diameter / 2);
+					x = this.width - (diameter / 2);
+					y = ((i + 1) / (this.viewModel.node.outputInfo.length + 1) * this.height) - (diameter / 2);
 					break;
 				case 1:
-					x = ((i + 1) / (this.node.outputInfo.length + 1) * this._width) - (diameter / 2);
-					y = this._height - (diameter / 2);
+					x = ((i + 1) / (this.viewModel.node.outputInfo.length + 1) * this.width) - (diameter / 2);
+					y = this.height - (diameter / 2);
 					break;
 				case 2:
 					x = -(diameter / 2);
-					y = ((i + 1) / (this.node.outputInfo.length + 1) * this._height) - (diameter / 2);
+					y = ((i + 1) / (this.viewModel.node.outputInfo.length + 1) * this.height) - (diameter / 2);
 					break;
 				case 3:
-					x = ((i + 1) / (this.node.outputInfo.length + 1) * this._width) - (diameter / 2);
+					x = ((i + 1) / (this.viewModel.node.outputInfo.length + 1) * this.width) - (diameter / 2);
 					y = -(diameter / 2);
 					break;
 			}
@@ -412,9 +384,9 @@ class Wire {
 		});
 
 		this.parent.on('moved', this.render);
-		this.parent.node.on('state-updated', this.update);
-		this.parent.node.on('disconnected', this.onParentNodeDisconnected);
-		this.parent.node.on('removed', this.dispose);
+		this.parent.viewModel.node.on('state-updated', this.update);
+		this.parent.viewModel.node.on('disconnected', this.onParentNodeDisconnected);
+		this.parent.viewModel.node.on('removed', this.dispose);
 		this.targetView.on('moved', this.render);
 		this.connection.to.node.on('removed', this.dispose);
 	}
@@ -426,17 +398,17 @@ class Wire {
 	}
 
 	public update() {
-		this.state = this.parent.node.getState(this.connection.from.port);
+		this.state = this.parent.viewModel.node.getState(this.connection.from.port);
 		this.render();
 	}
 
 	public render() {
-		const outputPortIndex = this.parent.node.outputInfo.findIndex(info => this.connection.from.port === info.id);
-		const inputPortIndex = this.targetView.node.inputInfo.findIndex(info => this.connection.to.port === info.id);
-		const lineStartX = this.parent.x + this.parent.outputPorts[outputPortIndex].el.x() + (this.parent.outputPorts[outputPortIndex].el.width() / 2);
-		const lineStartY = this.parent.y + this.parent.outputPorts[outputPortIndex].el.y() + (this.parent.outputPorts[outputPortIndex].el.height() / 2);
-		const lineEndX = this.targetView.x + this.targetView.inputPorts[inputPortIndex].el.x() + (this.targetView.inputPorts[inputPortIndex].el.width() / 2);
-		const lineEndY = this.targetView.y + this.targetView.inputPorts[inputPortIndex].el.y() + (this.targetView.inputPorts[inputPortIndex].el.height() / 2);
+		const outputPortIndex = this.parent.viewModel.node.outputInfo.findIndex(info => this.connection.from.port === info.id);
+		const inputPortIndex = this.targetView.viewModel.node.inputInfo.findIndex(info => this.connection.to.port === info.id);
+		const lineStartX = this.parent.viewModel.x + this.parent.outputPorts[outputPortIndex].el.x() + (this.parent.outputPorts[outputPortIndex].el.width() / 2);
+		const lineStartY = this.parent.viewModel.y + this.parent.outputPorts[outputPortIndex].el.y() + (this.parent.outputPorts[outputPortIndex].el.height() / 2);
+		const lineEndX = this.targetView.viewModel.x + this.targetView.inputPorts[inputPortIndex].el.x() + (this.targetView.inputPorts[inputPortIndex].el.width() / 2);
+		const lineEndY = this.targetView.viewModel.y + this.targetView.inputPorts[inputPortIndex].el.y() + (this.targetView.inputPorts[inputPortIndex].el.height() / 2);
 
 		this.coverElement
 			.attr('d', `M${lineStartX},${lineStartY} L${lineEndX},${lineEndY}`)
@@ -461,9 +433,9 @@ class Wire {
 		this.lineElement.remove();
 
 		this.parent.off('moved', this.render);
-		this.parent.node.off('state-updated', this.update);
-		this.parent.node.off('disconnected', this.onParentNodeDisconnected);
-		this.parent.node.off('removed', this.dispose);
+		this.parent.viewModel.node.off('state-updated', this.update);
+		this.parent.viewModel.node.off('disconnected', this.onParentNodeDisconnected);
+		this.parent.viewModel.node.off('removed', this.dispose);
 		this.targetView.off('moved', this.render);
 		this.connection.to.node.off('removed', this.dispose);
 	}

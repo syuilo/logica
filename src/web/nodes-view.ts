@@ -80,6 +80,33 @@ export default abstract class NodesView {
 		this._selectedNodeViews = [];
 	}
 
+	/**
+	 * 選択されているノードをパッケージングします
+	 */
+	public packaging() {
+		if (Array.from(this.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.nodes).find(n => n.type === 'PackageOutput') == null) {
+			alert('パッケージを作成するには、回路に一つ以上のPackageInputおよびPackageOutputが含まれている必要があります' + '\n' + 'To create a package, you must include PackageInput and PackageOutput.');
+			return;
+		}
+
+		const author = window.prompt('Your name');
+		const name = window.prompt('Package name');
+		const desc = window.prompt('Package description');
+
+		const childNodeViews = this.selectedNodeViews;
+		childNodeViews.forEach(v => {
+			v.nodesView = null;//moduleNodesView;
+			//this.nodes.delete(v.node);
+			this.nodeViews = this.nodeViews.filter(_v => _v != v);
+		});
+
+		const moduleView = new ModuleView(this.config, this, childNodeViews, name, desc, author);
+
+		//const moduleNodesView = new ModuleNodesView(config, moduleView);
+
+		this.addNode(moduleView);
+	}
+
 	addNode(nodeView: NodeView) {
 		this.nodeViews.push(nodeView);
 		nodeView.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
@@ -175,12 +202,12 @@ export class CircuitNodesView extends NodesView {
 	}
 
 	addNode(nodeView: NodeView) {
-		this.circuit.addNode(nodeView.node);
+		this.circuit.addNode(nodeView.viewModel.node);
 		super.addNode(nodeView);
 	}
 
 	removeNode(nodeView: NodeView) {
-		this.circuit.removeNode(nodeView.node);
+		this.circuit.removeNode(nodeView.viewModel.node);
 	}
 }
 

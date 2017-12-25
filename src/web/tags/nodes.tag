@@ -128,7 +128,7 @@
 			e.preventDefault();
 			e.stopImmediatePropagation();
 			const ctx = riot.mount(document.body.appendChild(document.createElement('lo-nodes-view-contextmenu')), {
-				nodesView: this
+				nodesView: this.view
 			})[0];
 			ctx.open({
 				x: e.pageX - window.pageXOffset,
@@ -160,7 +160,7 @@
 			this.refs.ctx.open(pos);
 		};
 		this.packaging = () => {
-			this.browser.createFolder();
+			this.opts.nodesView.packaging();
 			this.refs.ctx.close();
 		};
 	</script>

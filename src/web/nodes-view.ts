@@ -111,9 +111,13 @@ export default abstract class NodesView {
 			this.removeNodeView(v);
 		});
 
+		// TODO: モジュール内のそれぞれのノードを接続しなおす
+
+		// モジュールをビューに追加
 		this.addNodeView(moduleView);
 
-		console.log(this);
+		// 選択を解除しておく
+		this.unSelectAllNodeViews();
 	}
 
 	removeNodeView(nodeView: NodeView) {
@@ -123,7 +127,7 @@ export default abstract class NodesView {
 
 	addNodeView(nodeView: NodeView) {
 		this.nodeViews.push(nodeView);
-		nodeView.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
+		//nodeView.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
 	}
 
 	addAnd() {
@@ -242,14 +246,11 @@ export class ModuleNodesView extends NodesView {
 		super(config, svg, w, h);
 		this.module = module;
 		this.module.nodeViewModels.forEach(vm => {
-			//vm.createView(this);
 			let v;
 			if (vm.node.type == 'And') v = new AndView(config, this, vm);
 			if (vm.node.type == 'PackageInput') v = new PackageInputView(config, this, vm as NodeViewModel<PackageInput>);
 			if (vm.node.type == 'PackageOutput') v = new PackageOutputView(config, this, vm as NodeViewModel<PackageOutput>);
-			(v as any).yoooooooooooo = 42;
 			this.addNodeView(v);
-			//console.log(v);
 		});
 	}
 

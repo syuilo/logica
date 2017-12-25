@@ -24,8 +24,8 @@ export abstract class NodeViewModel<T extends のーど = のーど> {
 
 	node: T;
 
-	private _x: number;
-	private _y: number;
+	private _x: number = 0;
+	private _y: number = 0;
 
 	get x() {
 		return this._x;
@@ -144,10 +144,20 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		this.nodesView = nodesView;
 		this.viewModel = nodeViewModel;
 
-		console.log(this.nodesView);
-
 		this.width = w;
 		this.height = h;
+
+		console.log(this.node);
+
+		// 導線描画
+		this.node.outputs.forEach(out => {
+			console.log(out);
+			const targetView = this.nodesView.nodeViews
+				.find(view => view.node == out.to.node);
+
+			const wire = new Wire(this, out, targetView);
+			wire.update();
+		});
 
 		this.node.on('connected', this.onNodeConnected);
 
@@ -297,8 +307,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 			});
 		}
 
-		//this.move(this.x, this.y);
-		this.el.move(this.x || 0, this.y || 0);
+		this.el.move(this.x, this.y);
 		this.updatePortPosition();
 	}
 
@@ -323,8 +332,6 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		/**********************************************************
 		 * 導線要素を作成
 		 **********************************************************/
-
-		console.log(this);
 
 		const targetView = this.nodesView.nodeViews
 			.find(view => view.node == connection.to.node);
@@ -449,8 +456,8 @@ class Wire {
 	private coverElement: any;
 	private lineElement: any;
 
-	constructor(panrent: NodeView, connection: Connection, targetView: NodeView) {
-		this.parent = panrent;
+	constructor(parent: NodeView, connection: Connection, targetView: NodeView) {
+		this.parent = parent;
 		this.connection = connection;
 		this.targetView = targetView;
 

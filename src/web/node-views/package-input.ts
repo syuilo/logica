@@ -3,13 +3,9 @@ import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import PackageInput from '../../core/nodes/package-input';
 
-export default class PackageInputView extends NodeView {
-	node: PackageInput;
-
-	constructor(config: Config, nodesView: NodesView, node: PackageInput);
-	constructor(config: Config, nodesView: NodesView, id: string, name: string, desc: string, index: number);
-	constructor(config: Config, nodesView: NodesView, x: PackageInput | string, name?: string, desc?: string, index?: number) {
-		super(config, nodesView, typeof x == 'string' ? new PackageInput(x, name, desc, index) : x, 96, 64);
+export class PackageInputView extends NodeView<PackageInput> {
+	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<PackageInput>) {
+		super(config, nodesView, nodeViewModel, 96, 64);
 
 		this.el.text('IN: ' + this.node.inputName).fill('#fff').style('pointer-events: none;').move(10, 4);
 
@@ -24,8 +20,16 @@ export default class PackageInputView extends NodeView {
 			this.node.inputIndex = parseInt(index);
 		});
 	}
+}
 
-	public static import(config: Config, nodesView: NodesView, data) {
-		return new PackageInputView(config, nodesView, PackageInput.import(data.node));
+export class PackageInputViewModel extends NodeViewModel<PackageInput> {
+	constructor(config: Config, node: PackageInput);
+	constructor(config: Config, id: string, name: string, desc: string, index: number);
+	constructor(config: Config, x: PackageInput | string, name?: string, desc?: string, index?: number) {
+		super(config, typeof x == 'string' ? new PackageInput(x, name, desc, index) : x);
+	}
+
+	public static import(config: Config, data) {
+		return new PackageInputViewModel(config, PackageInput.import(data.node));
 	}
 }

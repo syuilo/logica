@@ -10,6 +10,9 @@ import { NodeView } from './node-view';
 import { AndView, AndViewModel } from './node-views/and';
 import { ButtonView, ButtonViewModel } from './node-views/button';
 import { LedView, LedViewModel } from './node-views/led';
+import { PackageInputView, PackageInputViewModel } from './node-views/package-input';
+import { PackageOutputView, PackageOutputViewModel } from './node-views/package-output';
+import { ModuleView, ModuleViewModel } from './node-views/module';
 /*
 import And3View from './node-views/and3';
 import OrView from './node-views/or';
@@ -26,9 +29,7 @@ import ButtonView from './node-views/button';
 import LedView from './node-views/led';
 import PinView from './node-views/pin';
 import { PackageView } from './node-views/package';
-import { PackageInputView } from './node-views/package-input';
-import { PackageOutputView } from './node-views/package-output';
-import { ModuleView } from './node-views/module';*/
+*/
 
 import Config from './config';
 
@@ -87,7 +88,9 @@ export default abstract class NodesView {
 	 * 選択されているノードをパッケージングします
 	 */
 	public packaging() {
-		if (Array.from(this.nodes).find(n => n.type === 'PackageInput') == null || Array.from(this.nodes).find(n => n.type === 'PackageOutput') == null) {
+		const nodes = this.selectedNodeViews.map(v => v.node);
+
+		if (nodes.find(n => n.type === 'PackageInput') == null || nodes.find(n => n.type === 'PackageOutput') == null) {
 			alert('パッケージを作成するには、回路に一つ以上のPackageInputおよびPackageOutputが含まれている必要があります' + '\n' + 'To create a package, you must include PackageInput and PackageOutput.');
 			return;
 		}
@@ -96,18 +99,17 @@ export default abstract class NodesView {
 		const name = window.prompt('Package name');
 		const desc = window.prompt('Package description');
 
-		const childNodeViews = this.selectedNodeViews;
-		childNodeViews.forEach(v => {
-			v.nodesView = null;//moduleNodesView;
+		const moduleView = new ModuleView(this.config, this, new ModuleViewModel(this.config, this.selectedNodeViews.map(v => v.viewModel), name, desc, author));
+
+		this.selectedNodeViews.forEach(v => {
+			v.destroy();
 			//this.nodes.delete(v.node);
 			this.nodeViews = this.nodeViews.filter(_v => _v != v);
 		});
 
-		/*const moduleView = new ModuleView(this.config, this, childNodeViews, name, desc, author);
-
 		//const moduleNodesView = new ModuleNodesView(config, moduleView);
 
-		this.addNode(moduleView);*/
+		this.addNode(moduleView);
 	}
 
 	addNode(nodeView: NodeView) {
@@ -125,6 +127,22 @@ export default abstract class NodesView {
 
 	addLed() {
 		this.addNode(new LedView(this.config, this, new LedViewModel(this.config)));
+	}
+
+	addPackageInput() {
+		const name = window.prompt('Input name');
+		const id = window.prompt('Input ID ([a-z0-9_]+)');
+		const desc = window.prompt('Input description');
+		const index = Array.from(this.nodes).filter(n => n.type === 'PackageInput').length;
+		this.addNode(new PackageInputView(this.config, this, new PackageInputViewModel(this.config, id, name, desc, index)));
+	}
+
+	addPackageOutput() {
+		const name = window.prompt('Output name');
+		const id = window.prompt('Output ID ([a-z0-9_]+)');
+		const desc = window.prompt('Output description');
+		const index = Array.from(this.nodes).filter(n => n.type === 'PackageOutput').length;
+		this.addNode(new PackageOutputView(this.config, this, new PackageOutputViewModel(this.config, id, name, desc, index)));
 	}
 
 /*
@@ -184,21 +202,7 @@ export default abstract class NodesView {
 		this.addNode(new PinView(this.config, this));
 	}
 
-	addPackageInput() {
-		const name = window.prompt('Input name');
-		const id = window.prompt('Input ID ([a-z0-9_]+)');
-		const desc = window.prompt('Input description');
-		const index = Array.from(this.nodes).filter(n => n.type === 'PackageInput').length;
-		this.addNode(new PackageInputView(this.config, this, id, name, desc, index));
-	}
-
-	addPackageOutput() {
-		const name = window.prompt('Output name');
-		const id = window.prompt('Output ID ([a-z0-9_]+)');
-		const desc = window.prompt('Output description');
-		const index = Array.from(this.nodes).filter(n => n.type === 'PackageOutput').length;
-		this.addNode(new PackageOutputView(this.config, this, id, name, desc, index));
-	}*/
+*/
 }
 
 @autobind
@@ -214,12 +218,12 @@ export class CircuitNodesView extends NodesView {
 	}
 
 	addNode(nodeView: NodeView) {
-		this.circuit.addNode(nodeView.viewModel.node);
+		this.circuit.addNode(nodeView.node);
 		super.addNode(nodeView);
 	}
 
 	removeNode(nodeView: NodeView) {
-		this.circuit.removeNode(nodeView.viewModel.node);
+		this.circuit.removeNode(nodeView.node);
 	}
 }
 /*

@@ -7,6 +7,7 @@ import Package from '../core/nodes/package';
 
 import NodesView from './nodes-view';
 import Config from './config';
+import VirtualNode from '../core/virtual-node';
 
 /*
 import { AndView } from './node-views/and';
@@ -135,6 +136,19 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		this.node.off('connected', this.onNodeConnected);
 	}
 
+	public drawWires() {
+		// 導線描画
+		this.node.outputs.forEach(out => {
+			console.log(out);
+			const targetView = this.nodesView.nodeViews
+				.find(view => view.node == out.to.node);
+			console.log(this.nodesView);
+
+			const wire = new Wire(this, out, targetView);
+			wire.update();
+		});
+	}
+
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<T>, w: number, h: number) {
 		super();
 
@@ -146,18 +160,6 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 
 		this.width = w;
 		this.height = h;
-
-		console.log(this.node);
-
-		// 導線描画
-		this.node.outputs.forEach(out => {
-			console.log(out);
-			const targetView = this.nodesView.nodeViews
-				.find(view => view.node == out.to.node);
-
-			const wire = new Wire(this, out, targetView);
-			wire.update();
-		});
 
 		this.node.on('connected', this.onNodeConnected);
 
@@ -494,6 +496,10 @@ class Wire {
 			this.connection.destroy();
 			//text.remove();
 		});
+/*
+		if (this.parent instanceof VirtualNode) {
+			this.parent.get
+		}*/
 
 		this.parent.on('moved', this.render);
 		this.parent.node.on('state-updated', this.update);

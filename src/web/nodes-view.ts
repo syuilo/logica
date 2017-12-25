@@ -107,10 +107,11 @@ export default abstract class NodesView {
 
 		const moduleView = new ModuleView(this.config, this, new ModuleViewModel(this.config, this.selectedNodeViews.map(v => v.viewModel), name, desc, author));
 
+		// ノードを回路から削除すると出力情報もクリアされるので記憶しておく
 		const outputs = {};
-		nodes.forEach(n => {
+		nodes.forEach((n, i) => {
 			if (n.hasOutputPorts) {
-				outputs[n.id] = Array.from(n.outputs).map(o => ({
+				outputs[i] = Array.from(n.outputs).map(o => ({
 					node: o.to.node,
 					to: o.to.port,
 					from: o.from.port
@@ -118,14 +119,18 @@ export default abstract class NodesView {
 			}
 		});
 
+		// 回路から削除
 		this.selectedNodeViews.forEach(v => {
 			this.removeNodeView(v);
 		});
 
-		nodes.forEach(n => {
-			const out = outputs[n.id];
-			if (out) {
-				n.connectTo(out.node, out.to, out.from);
+		// 繋ぎなおす
+		nodes.forEach((n, i) => {
+			const outs = outputs[i];
+			if (outs) {
+				outs.forEach(out => {
+					n.connectTo(out.node, out.to, out.from);
+				});
 			}
 		});
 
@@ -268,6 +273,9 @@ export class ModuleNodesView extends NodesView {
 			if (vm.node.type == 'PackageOutput') v = new PackageOutputView(config, this, vm as NodeViewModel<PackageOutput>);
 			this.addNodeView(v);
 		});
+
+		// 導線描画
+		this.nodeViews.forEach(v => v.drawWires());
 	}
 
 	addNodeView(nodeView: NodeView) {

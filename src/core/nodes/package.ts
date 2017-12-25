@@ -58,11 +58,25 @@ export default class Package extends VirtualNode {
 				desc: po.outputDesc
 			}));
 
+		// このパッケージ内の出力端子が状態を変化させた場合、
+		// このパッケージ自体の出力状態が変わったということなのでイベントを発行
+		// TODO: 出力端子が削除された場合イベントリスナを解除
 		Array.from(this.nodes)
 			.filter(n => Array.from(n.outputs).find(c => c.to.node.type === 'PackageOutput'))
 			.forEach(n => n.on('state-updated', () => {
 				this.emit('state-updated');
-			}))
+			}));
+/*
+		// このパッケージの入力に繋がれているノードが状態を変化させた場合、
+		// このパッケージ内の入力端子の出力状態が変わったということなのでイベントを発行
+		// TODO: このパッケージの入力に繋がれているノードが削除などされた場合イベントリスナを解除
+		this.inputs.forEach(c => {
+			c.from.node.on('state-updated', () => {
+				Array.from(this.nodes)
+					.filter(n => n.type == 'PackageInput')
+					.forEach(n => n.emit('state-updated'));
+			});
+		});*/
 	}
 
 	public getState(portId?: string) {

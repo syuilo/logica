@@ -107,11 +107,27 @@ export default abstract class NodesView {
 
 		const moduleView = new ModuleView(this.config, this, new ModuleViewModel(this.config, this.selectedNodeViews.map(v => v.viewModel), name, desc, author));
 
+		const outputs = {};
+		nodes.forEach(n => {
+			if (n.hasOutputPorts) {
+				outputs[n.id] = Array.from(n.outputs).map(o => ({
+					node: o.to.node,
+					to: o.to.port,
+					from: o.from.port
+				}));
+			}
+		});
+
 		this.selectedNodeViews.forEach(v => {
 			this.removeNodeView(v);
 		});
 
-		// TODO: モジュール内のそれぞれのノードを接続しなおす
+		nodes.forEach(n => {
+			const out = outputs[n.id];
+			if (out) {
+				n.connectTo(out.node, out.to, out.from);
+			}
+		});
 
 		// モジュールをビューに追加
 		this.addNodeView(moduleView);

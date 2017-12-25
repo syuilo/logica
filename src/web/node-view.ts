@@ -6,14 +6,91 @@ import { Connection } from '../core/node';
 import Package from '../core/nodes/package';
 
 import NodesView from './nodes-view';
-import NodeViewModel from './node-view-model';
 import Config from './config';
+
+@autobind
+export abstract class NodeViewModel extends EventEmitter {
+	id: string;
+
+	node: のーど;
+
+	private _x: number;
+	private _y: number;
+
+	get x() {
+		return this._x;
+	}
+
+	get y() {
+		return this._y;
+	}
+
+	set x(x) {
+		this._x = x;
+	}
+
+	set y(y) {
+		this._y = y;
+	}
+
+	/**
+	 * この値を操作しないでください
+	 *
+	 * 0 ... ↑ (default)
+	 * 1 ... →
+	 * 2 ... ↓
+	 * 3 ... ←
+	 */
+	public rotate: number = 0;
+
+	inputPorts: any[] = [];
+	outputPorts: any[] = [];
+
+	config: Config;
+
+	constructor(config: Config, node: のーど) {
+		super();
+
+		this.setMaxListeners(Infinity);
+
+		this.config = config;
+		this.node = node;
+	}
+
+
+	/**
+	 * 移動します
+	 * @param x X位置
+	 * @param y Y位置
+	 */
+	public move(x: number, y: number) {
+		if (this.config.snapToGrid) {
+			const gridSize = 16;
+			x = Math.round(x / gridSize) * gridSize;
+			y = Math.round(y / gridSize) * gridSize;
+		}
+
+		if (x !== this.x || y !== this.y) {
+			this.emit('moved');
+		}
+	}
+
+	/**
+	 * 回転します
+	 * @param r 0~4
+	 */
+	public setRotate(r: number) {
+		if (r > 3) r = 0;
+		this.rotate = r;
+		this.emit('moved');
+	}
+}
 
 // ポートの直径
 const diameter = 8;
 
 @autobind
-abstract class NodeView extends EventEmitter {
+export abstract class NodeView extends EventEmitter {
 	viewModel: NodeViewModel;
 	el: any;
 
@@ -323,8 +400,6 @@ abstract class NodeView extends EventEmitter {
 		if (this.mouseoutTimer) clearTimeout(this.mouseoutTimer);
 	}
 }
-
-export default NodeView;
 
 /**
  * 導線

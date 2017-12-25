@@ -35,6 +35,7 @@
 	<style>
 		:scope
 			display block
+			float left
 			width 512px
 			height 512px
 			box-shadow 0 0 16px #000
@@ -68,6 +69,7 @@
 				this.view = new CircuitNodesView(this.config, this.opts.circuit, this.refs.drawing, 512, 512);
 			} else {
 				this.view = new ModuleNodesView(this.config, this.opts.module, this.refs.drawing, 512, 512);
+				console.log(this.view);
 			}
 			this.update();
 		});

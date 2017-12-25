@@ -15,6 +15,10 @@ export class ModuleView extends NodeView<Package> {
 		super(config, nodesView, nodeViewModel, 96, height);
 
 		this.el.text(pkg.packageName).fill('#fff').style('pointer-events: none;').move(10, 4);
+		this.el.mousedown(e => {
+			if (e.button === 0) return;
+			nodesView.open(this.viewModel);
+		});
 	}
 }
 

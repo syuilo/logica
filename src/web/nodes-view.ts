@@ -1,11 +1,14 @@
 import * as SVG from 'svg.js';
 import autobind from 'autobind-decorator';
+import * as riot from 'riot';
 
 import CircuitCore from '../core/circuit';
 import のーど from '../core/node';
 import Package from '../core/nodes/package';
+import PackageInput from '../core/nodes/package-input';
+import PackageOutput from '../core/nodes/package-output';
 
-import { NodeView } from './node-view';
+import { NodeView, NodeViewModel } from './node-view';
 
 import { AndView, AndViewModel } from './node-views/and';
 import { ButtonView, ButtonViewModel } from './node-views/button';
@@ -82,6 +85,12 @@ export default abstract class NodesView {
 			v.drawUnSelected();
 		});
 		this._selectedNodeViews = [];
+	}
+
+	public open(vm: NodeViewModel) {
+		riot.mount(document.body.appendChild(document.createElement('lo-nodes')), {
+			module: vm
+		});
 	}
 
 	/**
@@ -208,7 +217,6 @@ export default abstract class NodesView {
 @autobind
 export class CircuitNodesView extends NodesView {
 	circuit: CircuitCore;
-	nodeViews: NodeView[] = [];
 	nodes: Set<のーど>;
 
 	constructor(config: Config, circuit: CircuitCore, svg, w, h) {
@@ -226,27 +234,32 @@ export class CircuitNodesView extends NodesView {
 		this.circuit.removeNode(nodeView.node);
 	}
 }
-/*
+
 @autobind
 export class ModuleNodesView extends NodesView {
-	module: ModuleView;
-	nodeViews: NodeView[] = [];
+	module: ModuleViewModel;
 	nodes: Set<のーど>;
 
-	constructor(config: Config, module: ModuleView, svg, w, h) {
+	constructor(config: Config, module: ModuleViewModel, svg, w, h) {
 		super(config, svg, w, h);
 		this.module = module;
 		this.nodes = this.module.node.nodes;
+		this.module.nodeViewModels.forEach(vm => {
+			//vm.createView(this);
+			let v;
+			if (vm.node.type == 'And') v = new AndView(config, this, vm);
+			if (vm.node.type == 'PackageInput') v = new PackageInputView(config, this, vm as NodeViewModel<PackageInput>);
+			if (vm.node.type == 'PackageOutput') v = new PackageOutputView(config, this, vm as NodeViewModel<PackageOutput>);
+			this.addNode(v);
+		});
 	}
 
 	addNode(nodeView: NodeView) {
-		this.module.nodeViews.push(nodeView);
+		this.module.node.nodes.add(nodeView.node);
 		super.addNode(nodeView);
 	}
 
 	removeNode(nodeView: NodeView) {
-		this.module.removeNode(nodeView);
+		//this.module.removeNode(nodeView);
 	}
 }
-
-*/

@@ -8,6 +8,16 @@ import Package from '../core/nodes/package';
 import NodesView from './nodes-view';
 import Config from './config';
 
+/*
+import { AndView } from './node-views/and';
+import { ButtonView } from './node-views/button';
+import { LedView } from './node-views/led';
+import { PackageInputView } from './node-views/package-input';
+import { PackageOutputView } from './node-views/package-output';
+import { ModuleView } from './node-views/module';
+import PackageInput from '../core/nodes/package-input';
+import PackageOutput from '../core/nodes/package-output';*/
+
 @autobind
 export abstract class NodeViewModel<T extends のーど = のーど> {
 	id: string;
@@ -53,8 +63,18 @@ export abstract class NodeViewModel<T extends のーど = のーど> {
 		this.config = config;
 		this.node = node;
 	}
+/*
+	public createView(nodesView: NodesView) {
+		if (this.node.type == 'And') return new AndView(this.config, nodesView, this);
+		if (isPackageInput(this)) return new PackageInputView(this.config, nodesView, this);
+		if (isPackageOutput(this)) return new PackageOutputView(this.config, nodesView, this);
+		throw 'unknown type ' + this.node.type;
+	}*/
 }
-
+/*
+const isPackageInput = (vm: NodeViewModel): vm is NodeViewModel<PackageInput> => vm.node.type === 'PackageInput';
+const isPackageOutput = (vm: NodeViewModel): vm is NodeViewModel<PackageOutput> => vm.node.type === 'PackageOutput';
+*/
 // ポートの直径
 const diameter = 8;
 
@@ -118,6 +138,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		this.config = config;
 		this.nodesView = nodesView;
 		this.viewModel = nodeViewModel;
+
 		this.width = w;
 		this.height = h;
 
@@ -269,6 +290,8 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 			});
 		}
 
+		//this.move(this.x, this.y);
+		this.el.move(this.x || 0, this.y || 0);
 		this.updatePortPosition();
 	}
 
@@ -293,6 +316,8 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		/**********************************************************
 		 * 導線要素を作成
 		 **********************************************************/
+
+		console.log(this.nodesView);
 
 		const targetView = this.nodesView.nodeViews
 			.find(view => view.node == connection.to.node);

@@ -69,7 +69,6 @@
 			} else {
 				this.view = new ModuleNodesView(this.config, this.opts.module, this.refs.drawing, 512, 512);
 			}
-			console.log(this.config);
 			this.update();
 		});
 

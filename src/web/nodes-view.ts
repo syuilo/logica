@@ -5,9 +5,12 @@ import CircuitCore from '../core/circuit';
 import のーど from '../core/node';
 import Package from '../core/nodes/package';
 
-import NodeView from './node-view';
+import { NodeView } from './node-view';
 
-import AndView from './node-views/and';
+import { AndView, AndViewModel } from './node-views/and';
+import { ButtonView, ButtonViewModel } from './node-views/button';
+import { LedView, LedViewModel } from './node-views/led';
+/*
 import And3View from './node-views/and3';
 import OrView from './node-views/or';
 import Or3View from './node-views/or3';
@@ -22,10 +25,10 @@ import RandomView from './node-views/random';
 import ButtonView from './node-views/button';
 import LedView from './node-views/led';
 import PinView from './node-views/pin';
-import PackageView from './node-views/package';
-import PackageInputView from './node-views/package-input';
-import PackageOutputView from './node-views/package-output';
-import ModuleView from './node-views/module';
+import { PackageView } from './node-views/package';
+import { PackageInputView } from './node-views/package-input';
+import { PackageOutputView } from './node-views/package-output';
+import { ModuleView } from './node-views/module';*/
 
 import Config from './config';
 
@@ -100,11 +103,11 @@ export default abstract class NodesView {
 			this.nodeViews = this.nodeViews.filter(_v => _v != v);
 		});
 
-		const moduleView = new ModuleView(this.config, this, childNodeViews, name, desc, author);
+		/*const moduleView = new ModuleView(this.config, this, childNodeViews, name, desc, author);
 
 		//const moduleNodesView = new ModuleNodesView(config, moduleView);
 
-		this.addNode(moduleView);
+		this.addNode(moduleView);*/
 	}
 
 	addNode(nodeView: NodeView) {
@@ -113,9 +116,18 @@ export default abstract class NodesView {
 	}
 
 	addAnd() {
-		this.addNode(new AndView(this.config, this));
+		this.addNode(new AndView(this.config, this, new AndViewModel(this.config)));
 	}
 
+	addButton() {
+		this.addNode(new ButtonView(this.config, this, new ButtonViewModel(this.config)));
+	}
+
+	addLed() {
+		this.addNode(new LedView(this.config, this, new LedViewModel(this.config)));
+	}
+
+/*
 	addAnd3() {
 		this.addNode(new And3View(this.config, this));
 	}
@@ -186,7 +198,7 @@ export default abstract class NodesView {
 		const desc = window.prompt('Output description');
 		const index = Array.from(this.nodes).filter(n => n.type === 'PackageOutput').length;
 		this.addNode(new PackageOutputView(this.config, this, id, name, desc, index));
-	}
+	}*/
 }
 
 @autobind
@@ -210,7 +222,7 @@ export class CircuitNodesView extends NodesView {
 		this.circuit.removeNode(nodeView.viewModel.node);
 	}
 }
-
+/*
 @autobind
 export class ModuleNodesView extends NodesView {
 	module: ModuleView;
@@ -233,3 +245,4 @@ export class ModuleNodesView extends NodesView {
 	}
 }
 
+*/

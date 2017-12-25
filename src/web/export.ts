@@ -1,8 +1,8 @@
 const msgpack = require('msgpack-lite');
 
-import NodeView from './node-view';
+import { NodeViewModel } from './node-view';
 
-export default function (views: NodeView[]) {
+export default function (views: NodeViewModel[]) {
 	views.forEach((view, i) => view.node.id = i);
 	const data = views
 		.map(view => ({

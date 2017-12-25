@@ -1,5 +1,5 @@
 import NodesView from '../nodes-view';
-import NodeView from '../node-view';
+import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import PackageInput from '../../core/nodes/package-input';
 

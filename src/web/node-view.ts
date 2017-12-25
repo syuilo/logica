@@ -9,10 +9,10 @@ import NodesView from './nodes-view';
 import Config from './config';
 
 @autobind
-export abstract class NodeViewModel extends EventEmitter {
+export abstract class NodeViewModel<T extends のーど = のーど> {
 	id: string;
 
-	node: のーど;
+	node: T;
 
 	private _x: number;
 	private _y: number;
@@ -43,46 +43,15 @@ export abstract class NodeViewModel extends EventEmitter {
 	 */
 	public rotate: number = 0;
 
-	inputPorts: any[] = [];
-	outputPorts: any[] = [];
-
 	config: Config;
 
-	constructor(config: Config, node: のーど) {
-		super();
+	constructor(config: Config, node: T) {
+		//super();
 
-		this.setMaxListeners(Infinity);
+		//this.setMaxListeners(Infinity);
 
 		this.config = config;
 		this.node = node;
-	}
-
-
-	/**
-	 * 移動します
-	 * @param x X位置
-	 * @param y Y位置
-	 */
-	public move(x: number, y: number) {
-		if (this.config.snapToGrid) {
-			const gridSize = 16;
-			x = Math.round(x / gridSize) * gridSize;
-			y = Math.round(y / gridSize) * gridSize;
-		}
-
-		if (x !== this.x || y !== this.y) {
-			this.emit('moved');
-		}
-	}
-
-	/**
-	 * 回転します
-	 * @param r 0~4
-	 */
-	public setRotate(r: number) {
-		if (r > 3) r = 0;
-		this.rotate = r;
-		this.emit('moved');
 	}
 }
 
@@ -90,19 +59,9 @@ export abstract class NodeViewModel extends EventEmitter {
 const diameter = 8;
 
 @autobind
-export abstract class NodeView extends EventEmitter {
-	viewModel: NodeViewModel;
+export abstract class NodeView<T extends のーど = のーど> extends EventEmitter {
+	viewModel: NodeViewModel<T>;
 	el: any;
-
-	/**
-	 * この値を操作しないでください
-	 *
-	 * 0 ... ↑ (default)
-	 * 1 ... →
-	 * 2 ... ↓
-	 * 3 ... ←
-	 */
-	public rotate: number = 0;
 
 	inputPorts: any[] = [];
 	outputPorts: any[] = [];
@@ -118,12 +77,37 @@ export abstract class NodeView extends EventEmitter {
 	width: number;
 	height: number;
 
-	constructor(config: Config, nodeViewModel: NodeViewModel, w: number, h: number) {
+	get x() {
+		return this.viewModel.x;
+	}
+
+	get y() {
+		return this.viewModel.y;
+	}
+
+	set x(x) {
+		this.viewModel.x = x;
+	}
+
+	set y(y) {
+		this.viewModel.y = y;
+	}
+
+	get rotate() {
+		return this.viewModel.rotate;
+	}
+
+	set rotate(r) {
+		this.viewModel.rotate = r;
+	}
+
+	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<T>, w: number, h: number) {
 		super();
 
 		this.setMaxListeners(Infinity);
 
 		this.config = config;
+		this.nodesView = nodesView;
 		this.viewModel = nodeViewModel;
 		this.width = w;
 		this.height = h;
@@ -149,14 +133,14 @@ export abstract class NodeView extends EventEmitter {
 			let otherSelectedNodeViewsPositions = [];
 
 			this.rect.draggable().on('dragstart', e => {
-				x = this.viewModel.x - e.detail.p.x;
-				y = this.viewModel.y - e.detail.p.y;
+				x = this.x - e.detail.p.x;
+				y = this.y - e.detail.p.y;
 				otherSelectedNodeViewsPositions = this.nodesView.selectedNodeViews
 					.filter(v => v != this)
 					.map(v => ({
 						v: v,
-						x: v.viewModel.x - e.detail.p.x,
-						y: v.viewModel.y - e.detail.p.y
+						x: v.x - e.detail.p.x,
+						y: v.y - e.detail.p.y
 					}));
 			});
 
@@ -222,18 +206,21 @@ export abstract class NodeView extends EventEmitter {
 
 				o.draggable().on('dragend', (e) => {
 					line.remove();
-					const x = this.viewModel.x + e.detail.p.x;
-					const y = this.viewModel.y + e.detail.p.y;
+					const x = this.x + e.detail.p.x;
+					const y = this.y + e.detail.p.y;
 
-					let target: any = null;
+					let target: {
+						view: NodeView;
+						portId: any;
+					} = null;
 
 					this.nodesView.nodeViews.some(view => {
 						const asobi = 12;
 						const nearPort = view.inputPorts.find(p =>
-							(p.el.x() + view.viewModel.x - asobi) < x &&
-							(p.el.y() + view.viewModel.y - asobi) < y &&
-							(p.el.x() + view.viewModel.x) + p.el.width() + asobi > x &&
-							(p.el.y() + view.viewModel.y) + p.el.height() + asobi > y);
+							(p.el.x() + view.x - asobi) < x &&
+							(p.el.y() + view.y - asobi) < y &&
+							(p.el.x() + view.x) + p.el.width() + asobi > x &&
+							(p.el.y() + view.y) + p.el.height() + asobi > y);
 
 						if (nearPort) {
 							target = {
@@ -248,10 +235,10 @@ export abstract class NodeView extends EventEmitter {
 
 					if (!target) {
 						const nearView = this.nodesView.nodeViews.find(v =>
-							v.viewModel.x < x &&
-							v.viewModel.y < y &&
-							v.viewModel.x + v.width > x &&
-							v.viewModel.y + v.height > y);
+							v.x < x &&
+							v.y < y &&
+							v.x + v.width > x &&
+							v.y + v.height > y);
 
 						if (nearView) {
 							target = {
@@ -262,7 +249,7 @@ export abstract class NodeView extends EventEmitter {
 					}
 
 					if (target) {
-						this.viewModel.node.connectTo(target.view.node, target.portId, output.id);
+						this.viewModel.node.connectTo(target.view.viewModel.node, target.portId, output.id);
 					}
 				});
 
@@ -317,8 +304,10 @@ export abstract class NodeView extends EventEmitter {
 			y = Math.round(y / gridSize) * gridSize;
 		}
 
-		if (x !== this.viewModel.x || y !== this.viewModel.y) {
+		if (x !== this.x || y !== this.y) {
 			this.el.move(x, y);
+			this.x = x;
+			this.y = y;
 			this.emit('moved');
 		}
 	}

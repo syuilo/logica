@@ -3,15 +3,15 @@ import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import And from '../../core/nodes/and';
 
-export default class AndView extends NodeView {
-	constructor(config: Config, nodeViewModel: NodeViewModel, node?: And) {
-		super(config, nodeViewModel, 64, 64);
+export class AndView extends NodeView<And> {
+	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<And>) {
+		super(config, nodesView, nodeViewModel, 64, 64);
 
 		this.el.text('And').fill('#fff').style('pointer-events: none;').move(10, 4);
 	}
 }
 
-export default class AndViewModel extends NodeViewModel {
+export class AndViewModel extends NodeViewModel<And> {
 	constructor(config: Config, node?: And) {
 		super(config, node || new And());
 	}

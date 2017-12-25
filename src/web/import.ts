@@ -6,7 +6,7 @@ import importNodes from '../core/import';
 
 import { CircuitNodesView } from './nodes-view';
 
-import AndView from './node-views/and';
+import { AndViewModel } from './node-views/and';/*
 import And3View from './node-views/and3';
 import OrView from './node-views/or';
 import Or3View from './node-views/or3';
@@ -23,7 +23,7 @@ import LedView from './node-views/led';
 import PinView from './node-views/pin';
 import PackageView from './node-views/package';
 import PackageInputView from './node-views/package-input';
-import PackageOutputView from './node-views/package-output';
+import PackageOutputView from './node-views/package-output';*/
 
 import Config from './config';
 
@@ -33,7 +33,7 @@ export default function (config: Config, circuitView: CircuitNodesView, data) {
 	data.forEach(viewData => {
 		let view = null;
 		switch (viewData.node.type) {
-			case 'And': view = AndView.import(config, circuitView, viewData); break;
+			case 'And': view = AndViewModel.import(config, viewData); break;/*
 			case 'And3': view = And3View.import(config, circuitView, viewData); break;
 			case 'Or': view = OrView.import(config, circuitView, viewData); break;
 			case 'Or3': view = Or3View.import(config, circuitView, viewData); break;
@@ -50,7 +50,7 @@ export default function (config: Config, circuitView: CircuitNodesView, data) {
 			case 'Pin': view = PinView.import(config, circuitView, viewData); break;
 			case 'Package': view = PackageView.import(config, circuitView, viewData); break;
 			case 'PackageInput': view = PackageInputView.import(config, circuitView, viewData); break;
-			case 'PackageOutput': view = PackageOutputView.import(config, circuitView, viewData); break;
+			case 'PackageOutput': view = PackageOutputView.import(config, circuitView, viewData); break;*/
 		}
 		view.id = viewData.node.id;
 		view.x = viewData.x;
@@ -61,7 +61,7 @@ export default function (config: Config, circuitView: CircuitNodesView, data) {
 		circuitView.nodeViews.push(view);
 
 		circuitView.circuit.addNode(view.node);
-	});
+	});/*
 
 	data.forEach(viewData => {
 		viewData.node.outputs.forEach(output => {
@@ -71,5 +71,5 @@ export default function (config: Config, circuitView: CircuitNodesView, data) {
 				output.from
 			);
 		});
-	});
+	});*/
 }

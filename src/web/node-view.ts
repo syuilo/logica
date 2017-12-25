@@ -107,6 +107,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 
 	public destroy() {
 		this.el.remove();
+		this.emit('destroyed');
 	}
 
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<T>, w: number, h: number) {
@@ -460,7 +461,7 @@ class Wire {
 		this.parent.node.on('disconnected', this.onParentNodeDisconnected);
 		this.parent.node.on('removed', this.dispose);
 		this.targetView.on('moved', this.render);
-		this.connection.to.node.on('removed', this.dispose);
+		this.targetView.on('destroyed', this.dispose);
 	}
 
 	private onParentNodeDisconnected(connection) {
@@ -509,6 +510,6 @@ class Wire {
 		this.parent.node.off('disconnected', this.onParentNodeDisconnected);
 		this.parent.node.off('removed', this.dispose);
 		this.targetView.off('moved', this.render);
-		this.connection.to.node.off('removed', this.dispose);
+		this.targetView.off('destoryed', this.dispose);
 	}
 }

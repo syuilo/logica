@@ -108,34 +108,34 @@ export default abstract class NodesView {
 		const moduleView = new ModuleView(this.config, this, new ModuleViewModel(this.config, this.selectedNodeViews.map(v => v.viewModel), name, desc, author));
 
 		this.selectedNodeViews.forEach(v => {
-			this.removeNode(v);
+			this.removeNodeView(v);
 		});
 
-		//const moduleNodesView = new ModuleNodesView(config, moduleView);
+		this.addNodeView(moduleView);
 
-		this.addNode(moduleView);
+		console.log(this);
 	}
 
-	removeNode(nodeView: NodeView) {
+	removeNodeView(nodeView: NodeView) {
 		this.nodeViews = this.nodeViews.filter(v => v != nodeView);
 		nodeView.destroy();
 	}
 
-	addNode(nodeView: NodeView) {
+	addNodeView(nodeView: NodeView) {
 		this.nodeViews.push(nodeView);
 		nodeView.move(32 + (Math.random() * 32), 32 + (Math.random() * 32));
 	}
 
 	addAnd() {
-		this.addNode(new AndView(this.config, this, new AndViewModel(this.config)));
+		this.addNodeView(new AndView(this.config, this, new AndViewModel(this.config)));
 	}
 
 	addButton() {
-		this.addNode(new ButtonView(this.config, this, new ButtonViewModel(this.config)));
+		this.addNodeView(new ButtonView(this.config, this, new ButtonViewModel(this.config)));
 	}
 
 	addLed() {
-		this.addNode(new LedView(this.config, this, new LedViewModel(this.config)));
+		this.addNodeView(new LedView(this.config, this, new LedViewModel(this.config)));
 	}
 
 	addPackageInput() {
@@ -143,7 +143,7 @@ export default abstract class NodesView {
 		const id = window.prompt('Input ID ([a-z0-9_]+)');
 		const desc = window.prompt('Input description');
 		const index = Array.from(this.nodes).filter(n => n.type === 'PackageInput').length;
-		this.addNode(new PackageInputView(this.config, this, new PackageInputViewModel(this.config, id, name, desc, index)));
+		this.addNodeView(new PackageInputView(this.config, this, new PackageInputViewModel(this.config, id, name, desc, index)));
 	}
 
 	addPackageOutput() {
@@ -151,7 +151,7 @@ export default abstract class NodesView {
 		const id = window.prompt('Output ID ([a-z0-9_]+)');
 		const desc = window.prompt('Output description');
 		const index = Array.from(this.nodes).filter(n => n.type === 'PackageOutput').length;
-		this.addNode(new PackageOutputView(this.config, this, new PackageOutputViewModel(this.config, id, name, desc, index)));
+		this.addNodeView(new PackageOutputView(this.config, this, new PackageOutputViewModel(this.config, id, name, desc, index)));
 	}
 
 /*
@@ -217,52 +217,49 @@ export default abstract class NodesView {
 @autobind
 export class CircuitNodesView extends NodesView {
 	circuit: CircuitCore;
-	nodes: Set<のーど>;
 
 	constructor(config: Config, circuit: CircuitCore, svg, w, h) {
 		super(config, svg, w, h);
 		this.circuit = circuit;
-		this.nodes = this.circuit.nodes;
 	}
 
-	addNode(nodeView: NodeView) {
+	addNodeView(nodeView: NodeView) {
 		this.circuit.addNode(nodeView.node);
-		super.addNode(nodeView);
+		super.addNodeView(nodeView);
 	}
 
-	removeNode(nodeView: NodeView) {
+	removeNodeView(nodeView: NodeView) {
 		this.circuit.removeNode(nodeView.node);
-		super.removeNode(nodeView);
+		super.removeNodeView(nodeView);
 	}
 }
 
 @autobind
 export class ModuleNodesView extends NodesView {
 	module: ModuleViewModel;
-	nodes: Set<のーど>;
 
 	constructor(config: Config, module: ModuleViewModel, svg, w, h) {
 		super(config, svg, w, h);
 		this.module = module;
-		this.nodes = this.module.node.nodes;
 		this.module.nodeViewModels.forEach(vm => {
 			//vm.createView(this);
 			let v;
 			if (vm.node.type == 'And') v = new AndView(config, this, vm);
 			if (vm.node.type == 'PackageInput') v = new PackageInputView(config, this, vm as NodeViewModel<PackageInput>);
 			if (vm.node.type == 'PackageOutput') v = new PackageOutputView(config, this, vm as NodeViewModel<PackageOutput>);
-			this.addNode(v);
-			console.log(v);
+			(v as any).yoooooooooooo = 42;
+			this.addNodeView(v);
+			//console.log(v);
 		});
 	}
 
-	addNode(nodeView: NodeView) {
+	addNodeView(nodeView: NodeView) {
 		this.module.node.nodes.add(nodeView.node);
-		super.addNode(nodeView);
+		super.addNodeView(nodeView);
 	}
 
-	removeNode(nodeView: NodeView) {
+	removeNodeView(nodeView: NodeView) {
 		this.module.removeNode(nodeView);
-		super.removeNode(nodeView);
+		super.removeNodeView(nodeView);
 	}
 }

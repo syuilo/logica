@@ -132,6 +132,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 	public destroy() {
 		this.el.remove();
 		this.emit('destroyed');
+		this.node.off('connected', this.onNodeConnected);
 	}
 
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<T>, w: number, h: number) {
@@ -143,12 +144,14 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		this.nodesView = nodesView;
 		this.viewModel = nodeViewModel;
 
+		console.log(this.nodesView);
+
 		this.width = w;
 		this.height = h;
 
 		this.node.on('connected', this.onNodeConnected);
 
-		this.node.on('removed', () => {
+		this.node.once('removed', () => {
 			this.destroy();
 			this.nodesView.nodeViews = this.nodesView.nodeViews.filter(view => view != this);
 		});
@@ -194,7 +197,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 			const removeButtonSize = 12;
 			this.removeButton = this.el.circle(removeButtonSize).move(this.width - (removeButtonSize / 2), -(removeButtonSize / 2)).fill('#f00').style('display: none;');
 			this.removeButton.click(() => {
-				this.nodesView.removeNode(this);
+				this.nodesView.removeNodeView(this);
 			});
 		}
 

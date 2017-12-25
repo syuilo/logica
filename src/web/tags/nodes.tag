@@ -69,7 +69,7 @@
 				this.view = new CircuitNodesView(this.config, this.opts.circuit, this.refs.drawing, 512, 512);
 			} else {
 				this.view = new ModuleNodesView(this.config, this.opts.module, this.refs.drawing, 512, 512);
-				console.log(this.view);
+				//console.log(this.view);
 			}
 			this.update();
 		});

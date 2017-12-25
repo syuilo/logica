@@ -113,6 +113,13 @@ export default class Package extends VirtualNode {
 		this.inputs.add(connection);
 		this.getActualInputNodes(connection.to.port)
 			.forEach(n => n.requestUpdateAtNextTick());
+
+		// TODO: removeInputのときにoffする
+		connection.from.node.on('state-updated', () => {
+			const n = Array.from(this.nodes)
+				.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === connection.to.port);
+			n.emit('state-updated')
+		});
 	}
 
 	public removeInput(connection: Connection) {

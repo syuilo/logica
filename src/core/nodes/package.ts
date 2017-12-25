@@ -1,3 +1,4 @@
+import autobind from 'autobind-decorator';
 import のーど from '../node';
 import { Connection } from '../node';
 import VirtualNode from '../virtual-node';
@@ -62,21 +63,10 @@ export default class Package extends VirtualNode {
 		// このパッケージ自体の出力状態が変わったということなのでイベントを発行
 		// TODO: 出力端子が削除された場合イベントリスナを解除
 		Array.from(this.nodes)
-			.filter(n => Array.from(n.outputs).find(c => c.to.node.type === 'PackageOutput'))
-			.forEach(n => n.on('state-updated', () => {
-				this.emit('state-updated');
+			.filter(n => n.type === 'PackageOutput')
+			.forEach(n => n.on('state-updated', (port, state) => {
+				this.setState(state, (n as PackageOutput).outputId);
 			}));
-/*
-		// このパッケージの入力に繋がれているノードが状態を変化させた場合、
-		// このパッケージ内の入力端子の出力状態が変わったということなのでイベントを発行
-		// TODO: このパッケージの入力に繋がれているノードが削除などされた場合イベントリスナを解除
-		this.inputs.forEach(c => {
-			c.from.node.on('state-updated', () => {
-				Array.from(this.nodes)
-					.filter(n => n.type == 'PackageInput')
-					.forEach(n => n.emit('state-updated'));
-			});
-		});*/
 	}
 
 	public getState(portId?: string) {
@@ -109,21 +99,29 @@ export default class Package extends VirtualNode {
 		return n.getActualNextNodes();
 	}
 
+	@autobind
+	public onInputStateUpdated(node: のーど, port, state) {
+		const outs = Array.from(node.outputs).filter(c => c.from.port == port);
+		const ns = Array.from(this.nodes)
+			.filter(n => n.type === 'PackageInput')
+			.filter(n => outs.find(c => c.to.port == (n as PackageInput).inputId));
+		ns.forEach(n => n.setState(state));
+	}
+
 	public addInput(connection: Connection) {
 		this.inputs.add(connection);
+
+		// このパッケージ内の入力端子に繋がれているノードを次回更新するようにする
 		this.getActualInputNodes(connection.to.port)
 			.forEach(n => n.requestUpdateAtNextTick());
 
-		// TODO: removeInputのときにoffする
-		connection.from.node.on('state-updated', () => {
-			const n = Array.from(this.nodes)
-				.find(n => n.type === 'PackageInput' && (n as PackageInput).inputId === connection.to.port);
-			n.emit('state-updated')
-		});
+		// このパッケージの入力が変化した場合パッケージ内の入力端子の状態も変化させる
+		connection.from.node.on('state-updated', this.onInputStateUpdated);
 	}
 
 	public removeInput(connection: Connection) {
 		this.inputs.delete(connection);
+		connection.from.node.off('state-updated', this.onInputStateUpdated);
 	}
 
 	public removeNode(node: のーど) {

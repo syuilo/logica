@@ -1,3 +1,4 @@
+import autobind from 'autobind-decorator';
 import のーど from '../node';
 import { Connection } from '../node';
 import VirtualNode from '../virtual-node';
@@ -38,12 +39,21 @@ export default class PackageOutput extends VirtualNode {
 		}
 	}
 
+	@autobind
+	public onInputStateUpdated(node: のーど, port, state) {
+		this.setState(state);
+	}
+
 	public addInput(connection: Connection) {
 		this.inputs.add(connection);
+
+		// 入力が変化した場合出力端子の状態も変化させる
+		connection.from.node.on('state-updated', this.onInputStateUpdated);
 	}
 
 	public removeInput(connection: Connection) {
 		this.inputs.delete(connection);
+		connection.from.node.off('state-updated', this.onInputStateUpdated);
 	}
 
 	export() {

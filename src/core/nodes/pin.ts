@@ -28,21 +28,21 @@ export default class Pin extends VirtualNode {
 	}
 
 	@autobind
-	private emitStateUpdated() {
+	private onInputStateUpdated(node: のーど, port, state) {
 		this.emit('state-updated');
 	}
 
 	public addInput(connection: Connection) {
 		this.inputs.add(connection);
 		this.emit('state-updated');
-		connection.from.node.on('state-updated', this.emitStateUpdated);
+		connection.from.node.on('state-updated', this.onInputStateUpdated);
 		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 
 	public removeInput(connection: Connection) {
 		this.inputs.delete(connection);
 		this.emit('state-updated');
-		connection.from.node.off('state-updated', this.emitStateUpdated);
+		connection.from.node.off('state-updated', this.onInputStateUpdated);
 		this.getActualNextNodes().forEach(n => n.requestUpdateAtNextTick());
 	}
 

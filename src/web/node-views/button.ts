@@ -1,8 +1,11 @@
+import autobind from 'autobind-decorator';
+
 import NodesView from '../nodes-view';
 import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import Button from '../../core/nodes/button';
 
+@autobind
 export class ButtonView extends NodeView {
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<Button>) {
 		super(config, nodesView, nodeViewModel, 64, 64);
@@ -18,6 +21,7 @@ export class ButtonView extends NodeView {
 	}
 }
 
+@autobind
 export class ButtonViewModel extends NodeViewModel<Button> {
 	constructor(config: Config, node?: Button) {
 		super(config, node || new Button());

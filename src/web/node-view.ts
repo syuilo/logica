@@ -90,6 +90,10 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 
 	rect: any;
 	removeButton: any;
+
+	/**
+	 * このノードビューが所属する回路ビュー(モジュール内部含む)
+	 */
 	nodesView: NodesView;
 
 	config: Config;
@@ -317,7 +321,7 @@ export abstract class NodeView<T extends のーど = のーど> extends EventEmi
 		 * 導線要素を作成
 		 **********************************************************/
 
-		console.log(this.nodesView);
+		console.log(this);
 
 		const targetView = this.nodesView.nodeViews
 			.find(view => view.node == connection.to.node);

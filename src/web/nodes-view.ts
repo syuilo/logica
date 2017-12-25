@@ -251,6 +251,7 @@ export class ModuleNodesView extends NodesView {
 			if (vm.node.type == 'PackageInput') v = new PackageInputView(config, this, vm as NodeViewModel<PackageInput>);
 			if (vm.node.type == 'PackageOutput') v = new PackageOutputView(config, this, vm as NodeViewModel<PackageOutput>);
 			this.addNode(v);
+			console.log(v);
 		});
 	}
 

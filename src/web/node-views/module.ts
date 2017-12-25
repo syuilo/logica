@@ -1,9 +1,12 @@
+import autobind from 'autobind-decorator';
+
 import NodesView from '../nodes-view';
 import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import のーど from '../../core/node';
 import Package from '../../core/nodes/package';
 
+@autobind
 export class ModuleView extends NodeView<Package> {
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<Package>) {
 		const pkg = nodeViewModel.node;
@@ -22,6 +25,7 @@ export class ModuleView extends NodeView<Package> {
 	}
 }
 
+@autobind
 export class ModuleViewModel extends NodeViewModel<Package> {
 	nodeViewModels: NodeViewModel[];
 

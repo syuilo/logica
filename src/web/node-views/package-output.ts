@@ -1,8 +1,11 @@
+import autobind from 'autobind-decorator';
+
 import NodesView from '../nodes-view';
 import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import PackageOutput from '../../core/nodes/package-output';
 
+@autobind
 export class PackageOutputView extends NodeView<PackageOutput> {
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<PackageOutput>) {
 		super(config, nodesView, nodeViewModel, 96, 64);
@@ -22,6 +25,7 @@ export class PackageOutputView extends NodeView<PackageOutput> {
 	}
 }
 
+@autobind
 export class PackageOutputViewModel extends NodeViewModel<PackageOutput> {
 	constructor(config: Config, node: PackageOutput);
 	constructor(config: Config, id: string, name: string, desc: string, index: number);

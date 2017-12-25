@@ -1,8 +1,11 @@
+import autobind from 'autobind-decorator';
+
 import NodesView from '../nodes-view';
 import { NodeView, NodeViewModel } from '../node-view';
 import Config from '../config';
 import Led from '../../core/nodes/led';
 
+@autobind
 export class LedView extends NodeView {
 	constructor(config: Config, nodesView: NodesView, nodeViewModel: NodeViewModel<Led>) {
 		super(config, nodesView, nodeViewModel, 64, 64);
@@ -15,6 +18,7 @@ export class LedView extends NodeView {
 	}
 }
 
+@autobind
 export class LedViewModel extends NodeViewModel<Led> {
 	constructor(config: Config, node?: Led) {
 		super(config, node || new Led());

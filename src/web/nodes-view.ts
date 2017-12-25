@@ -60,8 +60,6 @@ export default abstract class NodesView {
 		return this.nodeViews.map(v => v.node);
 	}
 
-	abstract removeNode(nodeView: NodeView);
-
 	private config: Config;
 
 	constructor(config: Config, svg, w, h) {
@@ -234,6 +232,7 @@ export class CircuitNodesView extends NodesView {
 
 	removeNode(nodeView: NodeView) {
 		this.circuit.removeNode(nodeView.node);
+		super.removeNode(nodeView);
 	}
 }
 
@@ -263,6 +262,7 @@ export class ModuleNodesView extends NodesView {
 	}
 
 	removeNode(nodeView: NodeView) {
-		//this.module.removeNode(nodeView);
+		this.module.removeNode(nodeView);
+		super.removeNode(nodeView);
 	}
 }

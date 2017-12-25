@@ -56,10 +56,9 @@ export default abstract class NodesView {
 		return this._selectedNodeViews;
 	}
 
-	/**
-	 * このビューに含まれるノード
-	 */
-	abstract nodes: Set<のーど>;
+	protected get nodes() {
+		return this.nodeViews.map(v => v.node);
+	}
 
 	abstract removeNode(nodeView: NodeView);
 
@@ -111,14 +110,17 @@ export default abstract class NodesView {
 		const moduleView = new ModuleView(this.config, this, new ModuleViewModel(this.config, this.selectedNodeViews.map(v => v.viewModel), name, desc, author));
 
 		this.selectedNodeViews.forEach(v => {
-			v.destroy();
-			//this.nodes.delete(v.node);
-			this.nodeViews = this.nodeViews.filter(_v => _v != v);
+			this.removeNode(v);
 		});
 
 		//const moduleNodesView = new ModuleNodesView(config, moduleView);
 
 		this.addNode(moduleView);
+	}
+
+	removeNode(nodeView: NodeView) {
+		this.nodeViews = this.nodeViews.filter(v => v != nodeView);
+		nodeView.destroy();
 	}
 
 	addNode(nodeView: NodeView) {

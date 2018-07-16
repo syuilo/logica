@@ -17,6 +17,7 @@ import XorView from './node-views/xor';
 import TrueView from './node-views/true';
 import FalseView from './node-views/false';
 import NopView from './node-views/nop';
+import RandomDelayView from './node-views/random-delay';
 import RandomView from './node-views/random';
 import ButtonView from './node-views/button';
 import LedView from './node-views/led';
@@ -42,6 +43,7 @@ export default function (circuitView: CircuitView, data) {
 			case 'True': view = TrueView.import(circuitView, viewData); break;
 			case 'False': view = FalseView.import(circuitView, viewData); break;
 			case 'Nop': view = NopView.import(circuitView, viewData); break;
+			case 'RandomDelay': view = RandomDelayView.import(circuitView, viewData); break;
 			case 'Random': view = RandomView.import(circuitView, viewData); break;
 			case 'Button': view = ButtonView.import(circuitView, viewData); break;
 			case 'Led': view = LedView.import(circuitView, viewData); break;

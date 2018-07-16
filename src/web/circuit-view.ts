@@ -21,6 +21,7 @@ import TrueView from './node-views/true';
 import FalseView from './node-views/false';
 import NopView from './node-views/nop';
 import RandomView from './node-views/random';
+import RandomDelayView from './node-views/random-delay';
 import ButtonView from './node-views/button';
 import LedView from './node-views/led';
 import PinView from './node-views/pin';
@@ -98,6 +99,10 @@ class CircuitView {
 
 	addNop() {
 		this.addNode(new NopView(this));
+	}
+
+	addRandomDelay() {
+		this.addNode(new RandomDelayView(this));
 	}
 
 	addRandom() {

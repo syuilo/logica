@@ -16,6 +16,7 @@
 		<button onclick={ circuitView.addTrue }>True</button>
 		<button onclick={ circuitView.addFalse }>False</button>
 		<button onclick={ circuitView.addNop }>Nop</button>
+		<button onclick={ circuitView.addRandomDelay }>RndDly</button>
 		<button onclick={ circuitView.addRandom }>Rnd</button>
 		<button onclick={ circuitView.addButton }>Button</button>
 		<button onclick={ circuitView.addLed }>LED</button>

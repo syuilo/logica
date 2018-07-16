@@ -10,6 +10,7 @@ import Xor from './nodes/xor';
 import True from './nodes/true';
 import False from './nodes/false';
 import Nop from './nodes/nop';
+import RandomDelay from './nodes/random-delay';
 import Random from './nodes/random';
 import Button from './nodes/button';
 import Led from './nodes/led';
@@ -33,6 +34,7 @@ export default function(nodesData): のーど[] {
 			case 'True':          node = True.import(n);          break;
 			case 'False':         node = False.import(n);         break;
 			case 'Nop':           node = Nop.import(n);           break;
+			case 'RandomDelay':   node = RandomDelay.import(n);   break;
 			case 'Random':        node = Random.import(n);        break;
 			case 'Button':        node = Button.import(n);        break;
 			case 'Led':           node = Led.import(n);           break;
